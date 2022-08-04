@@ -24,7 +24,7 @@ switch(keyboard_key){
 		Move(directions.down);
 			break;
 	default:
-		moveInputReceived = false;
+		//moveInputReceived = false;
 }//A switch to define which direction the character is going to move before they move on screen, making it a switch means it checks in order and breaks
 
 //Gets the input of the keys the user is pressing
@@ -75,4 +75,5 @@ if (state == states.walking) { //checks if player is in walking state
 	x = _x * TILE_WIDTH;
 	y = _y * TILE_HEIGHT;
 	
+	image_index = frames[floor((walk_anim_frames - 1) * t)]
 }

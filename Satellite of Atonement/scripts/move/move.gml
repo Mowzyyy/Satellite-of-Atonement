@@ -20,6 +20,7 @@ var dy = components [1];
 		y_pos = y_to;
 		
 		state = states.walking;
+		sprite_index = sprite[dir];
 	}
 
 }

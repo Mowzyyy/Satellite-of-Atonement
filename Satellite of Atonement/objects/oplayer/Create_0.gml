@@ -24,10 +24,15 @@ y_from = y_pos;
 x_to = x_pos;//defines what x position the player is moving to
 y_to = y_pos;
 
-walk_anim_length = 0.25; //time in seconds it takes to cross one tile
+walk_anim_length = 0.5; //time in seconds it takes to cross one tile
 walk_anim_time = 0; //how far along the animation we are in seconds
 
 image_speed = 0; //stops sprite from animating
-frames = [0, 1, 2, 3];
-walk_anim_frames = 4;
+frames = [0, 1, 0, 2, 0];
+walk_anim_frames = 5;
+
+sprite[directions.right] = sLeonRight;
+sprite[directions.left] = sLeonLeft;
+sprite[directions.up] = sLeonUp;
+sprite[directions.down] = sLeonDown;
 

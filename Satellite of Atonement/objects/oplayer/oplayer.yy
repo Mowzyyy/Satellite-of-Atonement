@@ -1,7 +1,13 @@
 {
   "name": "oPlayer",
-  "spriteId": null,
-  "spriteMaskId": null,
+  "spriteId": {
+    "name": "sLeonWalking",
+    "path": "sprites/sLeonWalking/sLeonWalking.yy",
+  },
+  "spriteMaskId": {
+    "name": "sLeonWalking",
+    "path": "sprites/sLeonWalking/sLeonWalking.yy",
+  },
   "visible": true,
   "solid": false,
   "persistent": false,

@@ -19,14 +19,11 @@
     {"resourceType":"GMRInstanceLayer","resourceVersion":"1.0","name":"Instances","instances":[
         {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_37AFADD2","properties":[],"isDnd":false,"objectId":{"name":"oPlayer","path":"objects/oPlayer/oPlayer.yy",},"inheritCode":false,"hasCreationCode":false,"colour":4294967295,"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"imageIndex":0,"imageSpeed":1.0,"inheritedItemId":null,"frozen":false,"ignore":false,"inheritItemSettings":false,"x":128.0,"y":96.0,},
       ],"visible":true,"depth":0,"userdefinedDepth":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"gridX":32,"gridY":32,"layers":[],"hierarchyFrozen":false,"effectEnabled":true,"effectType":null,"properties":[],},
-    {"resourceType":"GMRTileLayer","resourceVersion":"1.1","name":"Tiles_1","tilesetId":{"name":"tileset_Dunes","path":"tilesets/tileset_Dunes/tileset_Dunes.yy",},"x":0,"y":0,"tiles":{"TileDataFormat":1,"SerialiseWidth":20,"SerialiseHeight":14,"TileCompressedData":[
--24,2,2,6,16,-18,2,1,25,-13,2,1,23,-5,2,1,25,-18,2,3,
-14,15,7,-4,2,1,10,-4,11,1,12,-8,2,2,35,25,-4,2,6,20,
-3,3,41,3,22,-9,2,1,25,-4,2,6,20,3,21,3,3,22,-9,2,
-2,13,16,-3,2,6,20,42,3,3,21,22,-14,2,1,30,-4,31,1,32,
--17,2,1,10,-6,11,-13,2,1,20,-4,3,4,41,3,2,43,-8,2,10,
-33,2,2,20,42,3,3,40,3,3,-13,2,7,20,3,3,41,3,3,42,
--13,2,3,20,3,40,-4,3,],},"visible":true,"depth":100,"userdefinedDepth":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"gridX":32,"gridY":32,"layers":[],"hierarchyFrozen":false,"effectEnabled":true,"effectType":null,"properties":[],},
+    {"resourceType":"GMRTileLayer","resourceVersion":"1.1","name":"Tiles_1","tilesetId":{"name":"tileset_Dunes","path":"tilesets/tileset_Dunes/tileset_Dunes.yy",},"x":0,"y":0,"tiles":{"TileDataFormat":1,"SerialiseWidth":48,"SerialiseHeight":40,"TileCompressedData":[
+-20,2,-28,-2147483648,-4,2,2,6,16,-14,2,-28,-2147483648,-4,2,1,25,-13,2,2,23,2,-28,-2147483648,-4,2,1,25,-15,2,-28,-2147483648,-3,2,3,14,15,7,-4,2,1,10,-4,11,1,12,-4,2,
+-28,-2147483648,-4,2,2,35,25,-4,2,6,20,3,3,41,3,22,-4,2,-28,-2147483648,-5,2,1,25,-4,2,6,20,3,21,3,3,22,-4,2,-28,-2147483648,-5,2,2,13,16,-3,2,6,20,42,3,
+3,21,22,-4,2,-28,-2147483648,-10,2,1,30,-4,31,1,32,-4,2,-28,-2147483648,-13,2,1,10,-6,11,-28,-2147483648,-13,2,1,20,-4,3,2,41,3,-28,-2147483648,2,2,43,-8,2,10,33,2,2,20,
+42,3,3,40,3,3,-28,-2147483648,-13,2,7,20,3,3,41,3,3,42,-28,-2147483648,-13,2,3,20,3,40,-4,3,-1276,-2147483648,],},"visible":true,"depth":100,"userdefinedDepth":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"gridX":32,"gridY":32,"layers":[],"hierarchyFrozen":false,"effectEnabled":true,"effectType":null,"properties":[],},
     {"resourceType":"GMRBackgroundLayer","resourceVersion":"1.0","name":"Background","spriteId":null,"colour":4278190080,"x":0,"y":0,"htiled":false,"vtiled":false,"hspeed":0.0,"vspeed":0.0,"stretch":false,"animationFPS":15.0,"animationSpeedType":0,"userdefinedAnimFPS":false,"visible":true,"depth":200,"userdefinedDepth":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"gridX":32,"gridY":32,"layers":[],"hierarchyFrozen":false,"effectEnabled":true,"effectType":null,"properties":[],},
   ],
   "inheritLayers": false,
@@ -39,8 +36,8 @@
   "sequenceId": null,
   "roomSettings": {
     "inheritRoomSettings": false,
-    "Width": 320,
-    "Height": 224,
+    "Width": 768,
+    "Height": 640,
     "persistent": false,
   },
   "viewSettings": {

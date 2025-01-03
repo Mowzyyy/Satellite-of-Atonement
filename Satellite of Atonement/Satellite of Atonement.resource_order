@@ -1,0 +1,15 @@
+{
+  "FolderOrderSettings":[],
+  "ResourceOrderSettings":[
+    {"name":"oPlayer","order":1,"path":"objects/oPlayer/oPlayer.yy",},
+    {"name":"Test","order":1,"path":"rooms/Test/Test.yy",},
+    {"name":"Move","order":1,"path":"scripts/Move/Move.yy",},
+    {"name":"PlayerAnimateSprite","order":2,"path":"scripts/PlayerAnimateSprite/PlayerAnimateSprite.yy",},
+    {"name":"sLeonLeft","order":1,"path":"sprites/sLeonLeft/sLeonLeft.yy",},
+    {"name":"sLeonRight","order":2,"path":"sprites/sLeonRight/sLeonRight.yy",},
+    {"name":"sLeonStanding","order":3,"path":"sprites/sLeonStanding/sLeonStanding.yy",},
+    {"name":"sLeonUp","order":4,"path":"sprites/sLeonUp/sLeonUp.yy",},
+    {"name":"sLeonWalking","order":5,"path":"sprites/sLeonWalking/sLeonWalking.yy",},
+    {"name":"sTileset_Dunes","order":2,"path":"sprites/sTileset_Dunes/sTileset_Dunes.yy",},
+  ],
+}

@@ -1,57 +1,69 @@
-//Track where a specific follower is in the party line
-myRank = array_get_index(global.partyOrder, object_index);
 
 //If not the leader (rank = 0), follow the person in front
-if (myRank > 0) {
-	var leader = global.partyOrder[myRank - 1]
+if (myRank == 0) {
+	// LEADER LOGIC
 	
-	//Check if the person in front has started moving
-	if (leader.state == states.walking && leader.walk_anim_t == 0) {
-		ds_list_insert(pos_x, 0, leader.x_from);
-		ds_list_insert(pos_y, 0, leader.y_from);
-		ds_list_insert(pos_dir, 0, leader.last_dir);
-	}
+	//Gets the input of the keys the user is pressing
+	keyUp = keyboard_check(vk_up) || keyboard_check(ord("W"));
+	keyDown = keyboard_check(vk_down) || keyboard_check(ord("S"))
+	keyLeft = keyboard_check(vk_left) || keyboard_check(ord("A"))
+	keyRight = keyboard_check(vk_right) || keyboard_check(ord("D"))
+	keyC = keyboard_check_pressed(ord("E")) || keyboard_check_pressed(ord("C")); //defines the Activate key as this button on the keyboard
+	keyB = keyboard_check_pressed(ord("Q")) || keyboard_check_pressed(ord("X"));
+	keyA = keyboard_check_pressed(vk_tab) || keyboard_check_pressed(ord("Z"));
 	
-	//If I have a destination and am idle, start moving
-	if (state == states.idle && ds_list_size(pos_x) > 0) {
-		x_from = x_pos;
-		y_from = y_pos;
-		
-		var _idx = ds_list_size(pos_x) -1;
-		x_to = ds_list_find_value(pos_x, _idx);
-        y_to = ds_list_find_value(pos_y, _idx);
-        last_dir = ds_list_find_value(pos_dir, _idx);
-		
-		//update the sprite to match the direction
-		sprite_index = sprite[last_dir];
-		
-		//remove the oldest recorded position after taking it
-		ds_list_delete(pos_x, _idx);
-		ds_list_delete(pos_y, _idx);
-		ds_list_delete(pos_dir, _idx);
-		
-		state = states.walking;
-		x_pos = x_to;
-		y_pos = y_to;
+//A switch to define which direction the character is going to move before they move on screen, making it a switch means it checks in order and breaks
+//Inspired directly by how Phantasy Star IV movement
+	if (state == states.idle) {
+		//placing the switch inside an if states idle check smoothens the effect of movement and feels less laggy/sluggish from input buffering
+		switch(keyboard_key){ 
+			case vk_left:
+			case ord("A"):
+				Move(directions.left);
+					break;
+	
+			case vk_right:
+			case ord("D"):
+				Move(directions.right);
+					break;
+
+			case vk_up:
+			case ord("W"):
+				Move(directions.up);
+					break;
+	
+			case vk_down:
+			case ord("S"):
+				Move(directions.down);
+					break;
+			default:
+				//moveInputReceived = false;
+		}
 	}
 }
 
 //movement script, identical to script from oPlayer Step Event
-if (state == states.walking) {
-	walk_anim_time += delta_time / 1000000;
-	var t = walk_anim_time / walk_anim_length;
-	
-	if (t >= 1) {
-		walk_anim_time = 0;
-		t = 1;
-		state = states.idle;
+if (state == states.walking){
+	//only the leader progresses the clock
+	if (myRank == 0) {
+		walk_anim_time += delta_time / 1000000;
 	}
 	
-	var _x = lerp(x_from, x_to, t);
-	var _y = lerp(y_from, y_to, t);
+	var _t = clamp(walk_anim_time / walk_anim_length, 0 ,1);
 	
-	x = _x * TILE_WIDTH;
-	y = _y * TILE_HEIGHT;
+	//only the leader resets the state
+	//followers will be reset in the end step
+	if (myRank == 0 && walk_anim_time >= walk_anim_length) {
+		walk_anim_time = 0;
+		state = states.idle;
+		x_pos = x_to;
+		y_pos = y_to;
+	}
 	
-	image_index = frames[floor((walk_anim_frames - 1) * t)];
+	x = lerp(x_from, x_to, _t) * TILE_WIDTH;
+	y = lerp(y_from, y_to, _t) * TILE_HEIGHT;
+	
+	if (is_array(frames) && array_length(frames) > 0) {
+		image_index = frames[floor((array_length(frames) - 1) * _t)];
+	}
 }

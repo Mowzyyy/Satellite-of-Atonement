@@ -1,14 +1,16 @@
 {
   "FolderOrderSettings":[
-    {"name":"Followers","order":5,"path":"folders/Objects/Followers.yy",},
+    {"name":"Characters","order":5,"path":"folders/Objects/Characters.yy",},
     {"name":"Coat","order":3,"path":"folders/Sprites/Coat.yy",},
     {"name":"Osei","order":4,"path":"folders/Sprites/Osei.yy",},
   ],
   "ResourceOrderSettings":[
+    {"name":"oAnna","order":4,"path":"objects/oAnna/oAnna.yy",},
     {"name":"oCoat","order":1,"path":"objects/oCoat/oCoat.yy",},
+    {"name":"oData","order":5,"path":"objects/oData/oData.yy",},
     {"name":"oGameController","order":2,"path":"objects/oGameController/oGameController.yy",},
+    {"name":"oLeon","order":3,"path":"objects/oLeon/oLeon.yy",},
     {"name":"oOsei","order":2,"path":"objects/oOsei/oOsei.yy",},
-    {"name":"oPlayer","order":1,"path":"objects/oPlayer/oPlayer.yy",},
     {"name":"Test","order":1,"path":"rooms/Test/Test.yy",},
     {"name":"Move","order":1,"path":"scripts/Move/Move.yy",},
     {"name":"PlayerAnimateSprite","order":2,"path":"scripts/PlayerAnimateSprite/PlayerAnimateSprite.yy",},

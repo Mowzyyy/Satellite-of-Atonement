@@ -15,6 +15,16 @@
     {"$GMFolder":"","%Name":"Fonts","folderPath":"folders/Fonts.yy","name":"Fonts","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Notes","folderPath":"folders/Notes.yy","name":"Notes","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Objects","folderPath":"folders/Objects.yy","name":"Objects","resourceType":"GMFolder","resourceVersion":"2.0",},
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+    {"$GMFolder":"","%Name":"Characters","folderPath":"folders/Objects/Characters.yy","name":"Characters","resourceType":"GMFolder","resourceVersion":"2.0",},
+=======
+>>>>>>> parent of 8f74867 (Followers)
+=======
+>>>>>>> parent of 8f74867 (Followers)
+=======
+>>>>>>> parent of 8f74867 (Followers)
     {"$GMFolder":"","%Name":"Paths","folderPath":"folders/Paths.yy","name":"Paths","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Rooms","folderPath":"folders/Rooms.yy","name":"Rooms","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Scripts","folderPath":"folders/Scripts.yy","name":"Scripts","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -36,8 +46,25 @@
   },
   "name":"Satellite of Atonement",
   "resources":[
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+    {"id":{"name":"oAnna","path":"objects/oAnna/oAnna.yy",},},
+    {"id":{"name":"oCamera","path":"objects/oCamera/oCamera.yy",},},
+    {"id":{"name":"oCoat","path":"objects/oCoat/oCoat.yy",},},
+    {"id":{"name":"oData","path":"objects/oData/oData.yy",},},
+    {"id":{"name":"oFollowerParent","path":"objects/oFollowerParent/oFollowerParent.yy",},},
+    {"id":{"name":"oGameController","path":"objects/oGameController/oGameController.yy",},},
+    {"id":{"name":"oLeon","path":"objects/oLeon/oLeon.yy",},},
+    {"id":{"name":"oOsei","path":"objects/oOsei/oOsei.yy",},},
+=======
+=======
+>>>>>>> parent of 8f74867 (Followers)
+=======
+>>>>>>> parent of 8f74867 (Followers)
     {"id":{"name":"oPlayer","path":"objects/oPlayer/oPlayer.yy",},},
     {"id":{"name":"oTest","path":"objects/oTest/oTest.yy",},},
+>>>>>>> parent of 8f74867 (Followers)
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
     {"id":{"name":"Test","path":"rooms/Test/Test.yy",},},
     {"id":{"name":"MACROS","path":"scripts/MACROS/MACROS.yy",},},

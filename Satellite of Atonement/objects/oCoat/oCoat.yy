@@ -8,8 +8,8 @@
   "name":"oCoat",
   "overriddenProperties":[],
   "parent":{
-    "name":"Followers",
-    "path":"folders/Objects/Followers.yy",
+    "name":"Characters",
+    "path":"folders/Objects/Characters.yy",
   },
   "parentObjectId":{
     "name":"oFollowerParent",

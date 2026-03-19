@@ -2,12 +2,19 @@ gml_pragma("global", "MACROS()"); //globals need to be called before they can be
 #macro TILE_WIDTH 16
 #macro TILE_HEIGHT 16
 
+//creates the directions
 enum directions {
 		right,
 		up,
 		left,
 		down
-} //creates the directions
+} 
+
+//creates the idle and walking states
+enum states {
+	idle,
+	walking
+}
 
 global.components = [];
 global.components[directions.right] = [1,0];

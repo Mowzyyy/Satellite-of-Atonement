@@ -1,34 +1,9 @@
 {
   "FolderOrderSettings":[
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    {"name":"Characters","order":5,"path":"folders/Objects/Characters.yy",},
-=======
->>>>>>> parent of 8f74867 (Followers)
     {"name":"Coat","order":3,"path":"folders/Sprites/Coat.yy",},
   ],
   "ResourceOrderSettings":[
-<<<<<<< HEAD
-    {"name":"oAnna","order":4,"path":"objects/oAnna/oAnna.yy",},
-    {"name":"oCoat","order":1,"path":"objects/oCoat/oCoat.yy",},
-    {"name":"oData","order":5,"path":"objects/oData/oData.yy",},
-    {"name":"oGameController","order":2,"path":"objects/oGameController/oGameController.yy",},
-    {"name":"oLeon","order":3,"path":"objects/oLeon/oLeon.yy",},
-    {"name":"oOsei","order":2,"path":"objects/oOsei/oOsei.yy",},
-=======
-=======
-    {"name":"Coat","order":3,"path":"folders/Sprites/Coat.yy",},
-  ],
-  "ResourceOrderSettings":[
->>>>>>> parent of 8f74867 (Followers)
-=======
-    {"name":"Coat","order":3,"path":"folders/Sprites/Coat.yy",},
-  ],
-  "ResourceOrderSettings":[
->>>>>>> parent of 8f74867 (Followers)
     {"name":"oPlayer","order":1,"path":"objects/oPlayer/oPlayer.yy",},
->>>>>>> parent of 8f74867 (Followers)
     {"name":"Test","order":1,"path":"rooms/Test/Test.yy",},
     {"name":"Move","order":1,"path":"scripts/Move/Move.yy",},
     {"name":"PlayerAnimateSprite","order":2,"path":"scripts/PlayerAnimateSprite/PlayerAnimateSprite.yy",},

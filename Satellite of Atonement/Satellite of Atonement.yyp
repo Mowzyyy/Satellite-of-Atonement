@@ -17,7 +17,10 @@
     {"$GMFolder":"","%Name":"Objects","folderPath":"folders/Objects.yy","name":"Objects","resourceType":"GMFolder","resourceVersion":"2.0",},
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     {"$GMFolder":"","%Name":"Characters","folderPath":"folders/Objects/Characters.yy","name":"Characters","resourceType":"GMFolder","resourceVersion":"2.0",},
+=======
+>>>>>>> parent of 8f74867 (Followers)
 =======
 >>>>>>> parent of 8f74867 (Followers)
 =======
@@ -45,6 +48,7 @@
   "resources":[
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     {"id":{"name":"oAnna","path":"objects/oAnna/oAnna.yy",},},
     {"id":{"name":"oCamera","path":"objects/oCamera/oCamera.yy",},},
     {"id":{"name":"oCoat","path":"objects/oCoat/oCoat.yy",},},
@@ -54,6 +58,8 @@
     {"id":{"name":"oLeon","path":"objects/oLeon/oLeon.yy",},},
     {"id":{"name":"oOsei","path":"objects/oOsei/oOsei.yy",},},
 =======
+=======
+>>>>>>> parent of 8f74867 (Followers)
 =======
 >>>>>>> parent of 8f74867 (Followers)
     {"id":{"name":"oPlayer","path":"objects/oPlayer/oPlayer.yy",},},

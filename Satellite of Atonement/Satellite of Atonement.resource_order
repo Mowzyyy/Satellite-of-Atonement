@@ -2,7 +2,6 @@
   "FolderOrderSettings":[
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
     {"name":"Characters","order":5,"path":"folders/Objects/Characters.yy",},
 =======
 >>>>>>> parent of 8f74867 (Followers)
@@ -17,11 +16,6 @@
     {"name":"oLeon","order":3,"path":"objects/oLeon/oLeon.yy",},
     {"name":"oOsei","order":2,"path":"objects/oOsei/oOsei.yy",},
 =======
-=======
-    {"name":"Coat","order":3,"path":"folders/Sprites/Coat.yy",},
-  ],
-  "ResourceOrderSettings":[
->>>>>>> parent of 8f74867 (Followers)
 =======
     {"name":"Coat","order":3,"path":"folders/Sprites/Coat.yy",},
   ],

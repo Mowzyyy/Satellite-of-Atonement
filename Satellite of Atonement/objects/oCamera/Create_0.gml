@@ -16,3 +16,11 @@ if (_target != noone) {
 	x = _target.x;
 	y = _target.y;
 }
+
+//store smooth subpixel center
+x = _target.x + (TILE_WIDTH /2);//initial
+y = _target.y + (TILE_HEIGHT / 2);
+
+//global frac variables
+global.cam_frac_x = 0;
+global.cam_frac_y = 0;

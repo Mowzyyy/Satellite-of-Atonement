@@ -37,12 +37,3 @@ sprite[directions.right] = noone;
 sprite[directions.left] = noone;
 sprite[directions.up] = noone;
 sprite[directions.down] = noone;
-
-//Track where a specific follower is in the party line
-myRank = -1;
-for (var slot = 0; slot < array_length(global.partyOrder); slot++) {
-	if (global.partyOrder[slot] == object_index){
-		myRank = slot;
-		break;
-	}
-}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"MenuEnums",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"MenuEnums",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

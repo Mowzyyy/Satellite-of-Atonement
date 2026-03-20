@@ -49,6 +49,8 @@
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
     {"id":{"name":"Test","path":"rooms/Test/Test.yy",},},
     {"id":{"name":"MACROS","path":"scripts/MACROS/MACROS.yy",},},
+    {"id":{"name":"MenuEnums","path":"scripts/MenuEnums/MenuEnums.yy",},},
+    {"id":{"name":"MenuFunctions","path":"scripts/MenuFunctions/MenuFunctions.yy",},},
     {"id":{"name":"Move","path":"scripts/Move/Move.yy",},},
     {"id":{"name":"PlayerAnimateSprite","path":"scripts/PlayerAnimateSprite/PlayerAnimateSprite.yy",},},
     {"id":{"name":"StoryVariables","path":"scripts/StoryVariables/StoryVariables.yy",},},

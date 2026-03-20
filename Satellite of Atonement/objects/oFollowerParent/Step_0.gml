@@ -2,15 +2,6 @@
 if (myRank == 0) {
 	// LEADER LOGIC
 	
-	//Gets the input of the keys the user is pressing
-	keyUp = keyboard_check(vk_up) || keyboard_check(ord("W"));
-	keyDown = keyboard_check(vk_down) || keyboard_check(ord("S"))
-	keyLeft = keyboard_check(vk_left) || keyboard_check(ord("A"))
-	keyRight = keyboard_check(vk_right) || keyboard_check(ord("D"))
-	keyC = keyboard_check_pressed(ord("E")) || keyboard_check_pressed(ord("C")); //defines the Activate key as this button on the keyboard
-	keyB = keyboard_check_pressed(ord("Q")) || keyboard_check_pressed(ord("X"));
-	keyA = keyboard_check_pressed(vk_tab) || keyboard_check_pressed(ord("Z"));
-	
 	//A switch to define which direction the character is going to move before they move on screen, making it a switch means it checks in order and breaks
 	//Inspired directly by how Phantasy Star IV movement
 	if (state == states.idle) {

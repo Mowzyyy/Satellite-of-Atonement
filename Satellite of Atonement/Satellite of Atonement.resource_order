@@ -12,6 +12,8 @@
     {"name":"oLeon","order":3,"path":"objects/oLeon/oLeon.yy",},
     {"name":"oOsei","order":2,"path":"objects/oOsei/oOsei.yy",},
     {"name":"Test","order":1,"path":"rooms/Test/Test.yy",},
+    {"name":"MenuEnums","order":4,"path":"scripts/MenuEnums/MenuEnums.yy",},
+    {"name":"MenuFunctions","order":5,"path":"scripts/MenuFunctions/MenuFunctions.yy",},
     {"name":"Move","order":1,"path":"scripts/Move/Move.yy",},
     {"name":"PlayerAnimateSprite","order":2,"path":"scripts/PlayerAnimateSprite/PlayerAnimateSprite.yy",},
     {"name":"StoryVariables","order":3,"path":"scripts/StoryVariables/StoryVariables.yy",},

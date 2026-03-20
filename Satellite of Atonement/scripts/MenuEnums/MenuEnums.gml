@@ -26,3 +26,15 @@ enum BATTLE_PHASE {
 	EXECUTE_TURN,
 	WIN_LOSS
 }
+
+enum TITLE_STAGE {
+	SPLASH_1,
+	SPLASH_2,
+	TITLE_IDLE,//Background showing, waiting for "Press Start"
+	MENU_ACTIVE//The actual selectable options appear
+}
+
+enum MENU_VARIANT {
+		NEW_PLAYER,//only new game and misc 
+		RETURNING//allows to load game
+}

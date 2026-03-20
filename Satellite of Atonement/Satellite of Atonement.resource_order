@@ -2,6 +2,8 @@
   "FolderOrderSettings":[
     {"name":"Characters","order":5,"path":"folders/Objects/Characters.yy",},
     {"name":"Coat","order":3,"path":"folders/Sprites/Coat.yy",},
+    {"name":"UI","order":9,"path":"folders/Sprites/UI.yy",},
+    {"name":"Main Menu","order":7,"path":"folders/Sprites/Main Menu.yy",},
     {"name":"Osei","order":4,"path":"folders/Sprites/Osei.yy",},
   ],
   "ResourceOrderSettings":[
@@ -10,7 +12,9 @@
     {"name":"oData","order":5,"path":"objects/oData/oData.yy",},
     {"name":"oGameController","order":2,"path":"objects/oGameController/oGameController.yy",},
     {"name":"oLeon","order":3,"path":"objects/oLeon/oLeon.yy",},
+    {"name":"oMainMenu","order":6,"path":"objects/oMainMenu/oMainMenu.yy",},
     {"name":"oOsei","order":2,"path":"objects/oOsei/oOsei.yy",},
+    {"name":"rmTitle","order":2,"path":"rooms/rmTitle/rmTitle.yy",},
     {"name":"Test","order":1,"path":"rooms/Test/Test.yy",},
     {"name":"MenuEnums","order":4,"path":"scripts/MenuEnums/MenuEnums.yy",},
     {"name":"MenuFunctions","order":5,"path":"scripts/MenuFunctions/MenuFunctions.yy",},
@@ -27,6 +31,8 @@
     {"name":"sLeonStanding","order":3,"path":"sprites/sLeonStanding/sLeonStanding.yy",},
     {"name":"sLeonUp","order":4,"path":"sprites/sLeonUp/sLeonUp.yy",},
     {"name":"sLeonWalking","order":5,"path":"sprites/sLeonWalking/sLeonWalking.yy",},
+    {"name":"sLogoEngine","order":2,"path":"sprites/sLogoEngine/sLogoEngine.yy",},
+    {"name":"sLogoStudio","order":1,"path":"sprites/sLogoStudio/sLogoStudio.yy",},
     {"name":"sOseiLeft","order":1,"path":"sprites/sOseiLeft/sOseiLeft.yy",},
     {"name":"sOseiRight","order":2,"path":"sprites/sOseiRight/sOseiRight.yy",},
     {"name":"sOseiStanding","order":4,"path":"sprites/sOseiStanding/sOseiStanding.yy",},

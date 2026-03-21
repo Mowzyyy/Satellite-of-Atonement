@@ -5,29 +5,35 @@ if (myRank == 0) {
 	//A switch to define which direction the character is going to move before they move on screen, making it a switch means it checks in order and breaks
 	//Inspired directly by how Phantasy Star IV movement
 	if (state == states.idle) {
+		
+		var input_dir = -1;
+		
+		if (global.keyLeft) input_dir = directions.left;
+		else if (global.keyRight) input_dir = directions.right;
+		else if (global.keyUp) input_dir = directions.up;
+		else if (global.keyDown) input_dir = directions.down;
+		
 		//placing the switch inside an if states idle check smoothens the effect of movement and feels less laggy/sluggish from input buffering
-		switch(keyboard_key){ 
-			case vk_left:
-			case ord("A"):
+		switch(input_dir){ 
+			case directions.left:
 				Move(directions.left);
 					break;
 	
-			case vk_right:
-			case ord("D"):
+			case directions.right:
 				Move(directions.right);
 					break;
 
-			case vk_up:
-			case ord("W"):
+			case directions.up:
 				Move(directions.up);
 					break;
 	
-			case vk_down:
-			case ord("S"):
+			case directions.down:
 				Move(directions.down);
 					break;
 			default:
-				//moveInputReceived = false;
+				//no movement input
+				//moveInputReceived = false; //uncomment if flag is in use
+				break;
 		}
 	}
 }

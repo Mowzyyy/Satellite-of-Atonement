@@ -24,10 +24,10 @@
     {"$GMFolder":"","%Name":"Sounds","folderPath":"folders/Sounds.yy","name":"Sounds","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Sprites","folderPath":"folders/Sprites.yy","name":"Sprites","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Coat","folderPath":"folders/Sprites/Coat.yy","name":"Coat","resourceType":"GMFolder","resourceVersion":"2.0",},
-    {"$GMFolder":"","%Name":"UI","folderPath":"folders/Sprites/UI.yy","name":"UI","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Leon","folderPath":"folders/Sprites/Leon.yy","name":"Leon","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Main Menu","folderPath":"folders/Sprites/Main Menu.yy","name":"Main Menu","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Osei","folderPath":"folders/Sprites/Osei.yy","name":"Osei","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"UI","folderPath":"folders/Sprites/UI.yy","name":"UI","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Tile Sets","folderPath":"folders/Tile Sets.yy","name":"Tile Sets","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Timelines","folderPath":"folders/Timelines.yy","name":"Timelines","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
@@ -40,6 +40,7 @@
   },
   "name":"Satellite of Atonement",
   "resources":[
+    {"id":{"name":"ftDefault","path":"fonts/ftDefault/ftDefault.yy",},},
     {"id":{"name":"oAnna","path":"objects/oAnna/oAnna.yy",},},
     {"id":{"name":"oCamera","path":"objects/oCamera/oCamera.yy",},},
     {"id":{"name":"oCoat","path":"objects/oCoat/oCoat.yy",},},
@@ -58,6 +59,8 @@
     {"id":{"name":"PlayerAnimateSprite","path":"scripts/PlayerAnimateSprite/PlayerAnimateSprite.yy",},},
     {"id":{"name":"StoryVariables","path":"scripts/StoryVariables/StoryVariables.yy",},},
     {"id":{"name":"sBackgroundMain","path":"sprites/sBackgroundMain/sBackgroundMain.yy",},},
+    {"id":{"name":"sBasicGUI","path":"sprites/sBasicGUI/sBasicGUI.yy",},},
+    {"id":{"name":"sBlink","path":"sprites/sBlink/sBlink.yy",},},
     {"id":{"name":"sCoatDown","path":"sprites/sCoatDown/sCoatDown.yy",},},
     {"id":{"name":"sCoatLeft","path":"sprites/sCoatLeft/sCoatLeft.yy",},},
     {"id":{"name":"sCoatRight","path":"sprites/sCoatRight/sCoatRight.yy",},},
@@ -84,8 +87,8 @@
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
-    {"roomId":{"name":"Test","path":"rooms/Test/Test.yy",},},
     {"roomId":{"name":"rmTitle","path":"rooms/rmTitle/rmTitle.yy",},},
+    {"roomId":{"name":"Test","path":"rooms/Test/Test.yy",},},
   ],
   "templateType":null,
   "TextureGroups":[

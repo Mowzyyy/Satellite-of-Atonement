@@ -10,12 +10,23 @@ switch (stage) {
 			draw_sprite(sLogoEngine, 0, 0, 0)
 			break;
 		case TITLE_STAGE.TITLE_IDLE:
-			if (show_press_start) {
-				if ((blink_timer mod 60) < 30) {
-					draw_text(room_width/2, room_height - 100, "Press E or C");
+				if (show_press_start) {
+					if ((current_time mod 1000) < 500) {
+						draw_set_halign(fa_center);
+						draw_set_color(c_white);
+						draw_set_alpha(1.0);
+				
+						var prompt_text = "Press E or C";
+						var center_x = room_width / 2;
+						var y_pos = room_height / 2;
+				
+						draw_text(center_x, y_pos, prompt_text);
+				
+						draw_set_halign(fa_left);
+					}
 				}
-			}
-			break;
+				break;
+
 		
 		case TITLE_STAGE.MENU_ACTIVE:
 			// -- Auto-menu using sBasicGUI

@@ -15,3 +15,4 @@ if (file_exists("save0.dat")) {
 cursor_index = 0;
 show_press_start = false;
 blink_timer = 0;
+prompt_start_time=0;

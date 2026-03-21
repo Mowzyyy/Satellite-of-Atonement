@@ -10,10 +10,8 @@ if (stage != TITLE_STAGE.MENU_ACTIVE) {
 		stage_timer = 0;//reset immediately
 	}
 	
-	show_debug_message("Stage: " + string(stage) + " | Timer: " + string(stage_timer) + " | Advance this frame: " + string(advance));
-	
 	//input skip: also only once per press
-	if (global.keyC) {
+	if (global.keyC && stage != TITLE_STAGE.TITLE_IDLE) {
 		advance = true;
 		stage_timer = 0;
 	}
@@ -23,14 +21,23 @@ if (stage != TITLE_STAGE.MENU_ACTIVE) {
 			stage = TITLE_STAGE.SPLASH_2;
 		} else if (stage == TITLE_STAGE.SPLASH_2) {
 			stage = TITLE_STAGE.TITLE_IDLE;
-		} else if (stage == TITLE_STAGE.TITLE_IDLE) {
-			stage = TITLE_STAGE.MENU_ACTIVE;
 		}
 	}
 	
-	//show press E or C after delay on title idle
-	if (stage == TITLE_STAGE.TITLE_IDLE && stage_timer > 60) {
+	//show blinking prompt
+	if (stage == TITLE_STAGE.TITLE_IDLE && stage_timer > 60 && !show_press_start) {
 		show_press_start = true;
+		prompt_start_time = current_time;
+	}
+
+	
+	//press E or C to hide prompt and go to menu
+	if (stage == TITLE_STAGE.TITLE_IDLE && show_press_start) {
+		if (keyboard_check_pressed(ord("E")) || keyboard_check_pressed(ord("C"))) {
+			show_press_start = false;
+			stage = TITLE_STAGE.MENU_ACTIVE;
+			stage_timer = 0;
+		}
 	}
 }
 
@@ -57,4 +64,3 @@ else {
 
 //Blinking cursor timer
 blink_timer++;
-		

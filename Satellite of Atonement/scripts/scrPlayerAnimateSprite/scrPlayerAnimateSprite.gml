@@ -1,5 +1,5 @@
 //Update Sprite
-function PlayerAnimateSprite(){
+function scrPlayerAnimateSprite(){
 	var _cardinalDirection = round(direction/90); //gets the cardinal direction as an integer 0-3
 	var _totalFrames = sprite_get_number(sprite_index) / 4; //chops up the total frames by the number of directions
 	image_index = localFrame + (_cardinalDirection * _totalFrames); //to get image index, take the local frame plut the direction multiplied by total frames in the animation

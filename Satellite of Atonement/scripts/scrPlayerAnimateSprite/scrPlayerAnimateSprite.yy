@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"MenuFunctions",
+  "%Name":"scrPlayerAnimateSprite",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"MenuFunctions",
+  "name":"scrPlayerAnimateSprite",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",

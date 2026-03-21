@@ -16,19 +16,19 @@ if (myRank == 0) {
 		//placing the switch inside an if states idle check smoothens the effect of movement and feels less laggy/sluggish from input buffering
 		switch(input_dir){ 
 			case directions.left:
-				Move(directions.left);
+				scrMove(directions.left);
 					break;
 	
 			case directions.right:
-				Move(directions.right);
+				scrMove(directions.right);
 					break;
 
 			case directions.up:
-				Move(directions.up);
+				scrMove(directions.up);
 					break;
 	
 			case directions.down:
-				Move(directions.down);
+				scrMove(directions.down);
 					break;
 			default:
 				//no movement input

@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"Move",
+  "%Name":"scrStoryVariables",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"Move",
+  "name":"scrStoryVariables",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",

@@ -1,4 +1,4 @@
-function Move(_dir){
+function scrMove(_dir){
     var components = global.components[_dir];
     var dx = components[0];
     var dy = components[1];

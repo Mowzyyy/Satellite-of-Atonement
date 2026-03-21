@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"StoryVariables",
+  "%Name":"scrMenuFunctions",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"StoryVariables",
+  "name":"scrMenuFunctions",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",

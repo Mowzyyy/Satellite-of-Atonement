@@ -33,7 +33,7 @@ if (stage != TITLE_STAGE.MENU_ACTIVE) {
 	
 	//press E or C to hide prompt and go to menu
 	if (stage == TITLE_STAGE.TITLE_IDLE && show_press_start) {
-		if (keyboard_check_pressed(ord("E")) || keyboard_check_pressed(ord("C"))) {
+		if (global.keyC) {
 			show_press_start = false;
 			stage = TITLE_STAGE.MENU_ACTIVE;
 			stage_timer = 0;
@@ -50,7 +50,9 @@ else {
 		var _choice = menu_options[cursor_index];
 		switch(_choice) {
 			case "New Game":
-				room_goto(Test);
+				global.state = GAME_STATE.OVERWORLD;
+				instance_destroy();
+				room_goto(rmTest);
 				break;
 			case "Continue":
 				//scr_load_game(0);

@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"MenuEnums",
+  "%Name":"scrMenuEnums",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"MenuEnums",
+  "name":"scrMenuEnums",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",

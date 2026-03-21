@@ -1,17 +1,17 @@
 {
   "$GMRoom":"v1",
-  "%Name":"Test",
+  "%Name":"rmTest",
   "creationCodeFile":"",
   "inheritCode":false,
   "inheritCreationOrder":false,
   "inheritLayers":false,
   "instanceCreationOrder":[
-    {"name":"inst_24BA67A3","path":"rooms/Test/Test.yy",},
-    {"name":"inst_Leon","path":"rooms/Test/Test.yy",},
-    {"name":"inst_79D93EC3","path":"rooms/Test/Test.yy",},
-    {"name":"inst_Coat","path":"rooms/Test/Test.yy",},
-    {"name":"inst_5B7CEB1F","path":"rooms/Test/Test.yy",},
-    {"name":"inst_134997B7","path":"rooms/Test/Test.yy",},
+    {"name":"inst_24BA67A3","path":"rooms/rmTest/rmTest.yy",},
+    {"name":"inst_Leon","path":"rooms/rmTest/rmTest.yy",},
+    {"name":"inst_79D93EC3","path":"rooms/rmTest/rmTest.yy",},
+    {"name":"inst_Coat","path":"rooms/rmTest/rmTest.yy",},
+    {"name":"inst_5B7CEB1F","path":"rooms/rmTest/rmTest.yy",},
+    {"name":"inst_134997B7","path":"rooms/rmTest/rmTest.yy",},
   ],
   "isDnd":false,
   "layers":[
@@ -35,7 +35,7 @@
         ],"TileDataFormat":1,},"tilesetId":{"name":"tileset_Dunes","path":"tilesets/tileset_Dunes/tileset_Dunes.yy",},"userdefinedDepth":false,"visible":true,"x":0,"y":0,},
     {"$GMRBackgroundLayer":"","%Name":"Background","animationFPS":15.0,"animationSpeedType":0,"colour":4278190080,"depth":300,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"hspeed":0.0,"htiled":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"layers":[],"name":"Background","properties":[],"resourceType":"GMRBackgroundLayer","resourceVersion":"2.0","spriteId":null,"stretch":false,"userdefinedAnimFPS":false,"userdefinedDepth":false,"visible":true,"vspeed":0.0,"vtiled":false,"x":0,"y":0,},
   ],
-  "name":"Test",
+  "name":"rmTest",
   "parent":{
     "name":"Rooms",
     "path":"folders/Rooms.yy",

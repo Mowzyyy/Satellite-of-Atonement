@@ -15,15 +15,26 @@ switch (global.state) {
 		break;
 	
 	case GAME_STATE.OVERWORLD:
-		if (keyA) {
+		if (global.keyA) {
 			global.state = GAME_STATE.IN_GAME_MENU;
 			global.menu_page = MENU_PAGE.MAIN;
+			menu_cursor = 0;
 			instance_deactivate_all(true);//pause the world
+			//audio_play_sound(sndExample, 10, false);
 		}
 			break;
 		
 		case GAME_STATE.IN_GAME_MENU:
+			//Navigation and selection, expand later
+			blink_timer++;
 			scrMenuPauseLogic();
+			
+			//Close menu with A or B
+			if (global.keyA || global.keyB) {
+				global.state = GAME_STATE.OVERWORLD;
+				instance_activate_all();
+				//audio_play_sound(sndEample, 10, false);
+			}
 			break;
 			
 			case GAME_STATE.BATTLE:

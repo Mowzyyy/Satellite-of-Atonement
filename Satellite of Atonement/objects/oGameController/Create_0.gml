@@ -7,7 +7,7 @@ global.partyStatus = {
 	data: false,
 }
 //party order index
-global.partyOrder = [oLeon, oCoat, oOsei, oAnna, oData];
+global.partyOrder = [oLeon, oCoat, oOsei, oAnna];
 
 
 //Below section manages the entirety of the main story linear variables enumerated in the StoryVariables script
@@ -57,14 +57,34 @@ draw_set_color(c_white);
 //==================================GUI Card Settings==================================
 var total_width = (3 * global.card_w) + (2 * global.card_gap);
 var start_x = (320 - total_width) / 2;//center horizontally - 320 = base_width
-	
+
 global.card_positions = array_create(6);
-	
+
 global.card_positions[0] = {x: start_x, y: 240 - global.card_bottom_margin - global.card_h * 2 - global.card_gap};
 global.card_positions[1] = {x: start_x + global.card_w + global.card_gap, y: global.card_positions[0].y};
 global.card_positions[2] = {x: start_x + (global.card_w + global.card_gap) * 2, y: global.card_positions[0].y};
-	
+
 global.card_positions[3] = {x: start_x, y: global.card_positions[0].y + global.card_h + global.card_gap};
 global.card_positions[4] = {x: global.card_positions[1].x, y: global.card_positions[3].y};
 global.card_positions[5] = {x: global.card_positions[2].x, y: global.card_positions[3].y};
-	
+
+global.party_card_map = [0, 2, 3, 5];
+
+//psiii style menu list
+global.menu_list = [
+"ITEM", "SKILL", "EQUIP",
+"STATS", "ORDER", "TALK",
+"MACRO", "CONFIG", "SAVE"
+];
+
+global.menu_page_map = [
+MENU_PAGE.INVENTORY,
+MENU_PAGE.SKILLS,
+MENU_PAGE.EQUIP,
+MENU_PAGE.STATS,
+MENU_PAGE.ORDER,
+MENU_PAGE.TALK,
+MENU_PAGE.MACRO,
+MENU_PAGE.SETTINGS,
+MENU_PAGE.SAVE
+];

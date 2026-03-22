@@ -43,7 +43,7 @@ if (stage != TITLE_STAGE.MENU_ACTIVE) {
 
 //menu navigation logic
 else {
-	var _move = global.keyDown - global.keyUp;
+	var _move = global.keyDownPressed - global.keyUpPressed;
 	cursor_index = clamp(cursor_index + _move, 0, array_length(menu_options) - 1);
 	
 	if (global.keyC) {

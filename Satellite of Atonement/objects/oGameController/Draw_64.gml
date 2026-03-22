@@ -1,5 +1,6 @@
 //============================Global Menu GUI============================
 if (global.state == GAME_STATE.IN_GAME_MENU) {
+	show_debug_message("Drawing ingame menu- state is correct");
 	//draw the 6 cards
 	for (var i = 0; i < 6; i++) {
 		var cx = global.card_positions[i].x;
@@ -7,39 +8,65 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 		
 		//draw 9-slice card bg
 		draw_sprite_stretched(sBasicGUI, 0, cx, cy, global.card_w, global.card_h);
+	}
 		
-		//draw the content inside each card
-		//example placeholder text
+	//middle cards: menu list split vertically
+	var top_middle = global.card_positions[1];//top middle card
+	var bot_middle = global.card_positions[4];//bottom middle card
+		
+	//top middle: first 4 options
+	for (var i = 0; i < 4; i++) {
+		var col = (menu_cursor == i) ? c_yellow : c_white;
+		var _y = top_middle.y + 20 + (i * 20);
+		draw_text_color(top_middle.x + 8 + 12, _y, global.menu_list[i], col, col, col, col, 1);
+	}
+		
+	//bottom middle card: remaining 5 options
+	for (var i = 4; i < 9; i++) {
+		var col = (menu_cursor == i) ? c_yellow : c_white;
+		var _y = bot_middle.y + 12 + ((i-4) * 20);
+		draw_text_color(bot_middle.x + 8 + 12, _y, global.menu_list[i], col, col, col, col, 1);
+	}
+		
+	//blinking cursor on the active options
+	var cursor_card = (menu_cursor < 4) ? global.card_positions[1] : global.card_positions[4];
+	var line_in_card = (menu_cursor < 4) ? menu_cursor : menu_cursor - 4;
+	var cursor_y = cursor_card.y + 20 + (line_in_card * 20);
+	if (menu_cursor >= 4) {
+		cursor_y -= 8;//move 8 pixels higher on bottom card only
+	}
+	
+	//keep the cursor 4 pixels to the left of content
+	var text_x = cursor_card.x + 12 + 12;//matches the text x position
+	var cursor_x = text_x - 8 - 8; //4 px left of text with 8px offset
+		
+	var _blink_on = (blink_timer mod 40) < 20;
+	var _cursor_spr = _blink_on ? sCursor : sBlink;
+	draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
+		
+	//side cards - party members
+	for (var p = 0; p <  array_length(global.partyOrder); p++) {
+		var party_obj = global.partyOrder[p];
+		
+		//get a display name
+		if (party_obj == oLeon) display_name = "LEON";
+		if (party_obj == oCoat) display_name = "COAT";
+		if (party_obj == oOsei) display_name = "OSEI";
+		if (party_obj == oAnna) display_name = "ANNA";
+		if (party_obj == oData) display_name = "DATA";
+		
+		var card_idx = global.party_card_map[p];//[0, 2, 3, 5]
+		var c = global.card_positions[card_idx];
+		
 		draw_set_halign(fa_center);
-		draw_set_valign(fa_middle);
-		draw_set_color(c_white);
-		
-		var label;
-		switch (i) {
-			case 0: label = "Inventory"; break;
-			case 1: label = "Skills"; break;
-			case 2: label = "Equip"; break;
-			case 3: label = "Stats"; break;
-			case 4: label = "Order"; break;
-			case 5: label = "Settings"; break;
-		}
-		
-		draw_text(cx + global.card_w/2, cy + global.card_h/2, label);
+		draw_text(c.x + global.card_w/2, c.y + 30, display_name);
+		draw_set_halign(fa_left);
+		//later add HP and MP, protraits, etc
 	}
-	
-	//Blinking cursor
-	if (global.menu_page == MENU_PAGE.MAIN) {
-		var sel_x = global.card_positions[menu_cursor].x;
-		var sel_y = global.card_positions[menu_cursor].y;
 		
-		var _blink_on = (blink_timer mod 40) < 20;
-		var _cursor_spr = _blink_on ? sCursor : sBlink;
-		
-		//place cursor left of card
-		draw_sprite(_cursor_spr, 0, sel_x - 12, sel_y + global.card_h/2);
-	}
-	
-	//reset draw states
+	//reset draw settings
 	draw_set_halign(fa_left);
-	draw_set_valign(fa_middle);
+	draw_set_valign(fa_center);
+	draw_set_color(c_white);
 }
+	

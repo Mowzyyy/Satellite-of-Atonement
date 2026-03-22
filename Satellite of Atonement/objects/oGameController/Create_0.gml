@@ -88,3 +88,8 @@ MENU_PAGE.MACRO,
 MENU_PAGE.SETTINGS,
 MENU_PAGE.SAVE
 ];
+
+//Inventory submenu state
+global.inventory_state = INVENTORY_STATE.SELECT_WHO;
+global.selected_party = 0;//0-3 for which party member
+global.selected_item = 0;//index in their inventory

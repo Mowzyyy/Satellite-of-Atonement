@@ -1,6 +1,5 @@
 //============================Global Menu GUI============================
 if (global.state == GAME_STATE.IN_GAME_MENU) {
-	show_debug_message("Drawing ingame menu- state is correct");
 	//draw the 6 cards
 	for (var i = 0; i < 6; i++) {
 		var cx = global.card_positions[i].x;
@@ -47,14 +46,8 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 	//side cards - party members
 	for (var p = 0; p <  array_length(global.partyOrder); p++) {
 		var party_obj = global.partyOrder[p];
-		
-		//get a display name
-		if (party_obj == oLeon) display_name = "LEON";
-		if (party_obj == oCoat) display_name = "COAT";
-		if (party_obj == oOsei) display_name = "OSEI";
-		if (party_obj == oAnna) display_name = "ANNA";
-		if (party_obj == oData) display_name = "DATA";
-		
+		var name = get_party_display_name(party_obj);
+
 		var card_idx = global.party_card_map[p];//[0, 2, 3, 5]
 		var c = global.card_positions[card_idx];
 		
@@ -69,4 +62,64 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 	draw_set_valign(fa_center);
 	draw_set_color(c_white);
 }
+//============================INVENTORY SUBMENU DRAWING============================
+if (global.menu_page == MENU_PAGE.INVENTORY) {
+	var top_mid = global.card_positions[1];
+	var bot_mid = global.card_positions[4];
+	var selected_obj = global.partyOrder[global.selected_party];
+	var selected_name = get_party_display_name(selected_obj)
 	
+	switch (global.inventory_state) {
+		
+		case INVENTORY_STATE.SELECT_WHO:
+			//top card: "ITEM" and "WHOSE?"
+			draw_text(top_mid.x + 24, top_mid.y + 28, "ITEM");
+			draw_text(top_mid.x + 24, top_mid.y + 52, "Whose?");
+		
+			//bottom card: party member list
+			for (var i = 0; i < array_length(global.partyOrder); i++) {
+				var party_obj = global.partyOrder[i];
+				var name = get_party_display_name(party_obj)
+				var col = (menu_cursor == i) ? c_yellow : c_white;
+				draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i*20), name, col, col, col, col, 1);
+		}
+		break;
+			
+		case INVENTORY_STATE.SELECT_ITEM:
+			draw_text(top_mid.x + 24, top_mid.y + 28, "ITEM");
+			draw_text(top_mid.x + 24, top_mid.y + 52, selected_name);
+			draw_text(top_mid.x + 24, top_mid.y + 76, "What?");
+				
+			//bottom card: fake inventory list to be replaced with real later
+			for (var i = 0; i < 8; i++) {
+				var col = (menu_cursor == i) ? c_yellow : c_white;
+				draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i*20), "Potion " + string(i+1), col, col, col, col, 1);
+			}
+		break;
+				
+		case INVENTORY_STATE.SELECT_ACTION:
+			draw_text(top_mid.x + 24, top_mid.y + 28, "ITEM");
+			draw_text(top_mid.x + 24, top_mid.y + 52, selected_name);
+			draw_text(top_mid.x + 24, top_mid.y + 76, "What?");
+					
+			var actions = ["Use", "Give", "Toss"];
+			for (var i = 0; i < 3; i++) {
+				var col = (menu_cursor == i) ? c_yellow : c_white;
+				draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i*20), "Potion " + string(i+1), col, col, col, col, 1);
+			}
+		break;
+				
+		case INVENTORY_STATE.SELECT_TARGET:
+			draw_text(top_mid.x + 24, top_mid.y + 28, "ITEM");
+			draw_text(top_mid.x + 24, top_mid.y + 52, selected_name);
+			draw_text(top_mid.x + 24, top_mid.y + 76, "On Whom?");
+					
+			for (var i = 0; i < array_length(global.partyOrder); i++) {
+				var party_obj = global.partyOrder[i];
+				var name = get_party_display_name(party_obj);
+				var col = (menu_cursor == i) ? c_yellow : c_white;
+				draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i*20), name, col, col, col, col, 1);
+			}
+		break;
+	}
+}

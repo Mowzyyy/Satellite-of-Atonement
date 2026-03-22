@@ -38,3 +38,10 @@ enum MENU_VARIANT {
 		NEW_PLAYER,//only new game and misc 
 		RETURNING//allows to load game
 }
+
+enum INVENTORY_STATE {
+	SELECT_WHO,//"Whose" + party list
+	SELECT_ITEM,//"What?" + inventory list
+	SELECT_ACTION,//"Use / Give / Toss"
+	SELECT_TARGET//"On Whom?" + party list again
+}

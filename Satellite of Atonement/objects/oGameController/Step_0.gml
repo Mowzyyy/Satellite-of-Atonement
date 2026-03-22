@@ -21,13 +21,11 @@ switch (global.state) {
 	
 	case GAME_STATE.OVERWORLD:
 		if (global.keyA) {
-			show_debug_message("Opening Menu!");
 			global.state = GAME_STATE.IN_GAME_MENU;
 			global.menu_page = MENU_PAGE.MAIN;
 			menu_cursor = 0;
 			
 			io_clear();
-			show_debug_message("Game state changes!");
 			//audio_play_sound(sndExample, 10, false);
 		}
 			break;

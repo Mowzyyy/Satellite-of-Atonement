@@ -101,7 +101,7 @@ function scrInventoryLogic() {
 				menu_cursor = 0;
 				io_clear();
 				global.keyC = false;
-				show_debug_message("Entered SELECT_ACTION");
+				show_debug_message("Entered SELECT_ACTION - selected item: " + string(global.selected_item));
 			}
 			break;
 	

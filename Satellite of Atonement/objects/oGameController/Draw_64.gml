@@ -73,6 +73,7 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 		var bot_right = global.card_positions[5];
 		var selected_obj = global.partyOrder[global.selected_party];
 		var selected_name = get_party_display_name(selected_obj)
+		
 	
 		switch (global.inventory_state) {
 		
@@ -88,6 +89,13 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 					var col = (menu_cursor == i) ? c_yellow : c_white;
 					draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i*20), name, col, col, col, col, 1);
 			}
+			
+			//blinking cursor
+			var cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
+			var cursor_x = bot_mid.x + 24 -12;//12 pixels left of text
+			var _blink_on = (blink_timer mod 40) < 20;
+			var _cursor_spr = _blink_on ? sCursor : sBlink;
+			draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
 			break;
 			
 			case INVENTORY_STATE.SELECT_ITEM:
@@ -121,7 +129,6 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 				var cursor_card = global.card_positions[cards[card_index]];
 				var cursor_y = cursor_card.y + 12 + (local_i * 20);
 				var cursor_x = cursor_card.x + 8; // 4px left of text
-
 				var _blink_on = (blink_timer mod 40) < 20;
 				var _cursor_spr = _blink_on ? sCursor : sBlink;
 				draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
@@ -131,6 +138,18 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 				draw_text(top_mid.x + 24, top_mid.y + 28, "ITEM");
 				draw_text(top_mid.x + 24, top_mid.y + 52, selected_name);
 				draw_text(top_mid.x + 24, top_mid.y + 76, "What?");
+				
+				//find which card the selected item was on
+				var selected_slot = global.selected_item;
+				var items_per_card = 5;
+				var card_index = floor(selected_slot / items_per_card);
+				var cards = [0, 3, 2, 5];
+				var selected_card = global.card_positions[cards[card_index]];
+				var local_i = selected_slot mod items_per_card;
+				var item_y = selected_card.y + 12 + (local_i * 20);
+				
+				//Draw only the selected item in its original position
+				draw_text_color(selected_card.x + 20, item_y, "Potion", c_yellow, c_yellow, c_yellow, c_yellow, 1);
 					
 				var actions = ["Use", "Give", "Toss"];
 				for (var i = 0; i < 3; i++) {
@@ -138,19 +157,34 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 					var action_y = bot_mid.y + 20 + (i * 20);
 					draw_text_color(bot_mid.x + 24, action_y, actions[i], col, col, col, col, 1);
 				}
+				
+				//blinking cursor
+				var cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
+				var cursor_x = bot_mid.x + 24 -12;//12 pixels left of text
+				var _blink_on = (blink_timer mod 40) < 20;
+				var _cursor_spr = _blink_on ? sCursor : sBlink;
+				draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
 			break;
 				
 			case INVENTORY_STATE.SELECT_TARGET:
 				draw_text(top_mid.x + 24, top_mid.y + 28, "ITEM");
 				draw_text(top_mid.x + 24, top_mid.y + 52, selected_name);
-				draw_text(top_mid.x + 24, top_mid.y + 76, "On Whom?");
+				draw_text(top_mid.x + 8, top_mid.y + 76, "On Whom?");
 					
 				for (var i = 0; i < array_length(global.partyOrder); i++) {
 					var party_obj = global.partyOrder[i];
 					var name = get_party_display_name(party_obj);
 					var col = (menu_cursor == i) ? c_yellow : c_white;
-					draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i*20), name, col, col, col, col, 1);
+					var name_y = bot_mid.y + 20 + (i * 20);
+					draw_text_color(bot_mid.x + 24, name_y, name, col, col, col, col, 1);
 				}
+				
+				//blinking cursor
+				var cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
+				var cursor_x = bot_mid.x + 24 -12;//12 pixels left of text
+				var _blink_on = (blink_timer mod 40) < 20;
+				var _cursor_spr = _blink_on ? sCursor : sBlink;
+				draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
 			break;
 		}
 	}

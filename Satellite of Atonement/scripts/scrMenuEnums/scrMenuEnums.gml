@@ -7,7 +7,7 @@ enum GAME_STATE {
 }
 
 enum MENU_PAGE {
-	MAIN,//Central panel
+	MAIN,
 	INVENTORY,
 	SKILLS,
 	EQUIP,
@@ -44,4 +44,13 @@ enum INVENTORY_STATE {
 	SELECT_ITEM,//"What?" + inventory list
 	SELECT_ACTION,//"Use / Give / Toss"
 	SELECT_TARGET//"On Whom?" + party list again
+}
+
+enum SUBMENU_HISTORY {
+	NONE,
+	MAIN,
+	INVENTORY_SELECT_WHO,
+	INVENTORY_SELECT_ITEM,
+	INVENTORY_SELECT_ACTION,
+	INVENTORY_SELECT_TARGET//add more later for other sub-menus
 }

@@ -1,5 +1,4 @@
-//Below section is the global party manager
-
+//==================================Party Manager==================================
 global.partyStatus = {
 	coat: false,
 	osei: false,
@@ -10,7 +9,7 @@ global.partyStatus = {
 global.partyOrder = [oLeon, oCoat, oOsei, oAnna];
 
 
-//Below section manages the entirety of the main story linear variables enumerated in the StoryVariables script
+//==================================Story Var==================================
 global.storyStep = PLOT.CHAPTER_ONE
 
 global.storyFlags = {
@@ -46,7 +45,6 @@ global.menu_page = MENU_PAGE.MAIN;
 global.selected_char = 0;//0-3 for the 4 portraits
 menu_cursor = 0;//Which menu option is highlighted
 blink_timer = 0;
-
 //============================Global Menu Drawing Settings============================
 //This makes every context menu in the game use the default font automatically
 draw_set_font(ftDefault);
@@ -93,3 +91,11 @@ MENU_PAGE.SAVE
 global.inventory_state = INVENTORY_STATE.SELECT_WHO;
 global.selected_party = 0;//0-3 for which party member
 global.selected_item = 0;//index in their inventory
+//==================================Global Menu Var==================================
+global.submenu_history = ds_stack_create();
+ds_stack_push(global.submenu_history, SUBMENU_HISTORY.MAIN);//start at top level
+
+//Fake inventory per party member - replace later with real ds_list or array
+global.party_inventory = ds_map_create();
+ds_map_add_list(global.party_inventory, oLeon, ds_list_create());//example
+//populate later

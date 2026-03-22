@@ -29,6 +29,7 @@
     {"name":"oOsei","order":2,"path":"objects/oOsei/oOsei.yy",},
     {"name":"rmTest","order":1,"path":"rooms/rmTest/rmTest.yy",},
     {"name":"rmTitle","order":2,"path":"rooms/rmTitle/rmTitle.yy",},
+    {"name":"charLeon","order":7,"path":"scripts/charLeon/charLeon.yy",},
     {"name":"scrMenuConstants","order":6,"path":"scripts/scrMenuConstants/scrMenuConstants.yy",},
     {"name":"scrMenuEnums","order":4,"path":"scripts/scrMenuEnums/scrMenuEnums.yy",},
     {"name":"scrMenuFunctions","order":5,"path":"scripts/scrMenuFunctions/scrMenuFunctions.yy",},

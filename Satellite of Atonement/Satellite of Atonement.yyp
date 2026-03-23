@@ -52,7 +52,6 @@
     {"id":{"name":"oOsei","path":"objects/oOsei/oOsei.yy",},},
     {"id":{"name":"rmTest","path":"rooms/rmTest/rmTest.yy",},},
     {"id":{"name":"rmTitle","path":"rooms/rmTitle/rmTitle.yy",},},
-    {"id":{"name":"charLeon","path":"scripts/charLeon/charLeon.yy",},},
     {"id":{"name":"MACROS","path":"scripts/MACROS/MACROS.yy",},},
     {"id":{"name":"scrMenuConstants","path":"scripts/scrMenuConstants/scrMenuConstants.yy",},},
     {"id":{"name":"scrMenuEnums","path":"scripts/scrMenuEnums/scrMenuEnums.yy",},},

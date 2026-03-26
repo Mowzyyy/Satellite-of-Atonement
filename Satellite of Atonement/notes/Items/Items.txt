@@ -1,0 +1,38 @@
+Here is a list of items that I thought we might want to add.
+
+
+
+Potions:
+	Lesser Healing Potion
+	Standard Healing Potion
+	Major Healing Potions
+	
+	Antidote - Cures poisons
+	
+	Lesser Elixir (Magic/Mana)
+	Standard Elixir (Magic/Mana)
+	High Elixir (Magic/Mana)
+	
+Weapons:
+
+	Swords:
+		Rusty Sword - Low attack / Early game weapon, perhaps starter weapon
+		Iron Sword - Maybe reward this after completing the first/second mission
+		Longsword - Two handed wielding, higher damage rate(perhaps have it have higher crit damage multipler if you decide to add that)
+		Claymores - Stronger Longsword, and perhaps have it do seperate abilites like sweep attacks/attacking multiple enemies 
+		Daggers - Low attack / Speed bonus damage
+		
+	Ranged
+		Crossbow - High damage / long cooldown?
+		Longbow - Heavy hitting maybe with debuff chances?
+		Shortbow - Quick cooldowns / Medium/Low damage
+		Recurved Bow - Perhaps bonus damage base of Speed of character?
+		
+	Magic
+		Crystal Wand - Stable standard magic?
+		Runed Wands - Maybe bonus attributed wands that boost their repsective area. Example, Fire Rune Wand --> Att Bonus
+		Staffs
+		
+		
+I want to later go over all the type of magic we would like to add in to expand on the magic catagory.
+		

@@ -36,11 +36,12 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.14.3.217",
+    "IDEVersion":"2024.14.4.221",
   },
   "name":"Satellite of Atonement",
   "resources":[
     {"id":{"name":"ftDefault","path":"fonts/ftDefault/ftDefault.yy",},},
+    {"id":{"name":"Items","path":"notes/Items/Items.yy",},},
     {"id":{"name":"oAnna","path":"objects/oAnna/oAnna.yy",},},
     {"id":{"name":"oCamera","path":"objects/oCamera/oCamera.yy",},},
     {"id":{"name":"oCoat","path":"objects/oCoat/oCoat.yy",},},

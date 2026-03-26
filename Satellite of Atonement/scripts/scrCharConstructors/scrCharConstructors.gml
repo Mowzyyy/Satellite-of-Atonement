@@ -35,7 +35,7 @@ function cstrPartyMember(_name, _level = 1, _bio = "Yux") constructor {
 	base_def = 8 + (level * 2)
 	base_spd = 10 + (level * 2);
 	base_mAtk = 6 + (level * 3);
-	base_mDef = 6 + (LEVEL * 2);
+	base_mDef = 6 + (level * 2);
 
 	//Equip	Slots
 	head = new cstrEquipment();//starts empty
@@ -116,7 +116,7 @@ function cstrPartyMember(_name, _level = 1, _bio = "Yux") constructor {
 		show_debug_message("=== " + name + "(Lv." + string(level) + ") ===");
 		show_debug_message("HP: " + string(current_hp) + "/" + string(s.maxhp) + " | Mana: " + string(current_mana) + "/" + string(s.max_mana));
 		show_debug_message("Atk: " + string(s.atk) + " Def:" + string(s.def) + " Spd:" + string(s.spd));
-		show_debug_message("mAtk:" +string(s.mAtk) + "mDef:" + string(s.mDef));
+		show_debug_message("mAtk: " +string(s.mAtk) + "mDef:" + string(s.mDef));
 		show_debug_message("Equipment: " + head.name + " | " + r_Hand.name + " | " + l_Hand.name + " | " + body.name + " | " + feet.name);
 	}
 }

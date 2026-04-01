@@ -4,6 +4,8 @@ function scrMenuMainLogic() {
 }
 //==================================In Game Menu==================================
 function scrMenuPauseLogic() {
+	if (global.is_restarting) return;
+	
 	if (global.keyB) {
 		var closed = submenu_back();
 		if (closed) {
@@ -70,6 +72,17 @@ function scrMenuPauseLogic() {
 				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.STATS_SELECT_WHO);
 				show_debug_message("Entered STATS SELECT_WHO from MAIN");
 			}
+			
+			//Quit logic for menu C
+			if (global.menu_page == MENU_PAGE.QUIT) {
+				menu_cursor = 0;
+				io_clear();
+				global.keyC = false;
+				while (ds_stack_size(global.submenu_history) > 0) ds_stack_pop(global.submenu_history);
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.MAIN);
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.QUIT_CONFIRM);
+				show_debug_message("Entered QUIT CONFIRM from MAIN");
+			}
 			//add similar reset/push for other submenus later
 		}
 	} 
@@ -80,6 +93,10 @@ function scrMenuPauseLogic() {
 	//========================= STATS SUBMENU =========================
 	if (global.menu_page == MENU_PAGE.STATS){
 		scrStatsLogic();
+	}
+	//========================= QUIT SUBMENU =========================
+	if (global.menu_page = MENU_PAGE.QUIT){
+		scrQuitLogic();
 	}
 	//====================== OTHER SUBMENUS (add later) ======================
 }
@@ -236,6 +253,11 @@ function submenu_back() {
 			global.stats_state = STATS_STATE.SELECT_WHO;
 			menu_cursor = global.selected_stat_char;
 			break;
+		
+		case SUBMENU_HISTORY.QUIT_CONFIRM:
+			global.menu_page = MENU_PAGE.MAIN;
+			menu_cursor = 9;
+			break;
 	}
 	return false;//did not close entire menu
 }
@@ -270,5 +292,33 @@ function scrStatsLogic() {
 		case STATS_STATE.VIEW_STATS:
 			//No navigation needed - B to go back is handled by submenu_back()
 		break;
+	}
+}
+
+//==================================Quit Menu Logic==================================
+function scrQuitLogic() {
+	var num_opts = 2;//yes,no
+	
+	if (global.keyUpPressed) menu_cursor = (menu_cursor - 1 + num_opts) mod num_opts;
+	if (global.keyDownPressed) menu_cursor = (menu_cursor + 1) mod num_opts;
+	
+	if (global.keyC) {
+		if (menu_cursor == 0) {
+			//No - back to main pause menu
+			submenu_back();
+			io_clear();
+			global.keyC = false;
+			show_debug_message("Quit cancelled, returning to pause menu");
+		} else {
+			//yes - full nuke reset
+			global.is_restarting = true;
+			global.state = GAME_STATE.MAIN_MENU;
+			ds_stack_clear(global.submenu_history);
+			menu_cursor = 0;
+			show_debug_message("Quit confirmed, restarting game");
+			instance_destroy(oGameController);
+			instance_create_depth(0, 0, 0, oGameController);
+			game_restart();
+		}
 	}
 }

@@ -16,7 +16,8 @@ enum MENU_PAGE {
 	TALK,
 	MACRO,
 	SETTINGS,
-	SAVE
+	SAVE,
+	QUIT
 }
 
 enum BATTLE_PHASE {
@@ -54,10 +55,15 @@ enum SUBMENU_HISTORY {
 	INVENTORY_SELECT_ACTION,
 	INVENTORY_SELECT_TARGET,
 	STATS_SELECT_WHO,
-	STATS_VIEW//add more later for other sub-menus
+	STATS_VIEW,
+	QUIT_CONFIRM//add more later for other sub-menus
 }
 
 enum STATS_STATE {
 	SELECT_WHO,
 	VIEW_STATS
+}
+
+enum QUIT_STATE {
+	SELECT
 }

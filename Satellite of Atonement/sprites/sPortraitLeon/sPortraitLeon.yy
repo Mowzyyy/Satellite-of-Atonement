@@ -2,9 +2,9 @@
   "$GMSprite":"v2",
   "%Name":"sPortraitLeon",
   "bboxMode":0,
-  "bbox_bottom":45,
+  "bbox_bottom":63,
   "bbox_left":0,
-  "bbox_right":45,
+  "bbox_right":63,
   "bbox_top":0,
   "collisionKind":1,
   "collisionTolerance":0,
@@ -12,14 +12,14 @@
   "edgeFiltering":false,
   "For3D":false,
   "frames":[
-    {"$GMSpriteFrame":"v1","%Name":"f778c74d-adab-4737-8736-5a22849317c7","name":"f778c74d-adab-4737-8736-5a22849317c7","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"2a90e7d8-a6aa-4332-8919-a62ec88fa3fc","name":"2a90e7d8-a6aa-4332-8919-a62ec88fa3fc","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
   ],
   "gridX":0,
   "gridY":0,
-  "height":46,
+  "height":64,
   "HTile":false,
   "layers":[
-    {"$GMImageLayer":"","%Name":"a1d155d7-cb00-49d2-b2ba-c2fb0bdd39b2","blendMode":0,"displayName":"default","isLocked":false,"name":"a1d155d7-cb00-49d2-b2ba-c2fb0bdd39b2","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
+    {"$GMImageLayer":"","%Name":"93b4d875-d758-4b48-9734-6a4f333ef298","blendMode":0,"displayName":"default","isLocked":false,"name":"93b4d875-d758-4b48-9734-6a4f333ef298","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
   ],
   "name":"sPortraitLeon",
   "nineSlice":null,
@@ -69,8 +69,8 @@
     "tracks":[
       {"$GMSpriteFramesTrack":"","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"$KeyframeStore<SpriteFrameKeyframe>":"","Keyframes":[
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"f778c74d-adab-4737-8736-5a22849317c7","path":"sprites/sPortraitLeon/sPortraitLeon.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"7f94ea23-b647-42f6-91a2-de35fc956907","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"2a90e7d8-a6aa-4332-8919-a62ec88fa3fc","path":"sprites/sPortraitLeon/sPortraitLeon.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"04bfb36e-71a5-4875-b8f5-da24c637e45e","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
           ],"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"2.0",},"modifiers":[],"name":"frames","resourceType":"GMSpriteFramesTrack","resourceVersion":"2.0","spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange":null,
@@ -86,5 +86,5 @@
   },
   "type":0,
   "VTile":false,
-  "width":46,
+  "width":64,
 }

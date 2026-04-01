@@ -14,7 +14,7 @@ global.party = [];
 array_push(global.party, new cstrPartyMember("Leon", 1, "Spearman", 20, "Human", true));
 array_push(global.party, new cstrPartyMember("Coat", 1, "Scout", 99, "Yux", true));
 array_push(global.party, new cstrPartyMember("Osei", 1, "Wizard", 45, "Human", true));
-array_push(global.party, new cstrPartyMember("Anna", 1, "General", 31, "Humean", true))
+array_push(global.party, new cstrPartyMember("Anna", 1, "General", 31, "Human", true))
 
 
 //==================================Economy==================================
@@ -58,6 +58,9 @@ global.stats_state = STATS_STATE.SELECT_WHO;
 global.selected_stat_char = 0;
 menu_cursor = 0;//Which menu option is highlighted
 blink_timer = 0;
+
+//Restart game guard flag
+global.is_restarting = false;
 //============================Global Menu Drawing Settings============================
 //This makes every context menu in the game use the default font automatically
 draw_set_font(ftDefault);
@@ -83,9 +86,8 @@ global.party_card_map = [0, 2, 3, 5];
 
 //psiii style menu list
 global.menu_list = [
-"ITEM", "SKILL", "EQUIP",
-"STATS", "ORDER", "TALK",
-"MACRO", "CONFIG", "SAVE"
+"ITEM", "SKILL", "EQUIP", "STATS", "ORDER", 
+"TALK", "MACRO", "CONFIG", "SAVE", "QUIT"
 ];
 
 global.menu_page_map = [
@@ -97,7 +99,8 @@ MENU_PAGE.ORDER,
 MENU_PAGE.TALK,
 MENU_PAGE.MACRO,
 MENU_PAGE.SETTINGS,
-MENU_PAGE.SAVE
+MENU_PAGE.SAVE,
+MENU_PAGE.QUIT
 ];
 
 //Inventory submenu state

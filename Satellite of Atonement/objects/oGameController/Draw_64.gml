@@ -3,6 +3,8 @@ draw_set_halign(fa_left);
 draw_set_valign(fa_middle);
 draw_set_color(c_white);
 
+if (global.is_restarting) exit;
+
 //============================Global Menu GUI============================
 if (global.state == GAME_STATE.IN_GAME_MENU) {
 	//draw the 6 cards
@@ -22,26 +24,23 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 		var bot_middle = global.card_positions[4];//bottom middle card
 		
 		//top middle: first 4 options
-		for (var i = 0; i < 4; i++) {
+		for (var i = 0; i < 5; i++) {
 			var col = (menu_cursor == i) ? c_yellow : c_white;
-			var _y = top_middle.y + 20 + (i * 20);
+			var _y = top_middle.y + 12 + (i * 20);
 			draw_text_color(top_middle.x + 8 + 12, _y, global.menu_list[i], col, col, col, col, 1);
 		}
 		
 		//bottom middle card: remaining 5 options
-		for (var i = 4; i < 9; i++) {
+		for (var i = 5; i < 10; i++) {
 			var col = (menu_cursor == i) ? c_yellow : c_white;
-			var _y = bot_middle.y + 12 + ((i-4) * 20);
+			var _y = bot_middle.y + 12 + ((i-5) * 20);
 			draw_text_color(bot_middle.x + 8 + 12, _y, global.menu_list[i], col, col, col, col, 1);
 		}
 		
 		//blinking cursor on the active options
-		var cursor_card = (menu_cursor < 4) ? global.card_positions[1] : global.card_positions[4];
-		var line_in_card = (menu_cursor < 4) ? menu_cursor : menu_cursor - 4;
-		var cursor_y = cursor_card.y + 20 + (line_in_card * 20);
-		if (menu_cursor >= 4) {
-			cursor_y -= 8;//move 8 pixels higher on bottom card only
-		}
+		var cursor_card = (menu_cursor < 5) ? global.card_positions[1] : global.card_positions[4];
+		var line_in_card = (menu_cursor < 5) ? menu_cursor : menu_cursor - 5;
+		var cursor_y = cursor_card.y + 12 + (line_in_card * 20);
 	
 		//keep the cursor 4 pixels to the left of content
 		var text_x = cursor_card.x + 12 + 12;//matches the text x position
@@ -62,15 +61,35 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 	if (_show_side_cards) {
 		for (var p = 0; p <  array_length(global.partyOrder); p++) {
 			var party_obj = global.partyOrder[p];
-			var name = get_party_display_name(party_obj);
-
-			var card_idx = global.party_card_map[p];//[0, 2, 3, 5]
+			var member = global.party[p];
+			var stats = member.get_effective_stats();
+			var card_idx = global.party_card_map[p];
 			var c = global.card_positions[card_idx];
-		
-			draw_set_halign(fa_center);
-			draw_text(c.x + global.card_w/2, c.y + 30, name);
+			
+			var lh = 14;//line height in pixels
+			var lpad = 6;//line padding inside card
+			
+			//portrait at topleft of card
+			var portrait_spr = sChatPortDefault;
+			if (party_obj == oLeon) portrait_spr = sChatPortLeon;
+			if (party_obj == oCoat) portrait_spr = sChatPortCoat;
+			if (party_obj == oOsei) portrait_spr = sChatPortOsei;
+			if (party_obj == oAnna) portrait_spr = sChatPortAnna;
+			if (party_obj == oData) portrait_spr = sChatPortData;
+			//draw_sprite(portrait_spr, 0, portrait_cx, bot_mid.y + lpad * 1);
+			draw_sprite(portrait_spr, 0, c.x + lpad * 3 + 4, c.y + lpad * 1);
+			
+			//HP and MP beneath protrait
+			draw_text(c.x + lpad, c.y + lh * 5 - 6, "HP " + string(member.current_hp) + "/" + string(stats.maxhp));
+			draw_text(c.x +lpad, c.y + lh * 6 - 6, "MP " + string(member.current_mana) + "/" + string(stats.max_mana));
+			
+			//Name left, level right
 			draw_set_halign(fa_left);
-			//later add HP and MP, protraits, etc
+			draw_text(c.x + lpad, c.y + lh * 7 - 6, member.name);
+			draw_set_halign(fa_right);
+			draw_text(c.x + global.card_w - lpad, c.y + lh * 7 - 6, "Lv" + string(member.level));
+			draw_set_halign(fa_left);
+			
 		}
 	}
 		
@@ -312,7 +331,7 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			//bot m id - portrait + hp mp name level
 			
 			//portrait centered at top of card
-			var portrait_cx = bot_mid.x + lpad;
+			var portrait_cx = bot_mid.x + lpad * 2;
 			//swap in per-character portrait sprites when they're made, fallback to default sPortraitDefault
 			var portrait_spr = sPortraitDefault;
 			if (global.partyOrder[char_idx] == oLeon) portrait_spr = sPortraitLeon;
@@ -320,18 +339,55 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			if (global.partyOrder[char_idx] == oOsei) portrait_spr = sPortraitOsei;
 			if (global.partyOrder[char_idx] == oAnna) portrait_spr = sPortraitAnna;
 			if (global.partyOrder[char_idx] == oData) portrait_spr = sPortraitData;
-			draw_sprite(portrait_spr, 0, portrait_cx, bot_mid.y + lh * 1);
+			draw_sprite(portrait_spr, 0, portrait_cx, bot_mid.y + lpad * 1);
 			
 			//hp and mp beneath portrait
 			draw_set_halign(fa_left);
-			draw_text(bot_mid.x + lpad, bot_mid.y + lh * 5 - 6, "HP " + string(member.current_hp) + "/" + string(stats.maxhp));
-			draw_text(bot_mid.x +lpad, bot_mid.y + lh * 6 - 6, "MP " + string(member.current_mana) + "/" + string(stats.max_mana));
-			
-			//name and lv at bottom of card
-			draw_text(bot_mid.x + lpad, bot_mid.y + lh * 7 - 6, " Lv." + string(member.level));
-			draw_set_halign(fa_left);
+			draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 6, "HP " + string(member.current_hp) + "/" + string(stats.maxhp));
+			draw_text(bot_mid.x +lpad, bot_mid.y + lh * 7 - 6, "MP " + string(member.current_mana) + "/" + string(stats.max_mana));
 		}
 	
+	}
+	
+	//==============================QUIT SUBMENU DRAWING==============================
+	if (global.menu_page == MENU_PAGE.QUIT) {
+		var top_left = global.card_positions[0];
+		var top_mid = global.card_positions[1];
+		var top_right = global.card_positions[2];
+		var bot_left = global.card_positions[3];
+		var bot_mid = global.card_positions[4];
+		var bot_right = global.card_positions[5];
+		var lh = 14;
+		
+		//top middle - prompt
+		draw_set_halign(fa_center);
+		draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 2, "Quit");
+		draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 3, "Game?");
+		draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 5, "RETURNS");
+		draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 6, "TO TITLE");
+		draw_set_halign(fa_left);
+		
+		//warning text spread across the four sidecards
+		draw_set_halign(fa_center);
+		draw_text(top_left.x + global.card_w / 2, top_left.y + lh * 3, "UNSAVED");
+		draw_text(top_right.x + global.card_w / 2, top_right.y + lh * 3, "PROGRESS");
+		draw_text(bot_left.x + global.card_w / 2, bot_left.y + lh * 3, "WILL BE");
+		draw_text(bot_right.x + global.card_w / 2, bot_right.y + lh * 3, "LOST!!!");
+		draw_set_halign(fa_left);
+		
+		//botmid no/yes
+		var quit_opts = ["No", "Yes"];
+		for (var i_quit = 0; i_quit < 2; i_quit++) {
+			var col = (menu_cursor == i_quit) ? c_yellow : c_white;
+			draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i_quit * 20), quit_opts[i_quit], col, col, col, col, 1);
+		}
+		
+		//blinking cursor
+				var cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
+				var cursor_x = bot_mid.x + 24 -12;//12 pixels left of text
+				var _blink_on = (blink_timer mod 40) < 20;
+				var _cursor_spr = _blink_on ? sCursor : sBlink;
+				draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
 	}
 	
 	//reset draw settings

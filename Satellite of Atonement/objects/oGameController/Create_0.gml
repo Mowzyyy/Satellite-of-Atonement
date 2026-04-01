@@ -1,13 +1,24 @@
-//==================================Party Manager==================================
+//==================================Party Data==================================
 global.partyStatus = {
 	coat: false,
 	osei: false,
 	anna: false,
 	data: false,
 }
+
 //party order index
 global.partyOrder = [oLeon, oCoat, oOsei, oAnna];
 
+global.party = [];
+//Party constuctor syntax: cstrPartyMember(name, level, bio, age, species, can_use_magic)
+array_push(global.party, new cstrPartyMember("Leon", 1, "Spearman", 20, "Human", true));
+array_push(global.party, new cstrPartyMember("Coat", 1, "Scout", 99, "Yux", true));
+array_push(global.party, new cstrPartyMember("Osei", 1, "Wizard", 45, "Human", true));
+array_push(global.party, new cstrPartyMember("Anna", 1, "General", 31, "Humean", true))
+
+
+//==================================Economy==================================
+global.money = 0;
 
 //==================================Story Var==================================
 global.storyStep = PLOT.CHAPTER_ONE
@@ -43,6 +54,8 @@ if (!variable_global_exists("state_initialized")) {
 }
 global.menu_page = MENU_PAGE.MAIN;
 global.selected_char = 0;//0-3 for the 4 portraits
+global.stats_state = STATS_STATE.SELECT_WHO;
+global.selected_stat_char = 0;
 menu_cursor = 0;//Which menu option is highlighted
 blink_timer = 0;
 //============================Global Menu Drawing Settings============================

@@ -15,10 +15,13 @@ function cstrEquipment(_name = "No Item", _slot_type = "none", _atk = 0, _def = 
 
 //====================================Main Party Constructor====================================
 
-function cstrPartyMember(_name, _level = 1, _bio = "Yux") constructor {
+function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "???", _can_use_magic = true) constructor {
 	//Basic Info
 	name = _name;
 	bio = _bio;
+	age = _age;
+	species = _species;
+	can_use_magic = _can_use_magic;
 	level = _level;
 	experience = 0;
 	exp_to_lvup = 100;
@@ -34,8 +37,7 @@ function cstrPartyMember(_name, _level = 1, _bio = "Yux") constructor {
 	base_atk = 12 + (level * 3);
 	base_def = 8 + (level * 2)
 	base_spd = 10 + (level * 2);
-	base_mAtk = 6 + (level * 3);
-	base_mDef = 6 + (level * 2);
+	base_mental = 10 + (level * 3);
 
 	//Equip	Slots
 	head = new cstrEquipment();//starts empty
@@ -60,8 +62,9 @@ function cstrPartyMember(_name, _level = 1, _bio = "Yux") constructor {
 		stats.atk					= base_atk + head.atk_bonus + r_Hand.atk_bonus + l_Hand.atk_bonus + body.atk_bonus + feet.atk_bonus;
 		stats.def					= base_def + head.def_bonus + r_Hand.def_bonus + l_Hand.def_bonus + body.def_bonus + feet.def_bonus;
 		stats.spd					= base_spd + head.spd_bonus + r_Hand.spd_bonus + l_Hand.spd_bonus + body.spd_bonus + feet.spd_bonus;
-		stats.mAtk				= base_mAtk + head.mAtk_bonus + r_Hand.mAtk_bonus + l_Hand.mAtk_bonus + body.mAtk_bonus + feet.mAtk_bonus;
-		stats.mDef				= base_mDef + head.mDef_bonus + r_Hand.mDef_bonus + l_Hand.mDef_bonus + body.mDef_bonus + feet.mDef_bonus;
+		stats.mental			= base_mental;
+		stats.mAtk				= base_mental + head.mAtk_bonus + r_Hand.mAtk_bonus + l_Hand.mAtk_bonus + body.mAtk_bonus + feet.mAtk_bonus;
+		stats.mDef				= base_mental + head.mDef_bonus + r_Hand.mDef_bonus + l_Hand.mDef_bonus + body.mDef_bonus + feet.mDef_bonus;
 
 		return stats;
 	}
@@ -94,8 +97,7 @@ function cstrPartyMember(_name, _level = 1, _bio = "Yux") constructor {
 		base_atk += 3 + irandom(2);
 		base_def += 2 + irandom(2);
 		base_spd += 2 + irandom(2);
-		base_mAtk += 3 + irandom(2);
-		base_mDef += 2 + irandom(2);
+		base_mental += 3 + irandom(2);
 		
 		//refill HP and mana on levelup
 		current_hp = base_max_hp;
@@ -116,7 +118,7 @@ function cstrPartyMember(_name, _level = 1, _bio = "Yux") constructor {
 		show_debug_message("=== " + name + "(Lv." + string(level) + ") ===");
 		show_debug_message("HP: " + string(current_hp) + "/" + string(s.maxhp) + " | Mana: " + string(current_mana) + "/" + string(s.max_mana));
 		show_debug_message("Atk: " + string(s.atk) + " Def:" + string(s.def) + " Spd:" + string(s.spd));
-		show_debug_message("mAtk: " +string(s.mAtk) + "mDef:" + string(s.mDef));
+		show_debug_message("Mental: " + string(stats.mental) + "mAtk: " +string(s.mAtk) + "mDef:" + string(s.mDef));
 		show_debug_message("Equipment: " + head.name + " | " + r_Hand.name + " | " + l_Hand.name + " | " + body.name + " | " + feet.name);
 	}
 }

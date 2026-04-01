@@ -44,6 +44,7 @@ function scrMenuPauseLogic() {
 		if (global.keyC) {
 			global.menu_page = global.menu_page_map[menu_cursor];
 			
+			//Inventory logic for menu C
 			if (global.menu_page == MENU_PAGE.INVENTORY) {
 				//reset inventory state when entering ITEM
 
@@ -57,12 +58,28 @@ function scrMenuPauseLogic() {
 				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.INVENTORY_SELECT_WHO);
 				show_debug_message("Entered SELECT_WHO from MAIN")
 			}
+			
+			//Stats logic for menu C
+			if (global.menu_page == MENU_PAGE.STATS) {
+				global.stats_state = STATS_STATE.SELECT_WHO;
+				menu_cursor = 0;
+				io_clear();
+				global.keyC = false;
+				while (ds_stack_size(global.submenu_history) > 0) ds_stack_pop(global.submenu_history);
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.MAIN);
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.STATS_SELECT_WHO);
+				show_debug_message("Entered STATS SELECT_WHO from MAIN");
+			}
 			//add similar reset/push for other submenus later
 		}
 	} 
 	//====================== INVENTORY SUBMENU ======================
 	if (global.menu_page == MENU_PAGE.INVENTORY) {
 		scrInventoryLogic();
+	}
+	//========================= STATS SUBMENU =========================
+	if (global.menu_page == MENU_PAGE.STATS){
+		scrStatsLogic();
 	}
 	//====================== OTHER SUBMENUS (add later) ======================
 }
@@ -209,6 +226,49 @@ function submenu_back() {
 			global.inventory_state = INVENTORY_STATE.SELECT_ACTION;//back to action after target
 			menu_cursor = 0;
 			break;
+			
+		case SUBMENU_HISTORY.STATS_SELECT_WHO:
+			global.stats_state = STATS_STATE.SELECT_WHO;
+			menu_cursor = global.selected_stat_char;
+			break;
+			
+		case SUBMENU_HISTORY.STATS_VIEW:
+			global.stats_state = STATS_STATE.SELECT_WHO;
+			menu_cursor = global.selected_stat_char;
+			break;
 	}
 	return false;//did not close entire menu
+}
+//==================================Stats Menu Logic==================================
+function scrStatsLogic() {
+	var num_party = array_length(global.partyOrder);
+	
+	switch (global.stats_state) {
+		case STATS_STATE.SELECT_WHO:
+			if(global.keyUpPressed) {
+				global.selected_stat_char = (global.selected_stat_char - 1 + num_party) mod num_party;
+				menu_cursor = global.selected_stat_char;
+				io_clear();
+			}
+			if (global.keyDownPressed) {
+				global.selected_stat_char = (global.selected_stat_char + 1) mod num_party;
+				menu_cursor = global.selected_stat_char;
+				io_clear();
+				show_debug_message("selected_stat_char: " + string(global.selected_stat_char) + " | num_party " + string(num_party));
+			}
+			
+			if(global.keyC) {
+				global.stats_state = STATS_STATE.VIEW_STATS;
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.STATS_VIEW);
+				menu_cursor = 0;
+				io_clear();
+				global.keyC = false;
+				show_debug_message("Stats: viewing " + get_party_display_name(global.partyOrder[global.selected_stat_char]));
+			}
+		break;
+		
+		case STATS_STATE.VIEW_STATS:
+			//No navigation needed - B to go back is handled by submenu_back()
+		break;
+	}
 }

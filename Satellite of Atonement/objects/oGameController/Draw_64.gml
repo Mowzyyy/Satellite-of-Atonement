@@ -118,14 +118,14 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 					var name = get_party_display_name(party_obj)
 					var col = (menu_cursor == i) ? c_yellow : c_white;
 					draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i*20), name, col, col, col, col, 1);
-			}
+				}
 			
-			//blinking cursor
-			var cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
-			var cursor_x = bot_mid.x + 24 -12;//12 pixels left of text
-			var _blink_on = (blink_timer mod 40) < 20;
-			var _cursor_spr = _blink_on ? sCursor : sBlink;
-			draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
+				//blinking cursor
+				var cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
+				var cursor_x = bot_mid.x + 24 -12;//12 pixels left of text
+				var _blink_on = (blink_timer mod 40) < 20;
+				var _cursor_spr = _blink_on ? sCursor : sBlink;
+				draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
 			break;
 			
 			case INVENTORY_STATE.SELECT_ITEM:
@@ -144,7 +144,7 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 				    var c = global.card_positions[cards[card_idx]];
 				    for (var local_i = 0; local_i < items_per_card; local_i++) {
 				        var global_slot = (card_idx * items_per_card) + local_i;
-				        if (global_slot >= max_items) break;
+				        if (global_slot >= max_items) continue;
 
 				        var col = (menu_cursor == global_slot) ? c_yellow : c_white;
 				        var item_y = c.y + 12 + (local_i * 20);
@@ -395,3 +395,141 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 	draw_set_valign(fa_center);
 	draw_set_color(c_white);
 }
+//==============================ORDER SUBMENU DRAWING==============================
+if (global.menu_page == MENU_PAGE.ORDER) {
+	var top_left = global.card_positions[0];
+	var top_mid = global.card_positions[1];
+	var top_right = global.card_positions[2];
+	var bot_left = global.card_positions[3];
+	var bot_mid = global.card_positions[4];
+	var bot_right = global.card_positions[5];
+		
+	//Line height and left/right apdding used across all cards
+	var lh = 14;//line height in pixels
+	var lpad = 6;//line padding inside card
+	var rpad = global.card_w - 6;//right aligned x inside card
+	
+	//top mid - party order header - shows okay when full
+	draw_set_halign(fa_center);
+	var mid_cx = top_mid.x + global.card_w / 2;
+	draw_text(mid_cx, top_mid.y + lh * 1, "PARTY");
+	draw_text(mid_cx, top_mid.y + lh * 2, "ORDER");
+	if (global.order_state == ORDER_STATE.CONFIRM) {
+		draw_text(mid_cx, top_mid.y + lh * 5, "OKAY?");
+	}
+	draw_set_halign(fa_left);
+	
+	//topleft - current order
+	draw_set_halign(fa_center);
+	draw_text(top_left.x + global.card_w / 2, top_left.y + lh * 1, "CURRENT");
+	draw_set_halign(fa_left);
+	for (var i_ord = 0; i_ord < array_length(global.partyOrder); i_ord++) {
+		var name_cur = get_party_display_name(global.partyOrder[i_ord]);
+		draw_text(top_left.x + lpad, top_left.y + lh * (2 + i_ord), string(i_ord + 1));
+		draw_set_halign(fa_right);
+		draw_text(top_left.x + global.card_w - lpad, top_left.y + lh * (2 + i_ord), name_cur);
+		draw_set_halign(fa_left);
+	}
+	
+	//topright - new order being built
+	draw_set_halign(fa_center);
+	draw_text(top_right.x + global.card_w / 2, top_right.y + lh * 1, "NEW");
+	draw_set_halign(fa_left);
+	for (var i_new = 0; i_new < array_length(global.partyOrder); i_new++) {
+		draw_text(top_right.x + lpad, top_right.y + lh * (2 + i_new), string(i_new + 1));
+		draw_set_halign(fa_right);
+		if (i_new < array_length(global.order_new)) {
+			draw_text(top_right.x + global.card_w - lpad, top_right.y + lh * ( 2 + i_new), get_party_display_name(global.order_new[i_new]));
+		}
+		draw_set_halign(fa_left);
+	}
+	
+	//build available list for botmid and botleft preview
+	var i_availDraw = 0;
+	var availableDraw = [];
+	for (var i_ord = 0; i_ord < array_length(global.partyOrder); i_ord++) {
+		var placed = false;
+		for (var j_avail = 0; j_avail < array_length(global.order_new); j_avail++) {
+			if (global.order_new[j_avail] == global.partyOrder[i_ord]) {
+				placed = true;
+				break;
+			}
+		}
+		if (!placed) array_push(availableDraw, global.partyOrder[i_ord]);
+	}
+	var num_availDraw = array_length(availableDraw);
+	
+	//botmid - available party list or yesno
+	if (global.order_state == ORDER_STATE.SELECT) {
+		for (var i_sel = 0; i_sel < num_availDraw; i_sel++) {
+			var col = (menu_cursor == i_sel) ? c_yellow : c_white;
+			var name_avail = get_party_display_name(availableDraw[i_sel]);
+			draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i_sel * 20), name_avail, col, col, col, col, 1);
+		}
+		
+		//blinking cursor
+		var cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
+		var cursor_x = bot_mid.x + 24 -12;//12 pixels left of text
+		var _blink_on = (blink_timer mod 40) < 20;
+		var _cursor_spr = _blink_on ? sCursor : sBlink;
+		draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
+				
+		//botleft - portrait preview of highlighted char
+		if (num_availDraw > 0) {
+			menu_cursor = clamp(menu_cursor, 0, num_availDraw - 1);
+			var preview_obj = availableDraw[menu_cursor];
+			//find matching party struct
+			var preview_member = global.party[0];
+			for (var i_pm = 0; i_pm < array_length(global.partyOrder); i_pm++) {
+				if (global.partyOrder[i_pm] == preview_obj) {
+					preview_member = global.party[i_pm];
+					break;
+				}
+			}
+			var preview_stats = preview_member.get_effective_stats();
+			
+			//portrait topleft of card
+			var prev_portrait = sPortraitDefault;
+			if (preview_obj == oLeon) prev_portrait = sChatPortLeon;
+			if (preview_obj == oCoat) prev_portrait = sChatPortCoat;
+			if (preview_obj == oOsei) prev_portrait = sChatPortOsei;
+			if (preview_obj == oAnna) prev_portrait = sChatPortAnna;
+			if (preview_obj == oData) prev_portrait = sChatPortData;
+			draw_sprite(prev_portrait, 0, bot_left.x + lpad * 3 + 4, bot_left.y + lpad * 1);
+			
+			//HP, MP, name, level matching main pause menu layout
+			draw_set_halign(fa_left);
+			draw_text(bot_left.x + lpad, bot_left.y + lh * 5 - 6, "HP " + string(preview_member.current_hp) + "/" + string(preview_stats.maxhp));
+			draw_text(bot_left.x +lpad, bot_left.y + lh * 6 - 6, "MP " + string(preview_member.current_mana) + "/" + string(preview_stats.max_mana));
+			//Name left, level right
+			draw_set_halign(fa_left);
+			draw_text(bot_left.x + lpad, bot_left.y + lh * 7 - 6, preview_member.name);
+			draw_set_halign(fa_right);
+			draw_text(bot_left.x + global.card_w - lpad, bot_left.y + lh * 7 - 6, "Lv" + string(preview_member.level));
+			draw_set_halign(fa_left);
+		}
+	}
+	
+	if (global.order_state == ORDER_STATE.CONFIRM) {
+		var confirm_opts = ["No", "Yes"];
+		for (var i_conf = 0; i_conf < 2; i_conf++) {
+			var col = (global.order_confirm_cursor == i_conf) ? c_yellow : c_white;
+			draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i_conf * 20), confirm_opts[i_conf], col, col, col, col, 1);
+		}
+		var cursor_y = bot_mid.y + 20 + (global.order_confirm_cursor * 20);
+		var cursor_x = bot_mid.x + 12;
+		var _blink_on = (blink_timer mod 40) < 20;
+		draw_sprite((_blink_on ? sCursor : sBlink), 0, cursor_x, cursor_y);
+	}
+	
+	//botright - overworld sprites stacked vertically as selected
+	for (var i_spr = array_length(global.order_new) - 1; i_spr >=0 ; i_spr--) {
+		var spr_obj = global.order_new[i_spr];
+		var spr_to_draw = -1;
+		if (instance_exists(spr_obj)) spr_to_draw = instance_find(spr_obj, 0).sprite_index;
+		if (spr_to_draw != -1) {
+			draw_sprite_ext(spr_to_draw, 3, bot_right.x + global.card_w / 2 - 8, bot_right.y + lh * 7 - 6 - (i_spr * 18), 1, 1, 0, c_white, 1);
+		}
+	}
+}
+	

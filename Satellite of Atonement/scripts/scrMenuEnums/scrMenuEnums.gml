@@ -56,7 +56,9 @@ enum SUBMENU_HISTORY {
 	INVENTORY_SELECT_TARGET,
 	STATS_SELECT_WHO,
 	STATS_VIEW,
-	QUIT_CONFIRM//add more later for other sub-menus
+	QUIT_CONFIRM,
+	ORDER_SELECT,
+	ORDER_CONFIRM//add more later for other sub-menus
 }
 
 enum STATS_STATE {
@@ -66,4 +68,9 @@ enum STATS_STATE {
 
 enum QUIT_STATE {
 	SELECT
+}
+
+enum ORDER_STATE {
+	SELECT,
+	CONFIRM
 }

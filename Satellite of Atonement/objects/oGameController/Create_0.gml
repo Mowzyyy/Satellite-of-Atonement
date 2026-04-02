@@ -56,6 +56,10 @@ global.menu_page = MENU_PAGE.MAIN;
 global.selected_char = 0;//0-3 for the 4 portraits
 global.stats_state = STATS_STATE.SELECT_WHO;
 global.selected_stat_char = 0;
+global.order_state = ORDER_STATE.SELECT;
+global.order_new = [];//builds the new order for partyOrder
+global.order_new_party = [];//builds the new order for party structs
+global.order_confirm_cursor = 0;
 menu_cursor = 0;//Which menu option is highlighted
 blink_timer = 0;
 

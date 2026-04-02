@@ -83,6 +83,21 @@ function scrMenuPauseLogic() {
 				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.QUIT_CONFIRM);
 				show_debug_message("Entered QUIT CONFIRM from MAIN");
 			}
+			
+			//Order logic for menu C
+			if (global.menu_page == MENU_PAGE.ORDER) {
+				global.order_state = ORDER_STATE.SELECT;
+				global.order_new = [];
+				global.order_new_party = [];
+				global.order_confirm_cursor = 0;
+				menu_cursor = 0;
+				io_clear();
+				global.keyC = false;
+				while (ds_stack_size(global.submenu_history) > 0) ds_stack_pop(global.submenu_history);
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.MAIN);
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.ORDER_SELECT);
+				show_debug_message("Entered ORDER from MAIN");
+			}
 			//add similar reset/push for other submenus later
 		}
 	} 
@@ -95,8 +110,12 @@ function scrMenuPauseLogic() {
 		scrStatsLogic();
 	}
 	//========================= QUIT SUBMENU =========================
-	if (global.menu_page = MENU_PAGE.QUIT){
+	if (global.menu_page == MENU_PAGE.QUIT){
 		scrQuitLogic();
+	}
+	//========================= ORDER SUBMENU =========================
+	if (global.menu_page == MENU_PAGE.ORDER) {
+		scrOrderLogic();
 	}
 	//====================== OTHER SUBMENUS (add later) ======================
 }
@@ -258,6 +277,22 @@ function submenu_back() {
 			global.menu_page = MENU_PAGE.MAIN;
 			menu_cursor = 9;
 			break;
+		
+		case SUBMENU_HISTORY.ORDER_SELECT:
+			global.order_state = ORDER_STATE.SELECT;
+			global.order_new = [];
+			global.order_new_party = [];
+			global.order_confirm_cursor = 0;
+			menu_cursor = 0;
+			break;
+		
+		case SUBMENU_HISTORY.ORDER_CONFIRM:
+			global.order_state = ORDER_STATE.SELECT;
+			global.order_new = [];
+			global.order_new_party = [];
+			global.order_confirm_cursor = 0;
+			menu_cursor = 0;
+			break;
 	}
 	return false;//did not close entire menu
 }
@@ -319,6 +354,106 @@ function scrQuitLogic() {
 			instance_destroy(oGameController);
 			instance_create_depth(0, 0, 0, oGameController);
 			game_restart();
+		}
+	}
+}
+//==================================Order Menu Logic==================================
+function scrOrderLogic() {
+	var num_available = 0;
+	//count how many are still in the list
+	for (var q = 0; q < array_length(global.partyOrder); q++) {
+		var already_placed = false;
+		for (var j = 0; j < array_length(global.order_new); j++) {
+			if (global.order_new[j] == global.partyOrder[q]) {
+				already_placed = true;
+				break;
+			}
+		}
+		if (!already_placed) num_available++;
+	}
+	
+	switch (global.order_state) {
+		
+		case ORDER_STATE.SELECT:
+		//build the available list dynamically
+			var available = [];
+			var available_party = [];
+			for (var q = 0; q < array_length(global.partyOrder); q++) {
+				var already_placed = false;
+				for (var j = 0; j < array_length(global.order_new); j++) {
+					if (global.order_new[j] == global.partyOrder[q]) {
+						already_placed = true;
+						break;
+						}
+					}
+			if (!already_placed) {
+				array_push(available, global.partyOrder[q]);
+				array_push(available_party, global.party[q]);
+				}
+			}
+			
+			var num_avail = array_length(available);
+			
+			//auto-place the last member
+			if(num_avail == 1) {
+				array_push(global.order_new, available[0]);
+				array_push(global.order_new_party, available_party[0]);
+				global.order_state = ORDER_STATE.CONFIRM;
+				menu_cursor = 0;
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.ORDER_CONFIRM);
+				io_clear();
+				break;
+			}
+			
+			if (global.keyUpPressed) menu_cursor = (menu_cursor - 1 + num_avail) mod num_avail;
+			if (global.keyDownPressed) menu_cursor = (menu_cursor + 1) mod num_avail;
+			
+			if (global.keyC) {
+				//place selected char into new order
+				array_push(global.order_new, available[menu_cursor]);
+				array_push(global.order_new_party, available_party[menu_cursor]);
+				menu_cursor = 0;
+				io_clear();
+				global.keyC = false;
+				show_debug_message("ORDER: placed " + get_party_display_name(available[menu_cursor]));
+			}
+			break;
+			
+		case ORDER_STATE.CONFIRM:
+			if (global.keyUpPressed) { global.order_confirm_cursor = (global.order_confirm_cursor - 1 + 2) mod 2; menu_cursor = global.order_confirm_cursor; io_clear(); }
+			if (global.keyDownPressed) { global.order_confirm_cursor = (global.order_confirm_cursor + 1) mod 2; menu_cursor = global.order_confirm_cursor; io_clear();}
+			
+			if (global.keyC) {
+				if (global.order_confirm_cursor == 1) {
+					//yes - apply new order to both arrays in sync
+					global.partyOrder = array_create(array_length(global.order_new));
+					global.party = array_create(array_length(global.order_new_party));
+					for (var i = 0; i < array_length(global.order_new); i++) {
+						global.partyOrder[i] = global.order_new[i];
+						global.party[i] = global.order_new_party[i];
+					}
+					scrRefreshPartyRanks();
+					show_debug_message("ORDER: new order applied");
+				} else {
+					show_debug_message("ORDER: cancelled, no changes")
+				}
+				//reset order state either way
+				global.order_new = [];
+				global.order_new_party = [];
+				global.order_state = ORDER_STATE.SELECT;
+				global.order_confirm_cursor = 0;
+				submenu_back();
+				io_clear();
+				global.keyC = false;
+			}
+		break;
+	}
+}
+function scrRefreshPartyRanks() {
+	for (var i_rnk = 0; i_rnk < array_length(global.partyOrder); i_rnk++) {
+		var inst = instance_find(global.partyOrder[i_rnk], 0);
+		if (inst != noone && instance_exists(inst)) {
+			inst.myRank = i_rnk;
 		}
 	}
 }

@@ -40,8 +40,8 @@ if (myRank > 0) {
 				y_pos = y_to;
 				state = states.idle;
 				walk_anim_time = 0;
-				sprite_index = sprite[last_dir];
-				image_index = 0;
+				sprite_index = sprite_standing;
+				image_index = last_dir;
 			}
 		}
 	}

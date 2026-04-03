@@ -55,6 +55,11 @@ if (state == states.walking){
 		state = states.idle;
 		x_pos = x_to;
 		y_pos = y_to;
+		sprite_index = sprite_standing;
+		image_index = last_dir;
+		x = x_pos * TILE_WIDTH;
+		y = y_pos * TILE_HEIGHT;
+		exit;
 	}
 	
 	x = lerp(x_from, x_to, _t) * TILE_WIDTH;

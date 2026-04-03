@@ -37,3 +37,4 @@ sprite[directions.right] = noone;
 sprite[directions.left] = noone;
 sprite[directions.up] = noone;
 sprite[directions.down] = noone;
+sprite_standing = noone;

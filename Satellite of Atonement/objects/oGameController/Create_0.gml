@@ -111,11 +111,24 @@ MENU_PAGE.QUIT
 global.inventory_state = INVENTORY_STATE.SELECT_WHO;
 global.selected_party = 0;//0-3 for which party member
 global.selected_item = 0;//index in their inventory
+global.inventory_full_msg = false;//trigger shows full in topmid card
 //==================================Global Menu Var==================================
 global.submenu_history = ds_stack_create();
 ds_stack_push(global.submenu_history, SUBMENU_HISTORY.MAIN);//start at top level
 
 //Fake inventory per party member - replace later with real ds_list or array
-global.party_inventory = ds_map_create();
-ds_map_add_list(global.party_inventory, oLeon, ds_list_create());//example
+//global.party_inventory = ds_map_create();
+//ds_map_add_list(global.party_inventory, oLeon, ds_list_create());//example
+
+//temporary construct items and assign for testing purposes
+var potion = new cstrItem("Potion", "consumable", "Restores 50 HP", 10).set_effect("heal_hp", 50);
+var stimpak = new cstrItem("Stimpak", "consumable", "Restores 150 HP", 30).set_effect("heal_hp", 150);
+var antitox = new cstrItem("Antitox", "consumable", "Cures poison", 15).set_effect("cure_status", 0);
+var cyanide = new cstrItem("Cyanide", "consumable", "Damages you", 25).set_effect("damage", 45);
+global.party[0].add_item(potion);
+global.party[0].add_item(stimpak);
+global.party[1].add_item(antitox);
+global.party[2].add_items(cyanide, cyanide, cyanide, potion, potion, stimpak, cyanide, antitox, antitox, cyanide, cyanide, cyanide, cyanide, potion, potion, stimpak, cyanide, antitox, antitox, cyanide);
+
 //populate later
+

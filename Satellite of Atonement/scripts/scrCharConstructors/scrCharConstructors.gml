@@ -1,16 +1,41 @@
 //Party Character Constructor
 	
 //====================================Equipment Constructor====================================
-function cstrEquipment(_name = "No Item", _slot_type = "none", _atk = 0, _def = 0, _spd = 0, _mAtk = 0, _mDef = 0) constructor {
+function cstrEquipment(_name = "No Item", _slot_type = "none", _atk = 0, _def = 0, _spd = 0, _mental =  0, _mAtk = 0, _mDef = 0) constructor {
 		name = _name;
 		slot_type = _slot_type;//head, right hand, left hand, body, feet
 		atk_bonus = _atk;
 		def_bonus = _def;
 		spd_bonus = _spd;
+		mental_bonus = _mental;
 		mAtk_bonus = _mAtk;
 		mDef_bonus = _mDef;
 		
 		//example : new cstrEquipment("Iron Sword", "right_hand", 15, 0, 2, 0, 0);
+}
+
+//=======================================Item Constructor=======================================
+//types - consumable, weapon, armor, key, misc
+//effect types - heal_hp, heal_mp, cure_status, damage, buff_stat
+function cstrItem(_name, _type, _description = "", _value = 0) constructor {
+	name					= _name;
+	type						= _type;//consumable, weapon, armor, key, misc
+	description			= _description;
+	value						= _value;//sell/buy price, 0 - unsellable
+	
+	//effect fields for consumables
+	effect_type			="none";		//heal_hp, heal_mp, cure_status, damage, buff_stat
+	effect_amount	= 0;					//amount healed, damaged, buffed
+	effect_state			="";					//for buff_stat - atk, def, spd, mental etc
+	
+	//fluent setter allows chaining configuration after construction
+	//eg var potion = new cstrIOtem("Potion", "consumable").set_effect("heal_hp", 50);
+	static set_effect = function(_type, _amount, _stat = "") {
+		effect_type			= _type;
+		effect_amount	= _amount;
+		effect_state			=  _stat;
+		return self;
+	}
 }
 
 //====================================Main Party Constructor====================================
@@ -52,6 +77,22 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 	//example 
 	//skills = [ { name: "Power Slash", power: 25, cooldown: 0, learned: true } ];
 	
+	//Inventory - up to 20 items not counting equipped gear
+	inventory = array_create(0);//array of cstrItem instances
+	
+	//status effects - array of strings like poison or stun
+	status_effects = [];
+	
+	//temporary battle buffs - reset at end of battle
+	battle_buffs = {
+		atk:				0,
+		def:				0,
+		spd:				0,
+		mental:			0,
+		mAtk:			0,
+		mDef:			0
+	};
+	
 	//Helper Methods - call these from objects
 	
 	static get_effective_stats = function() {
@@ -59,12 +100,12 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 		
 		stats.maxhp			= base_max_hp;
 		stats.max_mana	= base_max_mana;
-		stats.atk					= base_atk + head.atk_bonus + r_Hand.atk_bonus + l_Hand.atk_bonus + body.atk_bonus + feet.atk_bonus;
-		stats.def					= base_def + head.def_bonus + r_Hand.def_bonus + l_Hand.def_bonus + body.def_bonus + feet.def_bonus;
-		stats.spd					= base_spd + head.spd_bonus + r_Hand.spd_bonus + l_Hand.spd_bonus + body.spd_bonus + feet.spd_bonus;
-		stats.mental			= base_mental;
-		stats.mAtk				= base_mental + head.mAtk_bonus + r_Hand.mAtk_bonus + l_Hand.mAtk_bonus + body.mAtk_bonus + feet.mAtk_bonus;
-		stats.mDef				= base_mental + head.mDef_bonus + r_Hand.mDef_bonus + l_Hand.mDef_bonus + body.mDef_bonus + feet.mDef_bonus;
+		stats.atk					= base_atk + head.atk_bonus + r_Hand.atk_bonus + l_Hand.atk_bonus + body.atk_bonus + feet.atk_bonus + battle_buffs.atk;
+		stats.def					= base_def + head.def_bonus + r_Hand.def_bonus + l_Hand.def_bonus + body.def_bonus + feet.def_bonus + battle_buffs.def;
+		stats.spd					= base_spd + head.spd_bonus + r_Hand.spd_bonus + l_Hand.spd_bonus + body.spd_bonus + feet.spd_bonus + battle_buffs.spd;
+		stats.mental			= base_mental + head.mental_bonus + r_Hand.mental_bonus + l_Hand.mental_bonus + body.mental_bonus + battle_buffs.mental;
+		stats.mAtk				= base_mental + head.mAtk_bonus + r_Hand.mAtk_bonus + l_Hand.mAtk_bonus + body.mAtk_bonus + feet.mAtk_bonus + battle_buffs.mAtk;
+		stats.mDef				= base_mental + head.mDef_bonus + r_Hand.mDef_bonus + l_Hand.mDef_bonus + body.mDef_bonus + feet.mDef_bonus + battle_buffs.mDef;
 
 		return stats;
 	}
@@ -110,6 +151,101 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 		//TODO - check for new skills here
 		//eg: if level >= 5 && _bio "Yux" tthen learn skill etc
 		
+	}
+	
+	//add an item to inventory - returns true if successful, false if full
+	static add_item = function(_item) {
+		if (array_length(inventory) >= 20) return false;
+		array_push(inventory, _item);
+		return true;
+	}
+	
+	//Remove item at index - returns the item or undefined if invalid
+	static remove_item = function(_index) {
+		if (_index < 0 || _index >= array_length(inventory)) return undefined;
+		var item = inventory[_index];
+		array_delete(inventory, _index, 1);
+		return item;
+	}
+	
+	//Use an item at index on a target party member struct, returns true if the item was consumed, false if no effect
+	static use_item = function(_index, _target) {
+		if (_index < 0 || _index >= array_length(inventory)) return false;
+		var item = inventory[_index];
+		if (item.type != "consumable") return false;
+		
+		var used = false;
+		
+		switch (item.effect_type) {
+			case "heal_hp":
+				if (_target.current_hp < _target.base_max_hp) {
+					_target.current_hp = min(_target.current_hp + item.effect_amount, _target.base_max_hp);
+					used = true;
+				}
+			break;
+			
+			case "heal_mp":
+				if (_target.current_mana < _target.base_max_mana) {
+					_target.current_mana = min(_target.current_mana + item.effect_amount, _target.base_max_mana);
+					used = true;
+				}
+			break;
+			
+			case "cure_status":
+				if (array_length(_target.status_effects) > 0) {
+					_target.status_effects = [];	
+					used = true;
+				}
+			break;
+				
+			case "damage":
+				//direct damage, typically used outside battle for story items
+				_target.current_hp = max(_target.current_hp - item.effect_amount, 0);
+				used = true;
+			break;
+		
+		case "buff_stat":
+			if (item.effect_stat != "") {
+				_target.battle_buffs[$ item.effect_stat] += item.effect_amount;
+				used = true;
+			}
+		break;
+		}
+		
+		if (used) array_delete(inventory, _index, 1);
+		return used;
+	}
+	
+	//adds multiple items
+	static add_items = function() {
+		for (var i_add = 0; i_add < argument_count; i_add++) {
+			add_item(argument[i_add]);
+		}
+		return self;
+	}
+	
+	//reset battle buffs - call at the end of the battle
+	static reset_battle_buffs = function() {
+		battle_buffs = { atk: 0, def: 0, spd: 0, mental: 0 };
+	}
+	
+	//check if a status is present
+	static has_status = function(_status) {
+		for (var i_status = 0; i_status < array_length(status_effects); i_status++) {
+			if (status_effects[i_status] == _status) return true;
+		}
+		return false;
+	}
+	
+	//Add a status effect if not already present
+	static add_status = function (_status) {
+		if (!has_status(_status)) array_push(status_effects, _status);
+	}
+	
+	static remove_status = function(_status) {
+		for (var i_rem = array_length(status_effects) - 1; i_rem >= 0; i_rem--) {
+			if (status_effects[i_rem] == _status) array_delete(status_effects, i_rem, 1);
+		}
 	}
 	
 	//debug print

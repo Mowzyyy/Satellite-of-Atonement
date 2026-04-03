@@ -44,7 +44,8 @@ enum INVENTORY_STATE {
 	SELECT_WHO,//"Whose" + party list
 	SELECT_ITEM,//"What?" + inventory list
 	SELECT_ACTION,//"Use / Give / Toss"
-	SELECT_TARGET//"On Whom?" + party list again
+	SELECT_TARGET,//"On Whom?" + party list again
+	SELECT_GIVE_TARGET//separate target selection for give
 }
 
 enum SUBMENU_HISTORY {
@@ -58,7 +59,8 @@ enum SUBMENU_HISTORY {
 	STATS_VIEW,
 	QUIT_CONFIRM,
 	ORDER_SELECT,
-	ORDER_CONFIRM//add more later for other sub-menus
+	ORDER_CONFIRM,
+	INVENTORY_SELECT_GIVE_TARGET//add more later for other sub-menus
 }
 
 enum STATS_STATE {

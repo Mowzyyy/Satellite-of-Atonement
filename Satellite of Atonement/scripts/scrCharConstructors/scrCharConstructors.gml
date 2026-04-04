@@ -104,8 +104,9 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 		stats.def					= base_def + head.def_bonus + r_Hand.def_bonus + l_Hand.def_bonus + body.def_bonus + feet.def_bonus + battle_buffs.def;
 		stats.spd					= base_spd + head.spd_bonus + r_Hand.spd_bonus + l_Hand.spd_bonus + body.spd_bonus + feet.spd_bonus + battle_buffs.spd;
 		stats.mental			= base_mental + head.mental_bonus + r_Hand.mental_bonus + l_Hand.mental_bonus + body.mental_bonus + battle_buffs.mental;
-		stats.mAtk				= base_mental + head.mAtk_bonus + r_Hand.mAtk_bonus + l_Hand.mAtk_bonus + body.mAtk_bonus + feet.mAtk_bonus + battle_buffs.mAtk;
-		stats.mDef				= base_mental + head.mDef_bonus + r_Hand.mDef_bonus + l_Hand.mDef_bonus + body.mDef_bonus + feet.mDef_bonus + battle_buffs.mDef;
+		
+		stats.mAtk				= floor(stats.mental * 0.6 + stats.atk * 0.4) + floor(base_max_mana / 4) + head.mAtk_bonus + r_Hand.mAtk_bonus + l_Hand.mAtk_bonus + body.mAtk_bonus + feet.mAtk_bonus + battle_buffs.mAtk;
+		stats.mDef				= floor(stats.mental * 0.6 + stats.def * 0.4) + floor(stats.spd / 4) + head.mDef_bonus + r_Hand.mDef_bonus + l_Hand.mDef_bonus + body.mDef_bonus + feet.mDef_bonus + battle_buffs.mDef;
 
 		return stats;
 	}

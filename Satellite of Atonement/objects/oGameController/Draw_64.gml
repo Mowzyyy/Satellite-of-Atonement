@@ -229,7 +229,10 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 				draw_text(top_mid.x + 24, top_mid.y + 52, selected_name);
 				if (global.inventory_full_msg) {
 					draw_set_color(c_red);
-					draw_text(top_mid.x + 24, top_mid.y + 76, "FULL!");
+					var full_msg = global.party[global.selected_party].is_equipped(
+						global.party[global.selected_party].inventory[global.selected_item].name
+						) ? "EQP'D!" : "FULL!";
+					draw_text(top_mid.x + 24, top_mid.y + 76, full_msg);
 					draw_set_color(c_white);
 				} else {
 					draw_text(top_mid.x + 8, top_mid.y + 76, "To Whom?")

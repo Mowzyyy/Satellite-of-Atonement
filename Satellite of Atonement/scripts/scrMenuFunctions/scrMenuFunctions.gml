@@ -263,6 +263,16 @@ function scrInventoryLogic() {
 			
 			var giver = global.party[global.selected_party];
 			var receiver = global.party[menu_cursor];
+			var give_item = giver.inventory[global.selected_item];
+			
+			//cannot give an equipped item
+			if (giver.is_equipped(give_item.name)) {
+				global.inventory_full_msg = true;//reuse flag but says "EQUIPD!"
+				io_clear();
+				global.keyC = false;
+				show_debug_message("Give failed - " + give_item.name + " is equipped");
+				break;
+			}
 			
 			if (array_length(receiver.inventory) >= 20) {
 				//target full - show message stay on screen

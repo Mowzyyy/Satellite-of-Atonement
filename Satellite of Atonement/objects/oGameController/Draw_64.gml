@@ -59,6 +59,7 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 		if (global.menu_page == MENU_PAGE.INVENTORY && global.inventory_state == INVENTORY_STATE.SELECT_TARGET) _show_side_cards = true;
 		if (global.menu_page == MENU_PAGE.INVENTORY && global.inventory_state == INVENTORY_STATE.SELECT_GIVE_TARGET) _show_side_cards = true;
 		if (global.menu_page == MENU_PAGE.STATS && global.stats_state == STATS_STATE.SELECT_WHO) _show_side_cards = true;
+		if (global.menu_page == MENU_PAGE.EQUIP && global.equip_state == EQUIP_STATE.SELECT_WHO) _show_side_cards = true;
 		
 	//side cards - party members
 	if (_show_side_cards) {
@@ -147,9 +148,16 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 					for (var i_locinv = 0; i_locinv < items_per_card; i_locinv++) {
 						var global_slot = (card_idx * items_per_card) + i_locinv;
 						if (global_slot >= inv_size) continue;
-						var col = (menu_cursor == global_slot) ? c_yellow : c_white;
-						var item_y = c.y + 12 + (i_locinv * 20);
-						draw_text_color(c.x + 20, item_y, inv[global_slot].name, col, col, col, col, 1);
+						
+						//draw all items, display equipped items as blue
+						var item_y  = c.y + 12 + (i_locinv * 20);
+						var is_eqp  = global.party[global.selected_party].is_equipped(inv[global_slot].name);
+						var is_sel  = (menu_cursor == global_slot);
+						var r = is_sel ? 255 : (is_eqp ? 100 : 255);
+						var g = is_sel ?   255 : (is_eqp ? 100 : 255);
+						var b = is_sel ?   0 : (is_eqp ? 255 :   255);
+						var item_col = make_color_rgb(r, g, b);
+						draw_text_color(c.x + 20, item_y, inv[global_slot].name, item_col, item_col, item_col, item_col, 1);
 					}
 				}
 				
@@ -554,4 +562,170 @@ if (global.menu_page == MENU_PAGE.ORDER) {
 		}
 	}
 }
+
+//================================EQUIP SUBMENU DRAWING================================
+if (global.menu_page == MENU_PAGE.EQUIP) {
+	var top_left = global.card_positions[0];
+	var top_mid = global.card_positions[1];
+	var top_right = global.card_positions[2];
+	var bot_left = global.card_positions[3];
+	var bot_mid = global.card_positions[4];
+	var bot_right = global.card_positions[5];
+	var lh = 14;
+	var lpad = 6;
+	var rpad = global.card_w - 6;
 	
+	//topmid - equip header
+	draw_set_halign(fa_center);
+	draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 1, "EQUIP");
+	draw_set_halign(fa_left);
+	
+	//select WHO
+	if (global.equip_state == EQUIP_STATE.SELECT_WHO) {
+		draw_set_halign(fa_center);
+		draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 2, "Who?");
+		draw_set_halign(fa_left);
+		
+		for (var i_eq = 0; i_eq < array_length(global.partyOrder); i_eq++) {
+			var col = (global.equip_char == i_eq) ? c_yellow : c_white;
+			draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i_eq * 20), get_party_display_name(global.partyOrder[i_eq]), col, col, col, col, 1);
+		}
+		var cursor_y = bot_mid.y + 20 + (global.equip_char * 20);
+		var cursor_x = bot_mid.x + 12;
+		var _blink_on = (blink_timer mod 40) < 20;
+		draw_sprite((_blink_on ? sCursor : sBlink), 0, cursor_x, cursor_y);
+	}
+	
+	//SELECT_SLOT and SELECT_HAND
+	if (global.equip_state == EQUIP_STATE.SELECT_SLOT || global.equip_state == EQUIP_STATE.SELECT_HAND) {
+		var member = global.party[global.equip_char];
+		var stats = member.get_effective_stats();
+		
+		//topmid - character name and What? prompt
+		draw_set_halign(fa_center);
+		draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 2, member.name);
+		draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 3, "What?");
+		draw_set_halign(fa_left);
+		
+		//topleft - head, rhand, lhand
+		var r_col = c_white;
+		var l_col = c_white;
+		if (global.equip_state == EQUIP_STATE.SELECT_HAND) {
+			r_col = (global.equip_hand_cursor == 0) ? c_yellow : c_white;
+			l_col = (global.equip_hand_cursor == 1) ? c_yellow : c_white;
+			//blinking cursor on selected hand
+			var hand_line = (global.equip_hand_cursor == 0) ? 4 : 6;
+			var hand_cur_y = top_left.y + lh * hand_line;
+			var _blink_on = (blink_timer mod 40) < 20;
+			draw_sprite((_blink_on ? sCursor : sBlink), 0, top_left.x, hand_cur_y);
+		}
+		
+		draw_text(top_left.x + lpad, top_left.y + lh * 1, "Head");
+		draw_set_halign(fa_right);
+		draw_text(top_left.x + rpad, top_left.y + lh * 2, member.head.name == "No Item" ? "" : member.head.name);
+		draw_set_halign(fa_left);
+		
+		draw_text_color(top_left.x + lpad, top_left.y + lh * 3, "R Hand", r_col, r_col, r_col, r_col, 1);
+		draw_set_halign(fa_right);
+		draw_text_color(top_left.x + rpad, top_left.y + lh * 4, member.r_Hand.name == "No Item" ? "" : member.r_Hand.name, r_col, r_col, r_col, r_col, 1);
+		draw_set_halign(fa_left);
+		
+		draw_text_color(top_left.x + lpad, top_left.y + lh * 5, "L Hand", l_col, l_col, l_col, l_col, 1);
+		draw_set_halign(fa_right);
+		draw_text_color(top_left.x + rpad, top_left.y + lh * 6, member.l_Hand.name == "No Item" ? "" : member.l_Hand.name, l_col, l_col, l_col, l_col, 1);
+		draw_set_halign(fa_left);
+		
+		//botleft - torso/feet/accessory
+		draw_text(bot_left.x + lpad, bot_left.y + lh * 1, "Torso");
+		draw_set_halign(fa_right);
+		draw_text(bot_left.x + rpad, bot_left.y + lh * 2, member.body.name == "No Item" ? "" : member.body.name);
+		draw_set_halign(fa_left);
+		
+		draw_text(bot_left.x + lpad, bot_left.y + lh * 3, "Feet");
+		draw_set_halign(fa_right);
+		draw_text(bot_left.x + rpad, bot_left.y + lh * 4, member.feet.name == "No Item" ? "" : member.feet.name);
+		draw_set_halign(fa_left);
+		
+		draw_text(bot_left.x + lpad, bot_left.y + lh * 5, "Artifact");
+		draw_set_halign(fa_right);
+		draw_text(bot_left.x + rpad, bot_left.y + lh * 6, member.accessory.name == "No Item" ? "" : member.accessory.name);
+		draw_set_halign(fa_left);
+		
+		//bot-right - live stats
+		var stat_labels = ["Atk", "Def", "Spd", "Mntl", "mAtk", "mDef"];
+		var stat_values = [stats.atk, stats.def, stats.spd, stats.mental, stats.mAtk, stats.mDef];
+		for (var i_st = 0; i_st < 6; i_st++) {
+			draw_set_halign(fa_left);
+			draw_text(bot_right.x + lpad, bot_right.y + lh * (1 + i_st), stat_labels[i_st]);
+			draw_set_halign(fa_right);
+			draw_text(bot_right.x + rpad, bot_right.y + lh * (1 + i_st), string(stat_values[i_st]));
+		}
+		draw_set_halign(fa_left);	
+		//botmid - character portrait
+		var portrait_spr = sChatPortDefault;
+		var p_obj = global.partyOrder[global.equip_char];
+		if (p_obj == oLeon) portrait_spr = sChatPortLeon;
+		if (p_obj == oCoat) portrait_spr = sChatPortCoat;
+		if (p_obj == oOsei) portrait_spr = sChatPortOsei;
+		if (p_obj == oAnna) portrait_spr = sChatPortAnna;
+		if (p_obj == oData) portrait_spr = sChatPortData;
+		draw_sprite(portrait_spr, 0, bot_mid.x + lpad * 3 + 4, bot_mid.y + lpad * 1);
+		draw_set_halign(fa_left);
+		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 5 - 6, "HP " + string(member.current_hp) + "/" + string(stats.maxhp));
+		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 6, "MP " + string(member.current_mana) + "/" + string(stats.max_mana));
+		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 7 - 6, member.name);
+		draw_set_halign(fa_right);
+		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 7 - 6, "Lv" + string(member.level));
+		draw_set_halign(fa_left);
+		
+		//topright - scrollable equipment inventory
+		if (global.equip_state == EQUIP_STATE.SELECT_SLOT) {
+			var equip_list = scrEquipBuildList(global.equip_char);
+			var list_size  = array_length(equip_list);
+			var page_start = global.equip_scroll_page * 5;
+			var has_next   = (page_start + 5) < list_size;
+			var is_last_page = !has_next && page_start > 0;
+			var show_next = has_next || is_last_page;
+			
+			//line 1 - shows NEXT if there are more pages
+			if (list_size == 0) {
+				//nothing to equip, show message
+				draw_set_halign(fa_center);
+				draw_text(top_right.x + global.card_w / 2, top_right.y + lh * 2, "Nothing");
+				draw_text(top_right.x + global.card_w / 2, top_right.y + lh * 3, "To");
+				draw_text(top_right.x + global.card_w / 2, top_right.y + lh * 4, "Equip");
+				draw_set_halign(fa_left);
+			} else {
+				if (show_next) {
+					var next_label = is_last_page ? "*FIRST*" : "*NEXT*";
+					var next_col = (global.equip_cursor == 0) ? c_yellow : c_white;
+					draw_text_color(top_right.x + lpad + 12, top_right.y + lh * 1, next_label, next_col, next_col, next_col, next_col, 1);
+				}
+			
+				//lines 2-6 items 
+				for (var i_ep = 0; i_ep < 5; i_ep++) {
+					var slot_idx = page_start + i_ep;
+					if (slot_idx >= list_size) break;
+					var entry = equip_list[slot_idx];
+					var item = entry.item;
+					var is_eqp = member.is_equipped(item.name);
+					var line_y = top_right.y + lh * (2 + i_ep);
+					var cursor_i = show_next ? i_ep + 1 : i_ep;
+					var is_sel = (global.equip_cursor == cursor_i);
+				
+					var r = is_eqp ? 100 : (is_sel ? 255 : 255);
+					var g = is_eqp ? 100 : (is_sel ? 255 : 255);
+					var b = is_eqp ? 255 : (is_sel ?   0 : 255);
+					var item_col = make_color_rgb(r, g, b);
+					draw_text_color(top_right.x + lpad + 12, line_y, item.name, item_col, item_col, item_col, item_col, 1);
+				}
+			
+				//blinking cursor topright
+				var cur_line  = show_next ? global.equip_cursor + 1 : global.equip_cursor + 2;
+				var cur_y      = top_right.y + lh * cur_line;
+				var _blink_on  = (blink_timer mod 40) < 20;
+				draw_sprite((_blink_on ? sCursor : sBlink), 0, top_right.x + lpad, cur_y);
+			}
+		}
+	}
+}

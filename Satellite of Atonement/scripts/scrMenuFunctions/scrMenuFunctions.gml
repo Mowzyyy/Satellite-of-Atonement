@@ -98,6 +98,23 @@ function scrMenuPauseLogic() {
 				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.ORDER_SELECT);
 				show_debug_message("Entered ORDER from MAIN");
 			}
+			
+			//Equip logic for menu C
+			if (global.menu_page == MENU_PAGE.EQUIP) {
+				global.equip_state = EQUIP_STATE.SELECT_WHO;
+				global.equip_char = 0;
+				global.equip_scroll_page = 0;
+				global.equip_cursor = 0;
+				global.equip_pending_item = -1;
+				global.equip_hand_cursor = 0;
+				menu_cursor = 0;
+				io_clear();
+				global.keyC = false;
+				while (ds_stack_size(global.submenu_history) > 0) ds_stack_pop(global.submenu_history);
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.MAIN);
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.EQUIP_SELECT_WHO);
+				show_debug_message("Entered EQUIP from MAIN");
+			}
 			//add similar reset/push for other submenus later
 		}
 	} 
@@ -116,6 +133,10 @@ function scrMenuPauseLogic() {
 	//========================= ORDER SUBMENU =========================
 	if (global.menu_page == MENU_PAGE.ORDER) {
 		scrOrderLogic();
+	}
+	//=========================== EQUIP SUBMENU ===========================
+	if (global.menu_page == MENU_PAGE.EQUIP) {
+		scrEquipLogic();
 	}
 	//====================== OTHER SUBMENUS (add later) ======================
 }
@@ -369,6 +390,26 @@ function submenu_back() {
 			global.inventory_full_msg = false;
 			menu_cursor = 1;
 			break;
+			
+		case SUBMENU_HISTORY.EQUIP_SELECT_WHO:
+			global.equip_state = EQUIP_STATE.SELECT_WHO;
+			global.equip_char = 0;
+			menu_cursor = 0;
+			break;
+		
+		case SUBMENU_HISTORY.EQUIP_SELECT_SLOT:
+			global.equip_state = EQUIP_STATE.SELECT_WHO;
+			global.equip_scroll_page = 0;
+			global.equip_cursor = 0;
+			menu_cursor = global.equip_char;
+			break;
+			
+		case SUBMENU_HISTORY.EQUIP_SELECT_HAND:
+		global.equip_state = EQUIP_STATE.SELECT_SLOT;
+		global.equip_pending_item = -1;
+		global.equip_hand_cursor = 0;
+		menu_cursor = 0;
+		break;
 	}
 	return false;//did not close entire menu
 }
@@ -531,5 +572,222 @@ function scrRefreshPartyRanks() {
 		if (inst != noone && instance_exists(inst)) {
 			inst.myRank = i_rnk;
 		}
+	}
+}
+
+//==================================Equip Menu Logic==================================
+function scrEquipLogic() {
+	var num_party = array_length(global.partyOrder);
+	var member = global.party[global.equip_char];
+	
+	switch global.equip_state {
+		case EQUIP_STATE.SELECT_WHO:
+			if (global.keyUpPressed) global.equip_char = (global.equip_char - 1 + num_party) mod num_party;
+			if (global.keyDownPressed) global.equip_char = (global.equip_char + 1) mod num_party;
+			if (global.keyUpPressed|| global.keyDownPressed) {
+				menu_cursor = global.equip_char;
+				io_clear();
+			}
+			
+			if (global.keyC) {
+				global.equip_state = EQUIP_STATE.SELECT_SLOT;
+				global.equip_scroll_page = 0;
+				global.equip_cursor = 0;
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.EQUIP_SELECT_SLOT);
+				menu_cursor = 0;
+				io_clear();
+				global.keyC = false;
+				show_debug_message("EQUIP: selected " + member.name);
+			}
+		break;
+		
+		case EQUIP_STATE.SELECT_SLOT:
+			//build equippable list for this page
+			var equip_list = scrEquipBuildList(global.equip_char);
+			var list_size = array_length(equip_list);
+			var page_start = global.equip_scroll_page * 5;
+			var page_items = min(5, list_size - page_start);
+			var has_next = (page_start + 5) < list_size;
+			var is_last_page = !has_next && page_start > 0;
+			var show_next = has_next || is_last_page;
+			
+			//if there is nothing equippable, C goes back
+			if (list_size == 0) {
+				if (global.keyC) {
+					submenu_back();
+					io_clear();
+					global.keyC = false;
+				}
+				break;
+			}
+			
+			if (global.keyUpPressed) {
+				if (global.equip_cursor <= 0) {
+				var max_cursor = show_next ? page_items : page_items - 1;
+				global.equip_cursor = max_cursor;
+				} else {
+				global.equip_cursor--;
+				}
+				io_clear();
+			}
+			if (global.keyDownPressed) {
+				var max_cursor = show_next ? page_items : page_items - 1;
+				if (global.equip_cursor >= max_cursor) {
+				global.equip_cursor = 0;
+				} else {
+				global.equip_cursor++;
+				}
+				io_clear();
+			}
+			if (global.keyC) {
+				//check if cursor is on NEXT
+				if (show_next && global.equip_cursor == 0) {
+					if (is_last_page) {
+						//FIRST - wrap to first page
+						global.equip_scroll_page = 0;
+					} else {
+						//NEXT -advance page
+						var total_pages = ceil(list_size / 5);
+						global.equip_scroll_page = (global.equip_scroll_page + 1) mod total_pages;
+					}
+					global.equip_cursor = 0;
+					io_clear();
+					global.keyC = false;
+					break;
+				}
+				
+				//resolve actual item index 
+				var item_cursor = show_next ? global.equip_cursor - 1 : global.equip_cursor;
+				var actual_idx = page_start + item_cursor;
+				if (actual_idx < 0 || actual_idx >= list_size) {io_clear(); global.keyC = false; break; }
+				
+				var inv_idx = equip_list[actual_idx].inv_idx;
+				var item = member.inventory[inv_idx];
+				
+				//if already equipped, unequip item first
+				if (member.is_equipped(item.name)) {
+					var slot = member.equipped_in_slot(item.name);
+					//if 2H, clear both hands
+					if (item.slot_type == "two_hand") {
+						member.unequip("r_Hand");
+						member.unequip("l_Hand");
+						show_debug_message("EQUIP: unequipped two-hander " + item.name + " from both hands");
+					} else {
+						member.unequip(slot);
+						show_debug_message("EQUIP: unequipped " + item.name + " from " + slot);
+					}
+					io_clear();
+					global.keyC = false;
+					break;
+				}
+				
+				//2H
+				if (item.slot_type == "two_hand") {
+					member.unequip("r_Hand");
+					member.unequip("l_Hand");
+					member.equip("r_Hand", item);
+					member.equip("l_Hand", item);
+					show_debug_message("EQUIP: equipped two-hander " + item.name);
+					 io_clear();
+					 global.keyC = false;
+					break;
+				}
+				
+				//offhand
+				if (item.slot_type == "l_Hand") {
+					//if rH holds a 2H, unequip from both slots first
+					if (member.r_Hand.slot_type == "two_hand") {
+						var two_h = member.r_Hand;
+						member.unequip("r_Hand");
+						member.unequip("l_Hand");
+						show_debug_message("EQUIP: cleared two-hander " + two_h.name + " to equip offhand");
+					}
+					member.equip("l_Hand", item);
+					show_debug_message("EQUIP: equipped offhand " + item.name + " to l_Hand");
+					io_clear();
+					global.keyC = false;
+					break;
+				}
+				
+				//ambidextrous weapon
+				if (item.slot_type == "weapon") {
+					//if rH holds a 2H, unequip both slots first
+					if (member.r_Hand.slot_type == "two_hand") {
+						member.unequip("r_Hand");
+						member.unequip("l_Hand");
+						show_debug_message("EQUIP: cleared two-hander before equipping weapon");
+					}
+					//only go to hand selection if neither hand already holds this item
+					global.equip_pending_item = inv_idx;
+					global.equip_hand_cursor = 0;
+					global.equip_state = EQUIP_STATE.SELECT_HAND;
+					ds_stack_push(global.submenu_history, SUBMENU_HISTORY.EQUIP_SELECT_HAND);
+					io_clear();
+					global.keyC = false;
+					show_debug_message("EQUIP: ambidextrous - select hand");
+					break;
+				}
+				
+				//all other slots
+				var auto_slot = scrEquipAutoSlot(item.slot_type);
+				if (auto_slot != "") {
+					member.equip(auto_slot, item);
+					show_debug_message("EQUIP: equipped " + item.name + " to " + auto_slot);
+				}
+				io_clear();
+				global.keyC = false;
+			}
+		break;
+		
+		case EQUIP_STATE.SELECT_HAND:
+			if (global.keyUpPressed || global.keyDownPressed) {
+			global.equip_hand_cursor = 1 - global.equip_hand_cursor;
+			io_clear();
+			}
+			if (global.keyC) {
+				var item = member.inventory[global.equip_pending_item];
+				var slot = (global.equip_hand_cursor == 0) ? "r_Hand" : "l_Hand";
+				member.equip(slot, item);
+				show_debug_message("EQUIP: equipped " + item.name + " to " + slot);
+				global.equip_state        = EQUIP_STATE.SELECT_SLOT;
+				ds_stack_pop(global.submenu_history);
+				global.equip_pending_item = -1;
+				global.equip_hand_cursor  = 0;
+				io_clear();
+				global.keyC = false;
+			}
+		break;
+	}
+}
+
+//returns array of { inv_idx, item } for equippable items
+function scrEquipBuildList(_char_idx) {
+	var member = global.party[_char_idx];
+	var result = [];
+	for (var i_idx = 0; i_idx < array_length(member.inventory); i_idx++) {
+		var item = member.inventory[i_idx];
+		var item_type = variable_struct_exists(item, "type") ? item.type : "";
+		if (item_type == "consumable" || item_type == "key") continue;
+		array_push(result, { inv_idx: i_idx, item: item });
+	}
+	return result;
+}
+
+//maps item type to default equipment slot
+function scrEquipAutoSlot(_type) {
+	switch(_type) {
+		case "head":				return "head";
+		case "body":				return "body";
+		case "feet":					return "feet";
+		case "armor":			return "body;"//fallback for generic armor
+		case "accessory":		return "accessory";
+		case "weapon":			return "r_Hand";//default overriden by hand selection
+		case "l_Hand":			return "l_Hand";
+		case "l_hand":			return "l_Hand";
+		case "r_Hand":			return "r_Hand";
+		case "r_hand":			return "r_Hand";
+		case "two_hand":		return "r_Hand";//placeholder, handled specially
+		case "misc":				return "";//misc has no autoslot
+		default:						return "";
 	}
 }

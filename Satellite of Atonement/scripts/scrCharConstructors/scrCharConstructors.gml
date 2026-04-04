@@ -3,13 +3,22 @@
 //====================================Equipment Constructor====================================
 function cstrEquipment(_name = "No Item", _slot_type = "none", _atk = 0, _def = 0, _spd = 0, _mental =  0, _mAtk = 0, _mDef = 0) constructor {
 		name = _name;
-		slot_type = _slot_type;//head, right hand, left hand, body, feet
+		slot_type = _slot_type;//head, body, feet, r_hand, l_hand, accessory, weapon, misc, none
 		atk_bonus = _atk;
 		def_bonus = _def;
 		spd_bonus = _spd;
 		mental_bonus = _mental;
 		mAtk_bonus = _mAtk;
 		mDef_bonus = _mDef;
+		//accessory special effects - array of effect structs
+		//effects: { type: "flat_stat|multiplier|teach_skill|teach_spell|auto_effect|stats }
+		special_effects = [];
+		
+		//fluent setter for chaining special effects onto accessories
+		static add_effect = function(_effect) {
+			array_push(special_effects, _effect);
+			return self;
+		}
 		
 		//example : new cstrEquipment("Iron Sword", "right_hand", 15, 0, 2, 0, 0);
 }
@@ -27,6 +36,7 @@ function cstrItem(_name, _type, _description = "", _value = 0) constructor {
 	effect_type			="none";		//heal_hp, heal_mp, cure_status, damage, buff_stat
 	effect_amount	= 0;					//amount healed, damaged, buffed
 	effect_state			="";					//for buff_stat - atk, def, spd, mental etc
+	
 	
 	//fluent setter allows chaining configuration after construction
 	//eg var potion = new cstrIOtem("Potion", "consumable").set_effect("heal_hp", 50);
@@ -70,6 +80,7 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 	l_Hand = new cstrEquipment();
 	body = new cstrEquipment();
 	feet = new cstrEquipment();
+	accessory = new cstrEquipment();
 	
 	//Non-Mana Combat Skills
 	skills = [];//Array of skill structs or strings - can push new ones as they level up
@@ -100,13 +111,21 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 		
 		stats.maxhp			= base_max_hp;
 		stats.max_mana	= base_max_mana;
-		stats.atk					= base_atk + head.atk_bonus + r_Hand.atk_bonus + l_Hand.atk_bonus + body.atk_bonus + feet.atk_bonus + battle_buffs.atk;
-		stats.def					= base_def + head.def_bonus + r_Hand.def_bonus + l_Hand.def_bonus + body.def_bonus + feet.def_bonus + battle_buffs.def;
-		stats.spd					= base_spd + head.spd_bonus + r_Hand.spd_bonus + l_Hand.spd_bonus + body.spd_bonus + feet.spd_bonus + battle_buffs.spd;
-		stats.mental			= base_mental + head.mental_bonus + r_Hand.mental_bonus + l_Hand.mental_bonus + body.mental_bonus + battle_buffs.mental;
+		stats.atk					= base_atk + head.atk_bonus + r_Hand.atk_bonus + l_Hand.atk_bonus + body.atk_bonus + feet.atk_bonus + battle_buffs.atk + accessory.atk_bonus;
+		stats.def					= base_def + head.def_bonus + r_Hand.def_bonus + l_Hand.def_bonus + body.def_bonus + feet.def_bonus + battle_buffs.def + accessory.def_bonus;
+		stats.spd					= base_spd + head.spd_bonus + r_Hand.spd_bonus + l_Hand.spd_bonus + body.spd_bonus + feet.spd_bonus + battle_buffs.spd + accessory.spd_bonus;
+		stats.mental			= base_mental + head.mental_bonus + r_Hand.mental_bonus + l_Hand.mental_bonus + body.mental_bonus + battle_buffs.mental + accessory.mental_bonus;
 		
-		stats.mAtk				= floor(stats.mental * 0.6 + stats.atk * 0.4) + floor(base_max_mana / 4) + head.mAtk_bonus + r_Hand.mAtk_bonus + l_Hand.mAtk_bonus + body.mAtk_bonus + feet.mAtk_bonus + battle_buffs.mAtk;
-		stats.mDef				= floor(stats.mental * 0.6 + stats.def * 0.4) + floor(stats.spd / 4) + head.mDef_bonus + r_Hand.mDef_bonus + l_Hand.mDef_bonus + body.mDef_bonus + feet.mDef_bonus + battle_buffs.mDef;
+		stats.mAtk				= floor(stats.mental * 0.6 + stats.atk * 0.4) + floor(base_max_mana / 4) + head.mAtk_bonus + r_Hand.mAtk_bonus + l_Hand.mAtk_bonus + body.mAtk_bonus + feet.mAtk_bonus + battle_buffs.mAtk + accessory.mAtk_bonus;
+		stats.mDef				= floor(stats.mental * 0.6 + stats.def * 0.4) + floor(stats.spd / 4) + head.mDef_bonus + r_Hand.mDef_bonus + l_Hand.mDef_bonus + body.mDef_bonus + feet.mDef_bonus + battle_buffs.mDef + accessory.mDef_bonus;
+		
+		//apply multiplier effects from accessories
+		for (var i_acc = 0; i_acc < array_length(accessory.special_effects); i_acc++) {
+			var fx = accessory.special_effects[i_acc];
+			if (fx.type == "multiplier") {
+				stats[$ fx.stat] = floor(stats[$ fx.stat] * fx.value);
+			}
+		}
 
 		return stats;
 	}
@@ -114,7 +133,12 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 	//Equip an item to a slot - automatically unequips old item if any
 	static equip = function(_slot, _item) {
 		//validate slot type
-		if (_item.slot_type != _slot && _item.slot_type != "none") {
+		if (_item.slot_type != _slot 
+		&& _item.slot_type != "none" 
+		&& _item.slot_type != "weapon" 
+		&& _item.slot_type != "armor"
+		&& _item.slot_type != "r_hand"
+		&& _item.slot_type != "l_hand") {
 			show_debug_message("WARNING: " + _item.name + " is not for " + _slot + " slot!")
 			return;
 		}
@@ -125,8 +149,35 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 			case "l_Hand":				l_Hand			=_item; break;
 			case "body":					body				=_item; break;
 			case "feet":						feet				=_item; break;
+			case "accessory":			accessory	=_item; break;
 			default: show_debug_message("Invalid slot: " + _slot);
 		}
+	}
+	
+	static unequip = function (_slot) {
+		equip(_slot, new cstrEquipment());
+	}
+	
+	//returns true if the item is currently equipped in any slot
+	static is_equipped = function(_item_name) {
+		if (head.name				== _item_name) return true;
+		if (r_Hand.name			== _item_name) return true;
+		if (l_Hand.name			== _item_name) return true;
+		if (body.name				== _item_name) return true;
+		if (feet.name					== _item_name) return true;
+		if (accessory.name		== _item_name) return true;
+		return false;
+	}
+	
+	//returns which slot an item is equipped in, or "" if none
+	static equipped_in_slot = function(_item_name) {
+		if (head.name				== _item_name) return "head";
+		if (r_Hand.name			== _item_name) return "r_Hand";
+		if (l_Hand.name			== _item_name) return "l_Hand";
+		if (body.name				== _item_name) return "body";
+		if (feet.name					== _item_name) return "feet";
+		if (accessory.name		== _item_name) return "accessory";
+		return "";
 	}
 	
 	//Simple levelup - can expand with specific growth tables later
@@ -173,6 +224,7 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 	static use_item = function(_index, _target) {
 		if (_index < 0 || _index >= array_length(inventory)) return false;
 		var item = inventory[_index];
+		if (!variable_struct_exists(item, "type")) return false;
 		if (item.type != "consumable") return false;
 		
 		var used = false;

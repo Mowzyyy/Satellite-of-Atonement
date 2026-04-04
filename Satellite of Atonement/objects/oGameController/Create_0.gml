@@ -112,6 +112,14 @@ global.inventory_state = INVENTORY_STATE.SELECT_WHO;
 global.selected_party = 0;//0-3 for which party member
 global.selected_item = 0;//index in their inventory
 global.inventory_full_msg = false;//trigger shows full in topmid card
+
+//equip menu state
+global.equip_state = EQUIP_STATE.SELECT_WHO;
+global.equip_char = 0;//which party member is being equipped
+global.equip_scroll_page = 0;//current page in topright card scroll
+global.equip_cursor = 0;//cursor position in scroll list 0-4
+global.equip_pending_item = -1;//inventory index of it em being equipped
+global.equip_hand_cursor = 0;//0 = rhand 1 = lhand for ambidextrous weapons
 //==================================Global Menu Var==================================
 global.submenu_history = ds_stack_create();
 ds_stack_push(global.submenu_history, SUBMENU_HISTORY.MAIN);//start at top level
@@ -125,10 +133,28 @@ var potion = new cstrItem("Potion", "consumable", "Restores 50 HP", 10).set_effe
 var stimpak = new cstrItem("Stimpak", "consumable", "Restores 150 HP", 30).set_effect("heal_hp", 150);
 var antitox = new cstrItem("Antitox", "consumable", "Cures poison", 15).set_effect("cure_status", 0);
 var cyanide = new cstrItem("Cyanide", "consumable", "Damages you", 25).set_effect("damage", 45);
+var test_sword    = new cstrEquipment("Sword",    "r_hand",   15, 0,  2, 0,  0, 0);
+var test_dagger = new cstrEquipment("Dagger", "weapon",   8,  0,  5, 0,  0, 0);
+var test_staff     = new cstrEquipment("Staff",     "two_hand",   5,  0,  0, 0, 8,  4);
+var test_wand = new cstrEquipment("Wand", "r_hand", 3, 2, 3, 7, 1, 0);
+var test_spear    = new cstrEquipment("Spear",    "two_hand", 20, 2,  0, 0,  0, 0);
+var test_shield = new cstrEquipment("Shield", "l_Hand",   0,  8,  0, 0,  0, 5);
+var test_hat  = new cstrEquipment("Hat",  "head",     0,  4,  0, 0,  0, 2);
+var test_helm     = new cstrEquipment("Helm",     "head",     0,  8,  0, 0,  0, 3);
+var test_vest  = new cstrEquipment("Vest",  "body",     0,  6,  0, 0,  0, 3);
+var test_plate    = new cstrEquipment("Plate",    "body",     0,  14, 0, 0,  0, 6);
+var test_boots = new cstrEquipment("Boots", "feet",     0,  3,  3, 0,  0, 0);
+var test_greaves  = new cstrEquipment("Greaves",  "feet",     0,  5,  1, 0,  2, 2);
+var test_ring   = new cstrEquipment("MgcRing",   "accessory", 0, 0,  0, 5,  5, 5);
+var test_charm  = new cstrEquipment("SpdChrm",  "accessory", 0, 0,  8, 0,  0, 0);
+
+
 global.party[0].add_item(potion);
 global.party[0].add_item(stimpak);
 global.party[1].add_item(antitox);
 global.party[2].add_items(cyanide, cyanide, cyanide, potion, potion, stimpak, cyanide, antitox, antitox, cyanide, cyanide, cyanide, cyanide, potion, potion, stimpak, cyanide, antitox, antitox, cyanide);
+global.party[3].add_items(test_sword, test_dagger, test_staff, test_spear, test_shield, test_hat, test_helm, test_vest, test_plate, test_boots, test_greaves, test_ring, test_charm);
+
 
 //populate later
 

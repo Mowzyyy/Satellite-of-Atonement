@@ -106,15 +106,19 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 		var bot_mid = global.card_positions[4];
 		var bot_right = global.card_positions[5];
 		var selected_obj = global.partyOrder[global.selected_party];
-		var selected_name = get_party_display_name(selected_obj)
+		var selected_name = get_party_display_name(selected_obj);
+		var lh = 14;
+		var lpad = 6;
 		
 	
 		switch (global.inventory_state) {
 		
 			case INVENTORY_STATE.SELECT_WHO:
 				//top card: "ITEM" and "WHOSE?"
-				draw_text(top_mid.x + 24, top_mid.y + 28, "ITEM");
-				draw_text(top_mid.x + 24, top_mid.y + 52, "Whose?");
+				draw_set_halign(fa_center);
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 1, "ITEM");
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 2, "Whose?");
+				draw_set_halign(fa_left);
 		
 				//bottom card: party member list
 				for (var i_inv = 0; i_inv < array_length(global.partyOrder); i_inv++) {
@@ -132,9 +136,11 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			
 			case INVENTORY_STATE.SELECT_ITEM:
 				// Top middle prompt
-				draw_text(top_mid.x + 24, top_mid.y + 28, "ITEM");
-				draw_text(top_mid.x + 24, top_mid.y + 52, selected_name);
-				draw_text(top_mid.x + 24, top_mid.y + 76, "What?");
+				draw_set_halign(fa_center);
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 1, "ITEM");
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 2, selected_name);
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 3, "What?");
+				draw_set_halign(fa_left);
 
 				// 4 cards in fixed order: top-left, bottom-left, top-right, bottom-right
 				var inv = global.party[global.selected_party].inventory;
@@ -183,11 +189,13 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 				var sel_inv = global.party[global.selected_party].inventory;
 				var sel_item_name = (global.selected_item < array_length(sel_inv)) ? sel_inv[global.selected_item].name : "???";
 				draw_set_color(c_yellow);
-				draw_text(top_mid.x + 20, top_mid.y + 28, sel_item_name);
+				draw_set_halign(fa_center);
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 1, sel_item_name);
 				draw_set_color(c_white);
 				
-				draw_text(top_mid.x + 24, top_mid.y + 52, selected_name);
-				draw_text(top_mid.x + 24, top_mid.y + 76, "What?");
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 2, selected_name);
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 3, "What?");
+				draw_set_halign(fa_left);
 				
 				
 				var actions = ["Use", "Give", "Toss"];
@@ -206,9 +214,11 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			break;
 				
 			case INVENTORY_STATE.SELECT_TARGET:
-				draw_text(top_mid.x + 24, top_mid.y + 28, "ITEM");
-				draw_text(top_mid.x + 24, top_mid.y + 52, selected_name);
-				draw_text(top_mid.x + 8, top_mid.y + 76, "On Whom?");
+			draw_set_halign(fa_center);
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 1, "ITEM");
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 2, selected_name);
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 3, "On Whom?");
+				draw_set_halign(fa_left);
 					
 				for (var i_invtsel = 0; i_invtsel < array_length(global.partyOrder); i_invtsel++) {
 					var col = (menu_cursor == i_invtsel) ? c_yellow : c_white;
@@ -225,18 +235,20 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			break;
 			
 			case INVENTORY_STATE.SELECT_GIVE_TARGET:
-				draw_text(top_mid.x + 24, top_mid.y + 28, "ITEM");
-				draw_text(top_mid.x + 24, top_mid.y + 52, selected_name);
+				draw_set_halign(fa_center);
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 1, "ITEM");
+				draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 2, selected_name);
 				if (global.inventory_full_msg) {
 					draw_set_color(c_red);
 					var full_msg = global.party[global.selected_party].is_equipped(
 						global.party[global.selected_party].inventory[global.selected_item].name
 						) ? "EQP'D!" : "FULL!";
-					draw_text(top_mid.x + 24, top_mid.y + 76, full_msg);
+					draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 3, full_msg);
 					draw_set_color(c_white);
 				} else {
-					draw_text(top_mid.x + 8, top_mid.y + 76, "To Whom?")
+					draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 3, "To Whom?")
 				}
+				draw_set_halign(fa_left);
 				
 				for (var i_give = 0; i_give < array_length(global.partyOrder); i_give++) {
 					//grey out the giver

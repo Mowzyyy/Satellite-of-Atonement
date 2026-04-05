@@ -165,9 +165,84 @@ function scrInventoryLogic() {
 		case INVENTORY_STATE.SELECT_ITEM:
 			var inv = global.party[global.selected_party].inventory;
 			var inv_size = array_length(inv);
+			var items_per_card = 5;
+			
+			//card order - topleft = 0, botleft = 1, topright = 2, bort-right = 3
+			//slot ranges - card 0 = slots 0-4, 1 = slots 5-9, 2 = 10-14, 3 = 15-19
+			var cur_card = floor(menu_cursor / items_per_card);//0-3
+			var cur_line = menu_cursor mod items_per_card;//0-4 within card
 
-			if (global.keyUpPressed) menu_cursor = max(0, menu_cursor - 1);
-			if (global.keyDownPressed) menu_cursor = min(max(0, inv_size - 1), menu_cursor + 1);
+			if (global.keyUpPressed) {
+				if (cur_line > 0) {
+					//move up within card only if slot above has an item
+					var target_slot = (cur_card * items_per_card) + (cur_line - 1);
+					if (target_slot < inv_size) menu_cursor = target_slot;
+				} else {
+					//at top of card find last item scanning backwards from end
+					var prev_card = cur_card - 1;
+					if (prev_card < 0) prev_card = 3;
+					//scan backwards through cards until one with items is found
+					var found = false;
+					for (var try_card = 0; try_card < 4; try_card++) {
+						var check_card = (prev_card - try_card + 4) mod 4;
+						var check_start = check_card * items_per_card;
+						for (var s = items_per_card - 1; s >= 0; s--) {
+							if (check_start + s < inv_size) {
+								menu_cursor = check_start + s;
+								found = true;
+								break;
+							}
+						}
+						if (found) break;
+					}
+				}
+				io_clear();
+			}
+			
+			if (global.keyDownPressed) {
+				var next_slot = (cur_card * items_per_card)  + (cur_line + 1);
+				if (cur_line < items_per_card - 1 && next_slot < inv_size) {
+					// move down within card
+					menu_cursor = next_slot;
+				} else {
+					//at bottom of card or end of items find first item on next non empty card
+					var next_card = cur_card + 1;
+					if (next_card > 3) next_card = 0;
+					var found = false;
+					for (var try_card = 0; try_card < 4; try_card++) {
+						var check_card = (next_card + try_card) mod 4;
+						var check_start = check_card * items_per_card;
+						if (check_start < inv_size) {
+							menu_cursor = check_start;
+							found = true;
+							break;
+						}
+					}
+				}
+				io_clear();
+			}
+			
+			//left - move from right card to left card on the same line
+			if (global.keyLeftPressed) {
+				//2 and 3 are right cards, 0 and 1 are left
+				if (cur_card == 2) {
+					var target_slot = (0 * items_per_card) + cur_line;//top-left same line
+					if (target_slot < inv_size) { menu_cursor = target_slot; io_clear(); }
+				} else if (cur_card == 3) {
+					var target_slot = (1 * items_per_card) + cur_line;//bot-left same line
+					if (target_slot < inv_size) { menu_cursor = target_slot; io_clear(); }
+				}
+			}
+			//right - move from left card to right card on the same line
+			if (global.keyRightPressed) {
+				if (cur_card == 0) {
+					var target_slot = (2 * items_per_card) + cur_line;//top right same line
+					if (target_slot < inv_size) { menu_cursor = target_slot; io_clear(); }
+				} else if (cur_card == 1) {
+					var target_slot = (3 * items_per_card) + cur_line;//bot-right same line
+					if (target_slot < inv_size) { menu_cursor = target_slot; io_clear(); }
+				}
+			}
 			
 			if (global.keyC && inv_size > 0) {
 				global.selected_item = menu_cursor;

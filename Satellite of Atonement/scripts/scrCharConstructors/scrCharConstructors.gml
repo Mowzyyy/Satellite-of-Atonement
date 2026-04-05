@@ -214,6 +214,7 @@ function cstrPartyMember(_name,
 		
 		//Check for spells and skills
 		learn_spells_at_level(name, level);
+		learn_skills_at_level(name, level);
 		
 	}
 	
@@ -281,12 +282,67 @@ function cstrPartyMember(_name,
 		return used;
 	}
 	
+	static cast_spell = function(_index, _targets) {
+		if (_index < 0 || _index >= array_length(spells)) return false;
+		var spell = spells[_index];
+		if (current_mana < spell.mp_cost) return false;
+		current_mana -= spell.mp_cost;
+		
+		var s = get_effective_stats();
+		var mpower = floor(s.mAtk * (spell.mpower / 100));
+		
+		if (!is_array(_targets)) _targets = [_targets];
+		for (var i = 0; i < array_length(_targets); i++) {
+			var t = _targets[i];
+			switch (spell.effect_type) {
+				case "heal_hp":
+					t.current_hp = min(t.current_hp + mpower, t.base_max_hp);
+					break;
+				case "heal_mp":
+					t.current_mana = min(t.current_mana + mpower, t.base_max_mana);
+					break;
+				case "damage":
+					t.current_hp = max(t.current_hp - mpower, 0);
+					break;
+				case "cure_status":
+					t.status_effects = [];
+					break;
+				case "buff_stat":
+					t.battle_buffs.mental += power;
+					break;
+				case "functional":
+					break;
+			}
+		}
+		return true;
+	}
+	
+	static use_skill = function(_index, _targets) {
+		if (_index < 0 || _index >= array_length(skills)) return false;
+		var skill = skills[_index];
+		if (skill.uses_left <= 0) return false;
+		skill.uses_left--;
+		
+		if (!is_array(_targets)) _targets = [_targets];
+		for (var i = 0; i < array_length(_targets); i++) {
+			var t = _targets[i];
+			switch (skill.effect_type) {
+				case "heal_hp":
+					t.current_hp = min(t.current_hp + skill.uses_max, t.base_max_hp);
+					break;
+				case "functiona;":
+					break;
+			}
+		}
+		return true;
+	}
+	
 	//adds multiple items
 	static add_items = function() {
 		for (var i_add = 0; i_add < argument_count; i_add++) {
 			add_item(argument[i_add]);
 		}
-		return self;
+		return true;
 	}
 	
 	//reset battle buffs - call at the end of the battle
@@ -503,11 +559,16 @@ function cstrLeon() {						//Initialize Leon creation
 }
 
 function cstrCoat() {
-	var c = new cstrPartyMember("Coat", "Scout", 45, "Yux", true, 1,
+	var c = new cstrPartyMember("Coat", "Scout", 45, "Yux", true, 10,
 	30, 14, 12, 12, 28, 20,
 	5.68, 4.68, 2.91, 1.09, 2.54, 1.8,
 	13, 13);
 	c.exp_to_lvup = xp_threshold("Coat", 1);
+	
+	array_push(c.spells, global.sp_heal);
+	
+	array_push(c.skills, global.sk_teleport);
+	
 	return c;
 }
 

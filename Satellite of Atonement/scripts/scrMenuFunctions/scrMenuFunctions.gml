@@ -115,6 +115,7 @@ function scrMenuPauseLogic() {
 				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.EQUIP_SELECT_WHO);
 				show_debug_message("Entered EQUIP from MAIN");
 			}
+			
 			//Save logic for menu C
 			if (global.menu_page == MENU_PAGE.SAVE) {
 				global.save_state = SAVE_STATE.SELECT_SLOT;
@@ -129,6 +130,23 @@ function scrMenuPauseLogic() {
 				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.MAIN);
 				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.SAVE_SELECT_SLOT);
 				show_debug_message("Entered SAVE from MAIN");
+			}
+			
+			//Skill logic for menu C
+			if (global.menu_page == MENU_PAGE.SKILLS) {
+				global.skill_state = SKILL_STATE.SELECT_WHO;
+				global.skill_char = 0;
+				global.skill_cursor = 0;
+				global.skill_selected = -1;
+				global.skill_cannot_timer = 0;
+				global.skill_target_cursor = 0;
+				menu_cursor = 0;
+				io_clear();
+				global.keyC = false;
+				while (ds_stack_size(global.submenu_history) > 0) ds_stack_pop(global.submenu_history);
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.MAIN);
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.SKILL_SELECT_WHO);
+				show_debug_message("Entered SKILL from MAIN");
 			}
 			//add similar reset/push for other submenus later
 		}
@@ -157,7 +175,10 @@ function scrMenuPauseLogic() {
 	if (global.menu_page == MENU_PAGE.SAVE) {
 		scrSaveLogic();
 	}
-	//====================== OTHER SUBMENUS (add later) ======================
+	//=========================== SKILL SUBMENU ===========================
+	if (global.menu_page == MENU_PAGE.SKILLS) {
+		scrSkillLogic();
+	}
 }
 //=============================Inventory Submenu=============================
 function scrInventoryLogic() {
@@ -528,6 +549,29 @@ function submenu_back() {
 			global.save_cursor = 0;
 			menu_cursor = 0;
 			break;
+			
+		case SUBMENU_HISTORY.SKILL_SELECT_WHO:
+			global.skill_state = SKILL_STATE.SELECT_WHO;
+			global.skill_char = 0;
+			menu_cursor = 0;
+			show_debug_message("Used BACK from SKILL_SELECT_WHO");
+			break;
+		
+		case SUBMENU_HISTORY.SKILL_SELECT_WHAT:
+			global.skill_state = SKILL_STATE.SELECT_WHO;
+			global.skill_char = 0;
+			menu_cursor = global.skill_char;
+			show_debug_message("Used BACK from SKILL_SELECT_WHAT");
+			break;
+			
+		case SUBMENU_HISTORY.SKILL_SELECT_TARGET:
+		global.skill_state = SKILL_STATE.SELECT_WHAT;
+		global.skill_target_cursor = 0;
+		menu_cursor = global.skill_target_cursor;
+		show_debug_message("Used BACK from SKILL_SELECT_TARGET");
+		break;
+	
+	
 	}
 	return false;//did not close entire menu
 }
@@ -1003,4 +1047,191 @@ function scrSaveRefreshCache() {
 			global.save_slot_cache[i] = undefined;
 		}
 	}
+}
+//==================================Skill Menu Logic==================================
+function scrSkillLogic() {
+	var num_party = array_length(global.partyOrder);
+	var member = global.party[global.skill_char];
+	
+	//CANNOT timer - block input while showing message
+	if (global.skill_cannot_timer > 0) {
+		global.skill_cannot_timer--;
+		return;
+	}
+	
+	switch (global.skill_state) {
+		
+		case SKILL_STATE.SELECT_WHO:
+			if (global.keyUpPressed) {
+				global.skill_char = (global.skill_char - 1 + num_party) mod num_party;
+				menu_cursor = global.skill_char;
+				io_clear();
+			}
+			if (global.keyDownPressed) {
+				global.skill_char = (global.skill_char + 1) mod num_party;
+				menu_cursor = global.skill_char;
+				io_clear();
+			}
+			if (global.keyC) {
+				var list = scrSkillBuildList(global.skill_char);
+				global.skill_state  = SKILL_STATE.SELECT_WHAT;
+				global.skill_cursor = 0;
+				if (array_length(list) > 0 && list[0].kind == "separator") {
+				    global.skill_cursor = scrSkillCursorNext(list, 0, 1);
+				}
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.SKILL_SELECT_TARGET);
+				menu_cursor = 0;
+				io_clear();
+				global.keyC = false;
+				show_debug_message("SKILL: selected " + member.name);
+			}
+		break;
+		
+		case SKILL_STATE.SELECT_WHAT:
+			var list      = scrSkillBuildList(global.skill_char);
+			var list_size = array_length(list);
+
+			if (list_size == 0) {
+				if (global.keyC) { submenu_back(); io_clear(); global.keyC = false; }
+				break;
+			}
+			
+			if (global.keyUpPressed) {
+				global.skill_cursor = scrSkillCursorNext(list, global.skill_cursor, -1);
+				io_clear();
+			}
+			
+			if (global.keyDownPressed) {
+				global.skill_cursor = scrSkillCursorNext(list, global.skill_cursor, 1);
+				io_clear();
+			}
+			
+			if (global.keyC) {
+				var entry = list[global.skill_cursor];
+				global.skill_selected = global.skill_cursor;
+
+				//check cannot
+				var cannot = false;
+				if (entry.kind == "spell" && member.current_mana < entry.data.mp_cost) cannot = true;
+				if (entry.kind == "skill" && entry.data.uses_left <= 0) cannot = true;
+
+				if (cannot) {
+					global.skill_cannot_timer = 90;
+					io_clear();
+					global.keyC = false;
+					break;
+				}
+				
+				//functional - apply immediately
+				if (entry.data.effect_type == "functional") {
+					if (entry.kind == "skill") member.use_skill(entry.index, []);
+					show_debug_message("SKILL: used functional " + entry.label);
+					io_clear();
+					global.keyC = false;
+					break;
+				}
+				
+				//all party - apply immediately
+				if (entry.data.target_type == "all_allies" || entry.data.target_type == "all_party") {
+					if (entry.kind == "spell") {
+						member.cast_spell(entry.index, global.party);
+					} else {
+						member.use_skill(entry.index, global.party);
+					}
+					show_debug_message("SKILL: used " + entry.label + " on all party");
+					io_clear();
+					global.keyC = false;
+					break;
+				}
+				
+				//single ally target
+				if (entry.data.target_type == "single_ally" || entry.data.target_type == "single_party") {
+					global.skill_state = SKILL_STATE.SELECT_TARGET;
+					global.skill_target_cursor = 0;
+					ds_stack_push(global.submenu_history, SUBMENU_HISTORY.SKILL_SELECT_TARGET);
+					io_clear();
+					global.keyC = false;
+					show_debug_message("SKILL: selecting target for " + entry.label);
+					break;
+				}
+				
+				io_clear();
+				global.keyC = false;
+			}
+		break;
+		
+		case SKILL_STATE.SELECT_TARGET:
+			if (global.keyUpPressed) {
+				global.skill_target_cursor = (global.skill_target_cursor - 1 + num_party) mod num_party;
+				menu_cursor = global.skill_target_cursor;
+				io_clear();
+			}
+			if (global.keyDownPressed) {
+				global.skill_target_cursor = (global.skill_target_cursor + 1) mod num_party;
+				menu_cursor = global.skill_target_cursor;
+				io_clear();
+			}
+			
+			if (global.keyC) {
+				var list  = scrSkillBuildList(global.skill_char);
+				var entry = list[global.skill_selected];
+				var target = global.party[global.skill_target_cursor];
+
+				if (entry.kind == "spell") {
+					member.cast_spell(entry.index, [target]);
+				} else {
+					member.use_skill(entry.index, [target]);
+				}
+				
+				show_debug_message("SKILL: used " + entry.label + " on " + target.name);
+				
+				while (ds_stack_top(global.submenu_history) != SUBMENU_HISTORY.SKILL_SELECT_WHAT && ds_stack_size(global.submenu_history) > 1) {
+					ds_stack_pop(global.submenu_history);
+				}
+				
+				global.skill_state = SKILL_STATE.SELECT_WHAT;
+				menu_cursor = global.skill_selected;
+				io_clear();
+				global.keyC = false;
+			}
+			break;
+	}
+}
+
+function scrSkillBuildList(_char_idx) {
+	var member = global.party[_char_idx];
+	var result = [];
+
+	if (array_length(member.spells) > 0) {
+		array_push(result, { kind: "separator", label: "*SPELLS*", index: -1, data: undefined });
+		for (var i = 0; i < array_length(member.spells); i++) {
+			array_push(result, { kind: "spell", label: member.spells[i].name, index: i, data: member.spells[i] });
+		}
+	}
+	
+	if (array_length(member.skills) > 0) {
+		array_push(result, { kind: "separator", label: "*SKILLS*", index: -1, data: undefined });
+		for (var i = 0; i < array_length(member.skills); i++) {
+			array_push(result, { kind: "skill", label: member.skills[i].name, index: i, data: member.skills[i] });
+		}
+	}
+	
+	return result;
+}
+
+function scrSkillCursorSelectable(_list, _cursor) {
+	if (_cursor < 0 || _cursor >= array_length(_list)) return false;
+	return _list[_cursor].kind != "separator";
+}
+
+function scrSkillCursorNext(_list, _cursor, _dir) {
+	var size = array_length(_list);
+	if (size == 0) return 0;
+	var next  = (_cursor + _dir + size) mod size;
+	var tries = 0;
+	while (_list[next].kind == "separator" && tries < size) {
+		next = (next + _dir + size) mod size;
+		tries++;
+	}
+	return next;
 }

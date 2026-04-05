@@ -3,7 +3,7 @@
 //initialize spell globals before constructing party members
 //damage formula - damage = spell.power + caster.mAtk - target.mDef
 	
-//=========================================Spell Constructor=========================================
+//==========================================Spell Constructor==========================================
 // target_type:
 //   "single_enemy" - one enemy, player-selected
 //   "all_enemies" - every enemy in the encounter
@@ -20,6 +20,7 @@ function cstrSpell (
 	_mp_cost,
 	_mpower,
 	_target_type,
+	_effect_type = "damage",
 	_element = "none",
 	_description = ""
 	) constructor {
@@ -27,9 +28,21 @@ function cstrSpell (
 		mp_cost			= _mp_cost;
 		mpower			= _mpower;
 		target_type		= _target_type;
+		effect_type		= _effect_type;
 		element			= _element;
 		description		= _description;
 	}
+//==========================================Skill Constructor==========================================
+// target_type: "single_enemy", "all_enemies", "single_ally", "all_allies", "any", "functional"
+// effect_type: "heal_hp", "heal_mp", "damage", "cure_status", "buff_stat", "functional"
+function cstrSkill(_name, _uses_max, _target_type, _effect_type, _description = "") constructor {
+	name					= _name;
+	uses_max			= _uses_max;
+	uses_left				= _uses_max;
+	target_type			= _target_type;
+	effect_type			= _effect_type;
+	description			= _description;
+}
 	
 //===========================================Spell Instances===========================================
 //one global per spell, prefix sp_
@@ -42,13 +55,33 @@ function scrInitSpellGlobals() {
 	/*mp_cost*/ 3,
 	/* power */ 12,
 	/* target_type */ "single_enemy",
+	/* effect type */ "damage",
 	/*element*/ "none",
 	/*desc*/ "A missile of raw magical force."
+	);
+	
+	global.sp_heal = new cstrSpell ( 
+	"Heal",
+	8,
+	120,
+	"single_ally",
+	"heal_hp",
+	"none",
+	"Restores HP to one ally"
 	);
 }
 
 
-
+//===========================================Skill Instances===========================================
+function scrInitSkillGlobals() {
+	global.sk_teleport = new cstrSkill ( 
+	"Teleport",
+	3,
+	"functional",
+	"functional",
+	"Warps the party - no effect yet"
+	);
+}
 //==========================================Spell Learn Table==========================================
 //called automatically from level)up(), add new cases here as spells are designed
 
@@ -69,7 +102,9 @@ function learn_spells_at_level(_name, _level) {
 		break;
 		
 		case "Coat":
-			//switch
+			switch (_level) {
+				case 10: array_push(member.spells, global.sp_heal); break;
+			}
 		break;
 		
 		case "Osei":
@@ -88,4 +123,40 @@ function learn_spells_at_level(_name, _level) {
 		
 	}
 }
-
+//==========================================Skill Learn Table==========================================
+function learn_skills_at_level(_name, _level) {
+	var member = undefined;
+	for (var i = 0; i < array_length(global.party); i++) {
+		if (global.party[i].name == _name) {
+			member = global.party[i];
+			break;
+		}
+	}
+	if (member == undefined) exit;
+	
+	switch (_name) {
+		
+		case "Leon":
+			//switch
+		break;
+		
+		case "Coat":
+			switch (_level) {
+				case 10: array_push(member.skills, global.sk_teleport); break;
+			}
+		break;
+		
+		case "Osei":
+			//switch
+		break;
+		
+		case "Anna":
+			//switch
+		break;
+		
+		case "Data":
+			//switch
+		break;
+		
+	}
+}

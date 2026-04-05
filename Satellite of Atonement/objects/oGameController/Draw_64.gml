@@ -60,6 +60,8 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 		if (global.menu_page == MENU_PAGE.INVENTORY && global.inventory_state == INVENTORY_STATE.SELECT_GIVE_TARGET) _show_side_cards = true;
 		if (global.menu_page == MENU_PAGE.STATS && global.stats_state == STATS_STATE.SELECT_WHO) _show_side_cards = true;
 		if (global.menu_page == MENU_PAGE.EQUIP && global.equip_state == EQUIP_STATE.SELECT_WHO) _show_side_cards = true;
+		if (global.menu_page == MENU_PAGE.SKILLS && global.skill_state == SKILL_STATE.SELECT_WHO) _show_side_cards = true;
+		if (global.menu_page == MENU_PAGE.SKILLS && global.skill_state == SKILL_STATE.SELECT_TARGET) _show_side_cards = true;
 		
 	//side cards - party members
 	if (_show_side_cards) {
@@ -902,5 +904,155 @@ if (global.menu_page == MENU_PAGE.SAVE) {
 		var cursor_x = bot_mid.x + 12;
 		var _blink_on = (blink_timer mod 40) < 20;
 		draw_sprite((_blink_on ? sCursor : sBlink), 0, cursor_x, cursor_y);
+	}
+}
+//================================SKILL SUBMENU DRAWING================================
+if (global.menu_page == MENU_PAGE.SKILLS) {
+	var top_left = global.card_positions[0];
+	var top_mid = global.card_positions[1];
+	var top_right = global.card_positions[2];
+	var bot_left = global.card_positions[3];
+	var bot_mid = global.card_positions[4];
+	var bot_right = global.card_positions[5];
+	var lh = 14;
+	var lpad = 6;
+	var rpad = global.card_w - 6;
+	var cards = [0, 3, 2, 5];
+	
+	//topmid - skill header
+	draw_set_halign(fa_center);
+	draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 1, "SKILL");
+	draw_set_halign(fa_left);
+	
+	//select who
+	if (global.skill_state == SKILL_STATE.SELECT_WHO) {
+		draw_set_halign(fa_center);
+		draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 2, "Who?");
+		draw_set_halign(fa_left);
+		
+		for (var i_sk = 0; i_sk < array_length(global.partyOrder); i_sk++) {
+			var col = (global.skill_char == i_sk) ? c_yellow : c_white;
+			draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i_sk * 20), get_party_display_name(global.partyOrder[i_sk]), col, col, col, col, 1);
+		}
+		var cursor_y = bot_mid.y + 20 + (global.skill_char * 20);
+		var cursor_x = bot_mid.x + 12;
+		var _blink_on = (blink_timer mod 40) < 20;
+		draw_sprite((_blink_on ? sCursor : sBlink), 0, cursor_x, cursor_y);
+	}
+	
+	//select what
+	if (global.skill_state == SKILL_STATE.SELECT_WHAT) {
+		var member    = global.party[global.skill_char];
+		var list      = scrSkillBuildList(global.skill_char);
+		var list_size = array_length(list);
+		var items_per_card = 5;
+
+		// Top mid: character name
+		draw_set_halign(fa_center);
+		draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 2, member.name);
+
+		// Top mid: CANNOT or What?
+		if (global.skill_cannot_timer > 0) {
+			draw_set_color(c_yellow);
+			draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 3, "CANNOT");
+			draw_set_color(c_white);
+		} else {
+			draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 3, "What?");
+		}
+		draw_set_halign(fa_left);
+		
+		//ability list across 4 cards
+		for (var card_idx = 0; card_idx < 4; card_idx++) {
+			var c = global.card_positions[cards[card_idx]];
+			for (var i_sl = 0; i_sl < items_per_card; i_sl++) {
+				var global_slot = (card_idx * items_per_card) + i_sl;
+				if (global_slot >= list_size) continue;
+				var entry  = list[global_slot];
+				var line_y = c.y + 12 + (i_sl * 20);
+
+				if (entry.kind == "separator") {
+					draw_set_color(c_dkgray);
+					draw_text(c.x + 8, line_y, entry.label);
+					draw_set_color(c_white);
+				} else {
+					var is_sel = (global.skill_cursor == global_slot);
+					var cannot = false;
+					if (entry.kind == "spell" && member.current_mana < entry.data.mp_cost) cannot = true;
+					if (entry.kind == "skill" && entry.data.uses_left <= 0) cannot = true;
+					var r = is_sel ? 255 : (cannot ? 128 : 255);
+					var g = is_sel ? 255 : (cannot ?   0 : 255);
+					var b = is_sel ?   0 : (cannot ?   0 : 255);
+					var col = make_color_rgb(r, g, b);
+					draw_text_color(c.x + 12, line_y, entry.label, col, col, col, col, 1);
+				}
+			}
+		}
+		
+		// Blinking cursor
+		if (list_size > 0) {
+			var cur_card  = floor(global.skill_cursor / items_per_card);
+			var cur_line  = global.skill_cursor mod items_per_card;
+			var cur_c     = global.card_positions[cards[cur_card]];
+			var cur_y     = cur_c.y + 12 + (cur_line * 20);
+			var _blink_on = (blink_timer mod 40) < 20;
+			draw_sprite((_blink_on ? sCursor : sBlink), 0, cur_c.x, cur_y);
+		}
+		
+		//botmid 
+		var s_stats = member.get_effective_stats();
+		if (list_size > 0 && scrSkillCursorSelectable(list, global.skill_cursor)) {
+			var entry = list[global.skill_cursor];
+			draw_set_halign(fa_left);
+			draw_text(bot_mid.x + lpad, bot_mid.y + lh * 1, entry.label);
+			if (entry.kind == "spell") {
+				draw_text(bot_mid.x + lpad, bot_mid.y + lh * 2, "MP: " + string(entry.data.mp_cost));
+			} else {
+				draw_text(bot_mid.x + lpad, bot_mid.y + lh * 2, string(entry.data.uses_left) + "/" + string(entry.data.uses_max) + " uses");
+			}
+			var effect_label = "";
+			switch (entry.data.effect_type) {
+				case "heal_hp":     effect_label = (entry.data.target_type == "all_allies" || entry.data.target_type == "all_party") ? "Heal All" : "Heals 1"; break;
+				case "heal_mp":     effect_label = (entry.data.target_type == "all_allies" || entry.data.target_type == "all_party") ? "Mana All" : "+Mana 1"; break;
+				case "damage":      effect_label = (entry.data.target_type == "all_enemies") ? "Dmg All" : "Dmg 1"; break;
+				case "cure_status": effect_label = "RmStatus"; break;
+				case "buff_stat":   effect_label = "StatBuff"; break;
+				case "functional":  effect_label = "Function"; break;
+				default:            effect_label = entry.data.effect_type; break;
+			}
+			draw_text(bot_mid.x + lpad, bot_mid.y + lh * 3, effect_label);
+		}
+		draw_set_halign(fa_left);
+		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 5 - 6, "H");
+		draw_set_halign(fa_right);
+		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 5 - 6, string(member.current_hp) + "/" + string(s_stats.maxhp));
+		draw_set_halign(fa_left);
+		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 6, "M");
+		draw_set_halign(fa_right);
+		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 6 - 6, string(member.current_mana) + "/" + string(s_stats.max_mana));
+		draw_set_halign(fa_left);
+		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 7 - 6, member.name);
+		draw_set_halign(fa_right);
+		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 7 - 6, "Lv" + string(member.level));
+		draw_set_halign(fa_left);
+	}
+	
+	//Select target
+	if (global.skill_state == SKILL_STATE.SELECT_TARGET) {
+		var member = global.party[global.skill_char];
+
+		//topmid
+		draw_set_halign(fa_center);
+		draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 2, member.name);
+		draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 3, "On Whom?");
+		draw_set_halign(fa_left);
+		
+		//party list in bot mid
+		for (var i_tgt = 0; i_tgt < array_length(global.partyOrder); i_tgt++) {
+			var col = (global.skill_target_cursor == i_tgt) ? c_yellow : c_white;
+			draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i_tgt * 20), get_party_display_name(global.partyOrder[i_tgt]), col, col, col, col, 1);
+		}
+		var cursor_y  = bot_mid.y + 20 + (global.skill_target_cursor * 20);
+		var _blink_on = (blink_timer mod 40) < 20;
+		draw_sprite((_blink_on ? sCursor : sBlink), 0, bot_mid.x + 12, cursor_y);
 	}
 }

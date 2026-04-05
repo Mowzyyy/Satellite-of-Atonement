@@ -14,6 +14,7 @@ global.party = [];
 //global xp init
 scrInitExpTables();
 scrInitSpellGlobals();
+scrInitSkillGlobals();
 
 //Party constuctor syntax: cstrPartyMember(name, level, bio, age, species, can_use_magic)
 array_push(global.party, cstrLeon());
@@ -85,6 +86,12 @@ global.order_state = ORDER_STATE.SELECT;
 global.order_new = [];//builds the new order for partyOrder
 global.order_new_party = [];//builds the new order for party structs
 global.order_confirm_cursor = 0;
+global.skill_state = SKILL_STATE.SELECT_WHO;
+global.skill_char = 0;
+global.skill_cursor = 0;
+global.skill_selected = -1;
+global.skill_cannot_timer = 0;
+global.skill_target_cursor = 0;
 menu_cursor = 0;//Which menu option is highlighted
 blink_timer = 0;
 

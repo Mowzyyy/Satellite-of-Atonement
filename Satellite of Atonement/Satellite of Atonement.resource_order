@@ -37,6 +37,7 @@
     {"name":"scrMenuFunctions","order":5,"path":"scripts/scrMenuFunctions/scrMenuFunctions.yy",},
     {"name":"scrMove","order":1,"path":"scripts/scrMove/scrMove.yy",},
     {"name":"scrPlayerAnimateSprite","order":2,"path":"scripts/scrPlayerAnimateSprite/scrPlayerAnimateSprite.yy",},
+    {"name":"scrSaveLoad","order":9,"path":"scripts/scrSaveLoad/scrSaveLoad.yy",},
     {"name":"scrSpellConstructors","order":8,"path":"scripts/scrSpellConstructors/scrSpellConstructors.yy",},
     {"name":"scrStoryVariables","order":3,"path":"scripts/scrStoryVariables/scrStoryVariables.yy",},
     {"name":"sAnnaLeft","order":1,"path":"sprites/sAnnaLeft/sAnnaLeft.yy",},

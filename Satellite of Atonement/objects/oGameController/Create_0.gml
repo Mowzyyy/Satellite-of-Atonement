@@ -31,8 +31,19 @@ show_debug_message("Spell 0: " + oseir.spells[0].name
                  + " | power: " + string(oseir.spells[0].mpower)
                  + " | target: " + oseir.spells[0].target_type);
 
-//==================================Economy==================================
+//==================================SaveLoad==================================
+global.save_state = SAVE_STATE.SELECT_SLOT;
+global.save_cursor = 0;
+global.save_confirm_cursor = 0;
+global.save_slot_cache = [];
+global.save_just_saved = false;
+global.save_saved_timer = 0;
 global.money = 0;
+global.playtime = 0;
+global.current_map_id = 0;
+global.player_map_x = 0;
+global.player_map_y = 0;
+
 
 //==================================Story Var==================================
 global.storyStep = PLOT.CHAPTER_ONE
@@ -170,5 +181,5 @@ global.party[2].add_items(cyanide, cyanide, cyanide, potion, potion, stimpak, cy
 global.party[3].add_items(test_sword, test_dagger, test_staff, test_spear, test_shield, test_hat, test_helm, test_vest, test_plate, test_boots, test_greaves, test_ring, test_charm);
 
 
-//populate later
-
+//pre-read slot metadata
+scrSaveRefreshCache();

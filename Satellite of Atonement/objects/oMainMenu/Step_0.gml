@@ -1,3 +1,17 @@
+if (save_slot_exists(0) || save_slot_exists(1) || save_slot_exists(2)) {
+	if (variant != MENU_VARIANT.RETURNING) {
+		variant = MENU_VARIANT.RETURNING;
+		menu_options = ["Continue", "New Game", "Misc"];
+		cursor_index = 0;
+	}
+} else {
+	if (variant != MENU_VARIANT.NEW_PLAYER) {
+		variant = MENU_VARIANT.NEW_PLAYER;
+		menu_options = ["New Game", "Misc"];
+		cursor_index = 0;
+	}
+}
+
 //splash and title logic
 if (stage != TITLE_STAGE.MENU_ACTIVE) {
 	stage_timer++;
@@ -43,6 +57,55 @@ if (stage != TITLE_STAGE.MENU_ACTIVE) {
 
 //menu navigation logic
 else {
+	if (slot_selecting) {
+		//count exisiting slots for clamping
+		var num_exists = 0;
+		for (var s = 0; s < 3; s++) {
+			if (slot_data[s] != undefined) num_exists++;
+		}
+		
+		if (slot_confirming) {
+			slot_confirm_timer++;
+			if (slot_confirm_timer >= slot_confirm_delay) {
+				//waiting for c to dismiss game loaded and actually load
+				if (global.keyC) {
+					load_game(slot_confirmed);
+					global.state = GAME_STATE.OVERWORLD;
+					instance_destroy();
+					room_goto(rmTest);
+					slot_confirm_timer = 0;
+				}
+				if (global.keyB) {
+					//cancel load - back to slot select
+					slot_confirming = false;
+					slot_confirmed = -1;
+					slot_confirm_timer = 0;
+				}
+			}
+			exit;
+		}
+		
+		var _mov = global.keyRightPressed - global.keyLeftPressed;
+		slot_cursor = clamp(slot_cursor + _mov, 0, max(0, num_exists - 1));
+		
+		//confirm - only load if slot has data
+		if (global.keyC) {
+			if (slot_data[slot_cursor] != undefined) {
+				slot_confirming = true;
+				slot_confirmed  = slot_cursor;
+			}
+		}
+		
+		//cancel - go back to menu
+		if (global.keyA || global.keyB) {
+			slot_selecting = false;
+			slot_confirming = false;
+			slot_confirmed  = -1;
+		}
+		
+		exit;//skip normal menu nav while slot screen is open
+	}
+	
 	var _move = global.keyDownPressed - global.keyUpPressed;
 	cursor_index = clamp(cursor_index + _move, 0, array_length(menu_options) - 1);
 	
@@ -55,7 +118,8 @@ else {
 				room_goto(rmTest);
 				break;
 			case "Continue":
-				//scr_load_game(0);
+				slot_selecting = true;
+				slot_cursor = 0;
 				break;
 			case "Misc":
 				//misc();

@@ -768,3 +768,139 @@ if (global.menu_page == MENU_PAGE.EQUIP) {
 		}
 	}
 }
+
+//============================SAVEGAME SUBMENU DRAWING============================
+if (global.menu_page == MENU_PAGE.SAVE) {
+	var top_left = global.card_positions[0];
+	var top_mid = global.card_positions[1];
+	var top_right = global.card_positions[2];
+	var bot_left = global.card_positions[3];
+	var bot_mid = global.card_positions[4];
+	var bot_right = global.card_positions[5];
+	var lh = 14;
+	var lpad = 6;
+	var rpad = global.card_w - 6;
+	
+	var leader = global.party[0];
+	var num_party = array_length(global.party);
+	
+	//topleft - playtime/money/leader
+	draw_set_halign(fa_left);
+	draw_text(top_left.x + lpad, top_left.y + lh * 1, "Playtime");
+	draw_set_halign(fa_right);
+	draw_text(top_left.x + rpad, top_left.y + lh * 2, format_playtime(global.playtime));
+	draw_set_halign(fa_left);
+	draw_text(top_left.x + lpad, top_left.y + lh * 3, "Money");
+	draw_set_halign(fa_right);
+	draw_text(top_left.x + rpad, top_left.y + lh * 4, string(global.money));
+	draw_set_halign(fa_left);
+	draw_text(top_left.x + lpad, top_left.y + lh * 5, leader.name);
+	draw_set_halign(fa_right);
+	draw_text(top_left.x + rpad, top_left.y + lh * 6, "Lv " + string(leader.level));
+	draw_set_halign(fa_left);
+	
+	//topmid - save game? warning saved
+	draw_set_halign(fa_center);
+	var mid_cx = top_mid.x + global.card_w / 2;
+
+	if (global.save_just_saved) {
+		draw_text(mid_cx, top_mid.y + lh * 1, "SAVE");
+		draw_text(mid_cx, top_mid.y + lh * 2, "GAME?");
+		draw_set_color(c_lime);
+		draw_text(mid_cx, top_mid.y + lh * 4, "SAVED!");
+		draw_set_color(c_white);
+	} else if (global.save_state == SAVE_STATE.CONFIRM_OVERWRITE) {
+		draw_set_color(c_red);
+		draw_text(mid_cx, top_mid.y + lh * 1, "WARNING!");
+		draw_set_color(c_white);
+		draw_text(mid_cx, top_mid.y + lh * 2, "Over-");
+		draw_text(mid_cx, top_mid.y + lh * 3, "Write");
+		draw_text(mid_cx, top_mid.y + lh * 4, "Save?");
+		draw_set_color(c_red);
+		draw_text(mid_cx, top_mid.y + lh * 6, "PERMANENT");
+		draw_set_color(c_white);
+	} else {
+		draw_text(mid_cx, top_mid.y + lh * 1, "SAVE");
+		draw_text(mid_cx, top_mid.y + lh * 2, "GAME?");
+	}
+	draw_set_halign(fa_left);
+	
+	//botleft - party members 2/3/4
+	for (var p_bl = 1; p_bl < 4; p_bl++) {
+		var line_start = (p_bl - 1) * 2 + 1;
+		if (p_bl < num_party) {
+			var pm = global.party[p_bl];
+			draw_set_halign(fa_left);
+			draw_text(bot_left.x + lpad, bot_left.y + lh * line_start, pm.name);
+			draw_set_halign(fa_right);
+			draw_text(bot_left.x + rpad, bot_left.y + lh * (line_start + 1), "Lv " + string(pm.level));
+			draw_set_halign(fa_left);
+		}
+	}
+	
+	//topright and botright - slot info across two cards
+	var slot_cards = [
+		{ card: top_right, start_line: 1 },
+		{ card: top_right, start_line: 5 },
+		{ card: bot_right, start_line: 3 }
+	];
+	var slot_overflow = [
+		{ card: top_right, lv_line: 3, money_line: 4 },
+		{ card: bot_right, lv_line: 1, money_line: 2 },
+		{ card: bot_right, lv_line: 4, money_line: 5 }
+	];
+
+	for (var sl = 0; sl < 3; sl++) {
+		var sc    = slot_cards[sl];
+		var so    = slot_overflow[sl];
+		var sd    = global.save_slot_cache[sl];
+		var is_sel = (global.save_cursor == sl);
+		var is_ow  = (global.save_state == SAVE_STATE.CONFIRM_OVERWRITE && is_sel);
+		var label_col = is_ow ? c_red : c_white;
+
+		draw_set_halign(fa_left);
+		draw_set_color(label_col);
+		draw_text(sc.card.x + lpad, sc.card.y + lh * sc.start_line, "Slot " + string(sl + 1));
+		draw_set_color(c_white);
+
+		if (sd != undefined) {
+			var sd_leader = sd.party[0];
+			var name_col  = is_ow ? c_red : c_white;
+			draw_set_halign(fa_right);
+			draw_set_color(name_col);
+			draw_text(sc.card.x + rpad, sc.card.y + lh * (sc.start_line + 1), sd_leader.name);
+			draw_text(so.card.x + rpad, so.card.y + lh * so.lv_line, "Lv " + string(sd_leader.level));
+			draw_text(so.card.x + rpad, so.card.y + lh * so.money_line, string(sd.money));
+			draw_set_color(c_white);
+			draw_set_halign(fa_left);
+		} else {
+			draw_set_halign(fa_right);
+			draw_set_color(c_dkgray);
+			draw_text(sc.card.x + rpad, sc.card.y + lh * (sc.start_line + 1), "Empty");
+			draw_set_color(c_white);
+			draw_set_halign(fa_left);
+		}
+	}
+
+	//botmid - slot selection or overwrite yes/no
+	if (global.save_state == SAVE_STATE.CONFIRM_OVERWRITE) {
+		var ow_opts = ["No", "Yes"];
+		for (var i_ow = 0; i_ow < 2; i_ow++) {
+			var col = (global.save_confirm_cursor == i_ow) ? c_yellow : c_white;
+			draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i_ow * 20), ow_opts[i_ow], col, col, col, col, 1);
+		}
+		var cursor_y = bot_mid.y + 20 + (global.save_confirm_cursor * 20);
+		var cursor_x = bot_mid.x + 12;
+		var _blink_on = (blink_timer mod 40) < 20;
+		draw_sprite((_blink_on ? sCursor : sBlink), 0, cursor_x, cursor_y);
+	} else {
+		for (var i_sl = 0; i_sl < 3; i_sl++) {
+			var col = (global.save_cursor == i_sl) ? c_yellow : c_white;
+			draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i_sl * 20), "Slot " + string(i_sl + 1), col, col, col, col, 1);
+		}
+		var cursor_y = bot_mid.y + 20 + (global.save_cursor * 20);
+		var cursor_x = bot_mid.x + 12;
+		var _blink_on = (blink_timer mod 40) < 20;
+		draw_sprite((_blink_on ? sCursor : sBlink), 0, cursor_x, cursor_y);
+	}
+}

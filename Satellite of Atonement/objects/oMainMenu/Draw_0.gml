@@ -29,7 +29,112 @@ switch (stage) {
 
 		
 		case TITLE_STAGE.MENU_ACTIVE:
-			// -- Auto-menu using sBasicGUI
+			if (slot_selecting) {
+			var box_w    = 96;
+			var box_h    = 64;
+			var box_gap  = 8;
+			var num_slots = 3;
+
+			//count how many slots actually exist
+			var existing_slots = [];
+			for (var s = 0; s < num_slots; s++) {
+				 if (slot_data[s] != undefined) array_push(existing_slots, s);
+			}
+			var num_existing = array_length(existing_slots);
+
+			//stack grows upward from bottom-middle of screen
+			var total_w = (num_existing * box_w) + ((num_existing - 1) * box_gap);
+			var row_x = room_width / 2 - total_w / 2;
+			var row_y = room_height - box_h - 24;
+
+			for (var s_idx = 0; s_idx < num_existing; s_idx++) {
+				var s      = existing_slots[s_idx];
+				var box_x  = row_x + s_idx * (box_w + box_gap);
+				var is_sel = (slot_cursor == s_idx);
+
+				//box background
+				draw_sprite_stretched(sBasicGUI, 0, box_x, row_y, box_w, box_h);
+
+				 //highlight selected box
+				if (is_sel) {
+					draw_set_alpha(0.15);
+					draw_set_color(c_yellow);
+					draw_rectangle(box_x, row_y, box_x + box_w, row_y + box_h, false);
+					draw_set_alpha(1.0);
+					draw_set_color(c_white);
+				}
+
+				//slot number at top
+				draw_set_halign(fa_center);
+				draw_set_color(is_sel ? c_yellow : c_white);
+				draw_text(box_x + box_w / 2, row_y + 6, string(s + 1));
+
+				var sd = slot_data[s];
+				if (sd != undefined) {
+					// party sprites facing left normally, forward when selected
+					var spr_frame = (slot_confirming && s_idx == slot_cursor) ? directions.down : directions.left;
+					var spr_start_x = box_x + 4;
+					var spr_y       = row_y + 16;
+					var num_members = array_length(sd.party);
+
+					for (var p = 0; p < num_members; p++) {
+						var spr_name = "s" + sd.party[p].name + "Standing";
+						var spr_idx  = asset_get_index(spr_name);
+						var slot_w     = (box_w - 8) / num_members;
+						var spr_draw_x = box_x - 4 + (p * slot_w) + (slot_w / 2);
+						var spr_draw_y = spr_y + 24;
+						if (spr_idx >= 0) {
+							draw_sprite(spr_idx, spr_frame, spr_draw_x, spr_draw_y);
+						} else {
+							draw_set_color(c_dkgray);
+							draw_rectangle(spr_draw_x, spr_y, spr_draw_x + 10, spr_y + 16, false);
+							draw_set_color(c_white);
+						}
+					}
+					
+					if (slot_confirming && slot_confirm_timer >= slot_confirm_delay) {
+						//dim overlay
+						draw_set_alpha(0.5);
+						draw_set_color(c_black);
+						draw_rectangle(0, 0, room_width, room_height, false);
+						draw_set_alpha(1.0);
+						draw_set_color(c_white);
+						
+						//centered dialogue box
+						var dlg_w = 120;
+						var dlg_h = 32;
+						var dlg_x = room_width / 2 - dlg_w / 2;
+						var dlg_y = room_height / 2 - dlg_h / 2;
+						draw_sprite_stretched(sBasicGUI, 0, dlg_x, dlg_y, dlg_w, dlg_h);
+						
+						draw_set_halign(fa_center);
+						draw_text(room_width / 2, dlg_y + 10, "Game Loaded!");
+						draw_text(room_width / 2, dlg_y + 22, "Press E or C");
+						draw_set_halign(fa_left);
+					}
+
+					//leader name and level
+					var lead     = sd.party[0];
+					var name_str = lead.name + " Lv" + string(lead.level);
+					draw_set_halign(fa_center);
+					draw_set_color(c_white);
+					draw_text(box_x + box_w / 2, row_y + box_h - 18, name_str);
+
+					//money
+					draw_text(box_x + box_w / 2, row_y + box_h - 8, "$" + string(sd.money));
+				} else {
+					draw_set_halign(fa_center);
+					draw_set_color(c_dkgray);
+					draw_text(box_x + box_w / 2, row_y + box_h / 2, "EMPTY");
+					draw_set_color(c_white);
+				}
+			}
+
+			draw_set_halign(fa_left);
+			exit;
+		}
+		
+			//auto-menu using sBasicGUI
 			var num_opts = array_length(menu_options);
 			
 			//find the longest text width

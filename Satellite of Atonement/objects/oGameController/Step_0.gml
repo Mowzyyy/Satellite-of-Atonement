@@ -40,3 +40,5 @@ switch (global.state) {
 				scrBattleLogic();
 				break;
 }
+
+global.playtime += delta_time / 1000000;

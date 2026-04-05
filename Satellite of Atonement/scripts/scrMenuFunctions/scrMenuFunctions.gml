@@ -115,6 +115,21 @@ function scrMenuPauseLogic() {
 				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.EQUIP_SELECT_WHO);
 				show_debug_message("Entered EQUIP from MAIN");
 			}
+			//Save logic for menu C
+			if (global.menu_page == MENU_PAGE.SAVE) {
+				global.save_state = SAVE_STATE.SELECT_SLOT;
+				global.save_cursor = 0;
+				global.save_confirm_cursor = 0;
+				global.save_just_saved = false;
+				menu_cursor = 0;
+				scrSaveRefreshCache();
+				io_clear();
+				global.keyC = false;
+				while (ds_stack_size(global.submenu_history) > 0) ds_stack_pop(global.submenu_history);
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.MAIN);
+				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.SAVE_SELECT_SLOT);
+				show_debug_message("Entered SAVE from MAIN");
+			}
 			//add similar reset/push for other submenus later
 		}
 	} 
@@ -137,6 +152,10 @@ function scrMenuPauseLogic() {
 	//=========================== EQUIP SUBMENU ===========================
 	if (global.menu_page == MENU_PAGE.EQUIP) {
 		scrEquipLogic();
+	}
+	//=========================== SAVE SUBMENU ===========================
+	if (global.menu_page == MENU_PAGE.SAVE) {
+		scrSaveLogic();
 	}
 	//====================== OTHER SUBMENUS (add later) ======================
 }
@@ -415,6 +434,8 @@ function submenu_back() {
 	switch (previous) {
 		case	SUBMENU_HISTORY.MAIN:
 			global.menu_page = MENU_PAGE.MAIN;
+			global.save_state = SAVE_STATE.SELECT_SLOT;
+			global.save_confirm_cursor = 0;
 			menu_cursor = 0;
 			break;
 			
@@ -490,11 +511,23 @@ function submenu_back() {
 			break;
 			
 		case SUBMENU_HISTORY.EQUIP_SELECT_HAND:
-		global.equip_state = EQUIP_STATE.SELECT_SLOT;
-		global.equip_pending_item = -1;
-		global.equip_hand_cursor = 0;
-		menu_cursor = 0;
-		break;
+			global.equip_state = EQUIP_STATE.SELECT_SLOT;
+			global.equip_pending_item = -1;
+			global.equip_hand_cursor = 0;
+			menu_cursor = 0;
+			break;
+			
+		case SUBMENU_HISTORY.SAVE_SELECT_SLOT:
+			global.save_state = SAVE_STATE.SELECT_SLOT;
+			global.save_cursor = 0;
+			menu_cursor = 0;
+			break;
+			
+		case SUBMENU_HISTORY.SAVE_CONFIRM_OVERWRITE:
+			global.save_state = SAVE_STATE.SELECT_SLOT;
+			global.save_cursor = 0;
+			menu_cursor = 0;
+			break;
 	}
 	return false;//did not close entire menu
 }
@@ -874,5 +907,100 @@ function scrEquipAutoSlot(_type) {
 		case "two_hand":		return "r_Hand";//placeholder, handled specially
 		case "misc":				return "";//misc has no autoslot
 		default:						return "";
+	}
+}
+//==================================Equip Menu Logic==================================
+function scrSaveLogic() {
+	//count down SAVED! display timer
+	if (global.save_just_saved) {
+		global.save_saved_timer--;
+		if (global.save_saved_timer <= 0) {
+			global.save_just_saved = false;
+		}
+	}
+	
+	switch (global.save_state) {
+		
+		case SAVE_STATE.SELECT_SLOT:
+			if (global.keyUpPressed) {
+				global.save_cursor = (global.save_cursor - 1 + 3) mod 3;
+				global.save_just_saved = false;
+				io_clear();
+			}
+			if (global.keyDownPressed) {
+				global.save_cursor = (global.save_cursor + 1) mod 3;
+				global.save_just_saved = false;
+				io_clear();
+			}
+			
+			if (global.keyC) {
+				if (global.save_slot_cache[global.save_cursor] != undefined) {
+					//slot has data - go to overwrite confirm
+					global.save_state = SAVE_STATE.CONFIRM_OVERWRITE;
+					global.save_confirm_cursor = 0;
+					ds_stack_push(global.submenu_history, SUBMENU_HISTORY.SAVE_CONFIRM_OVERWRITE);
+					io_clear();
+					global.keyC = false;
+					break;
+				} else {
+					//empty slot - save immediately
+					save_game(global.save_cursor);
+					scrSaveRefreshCache();
+					global.save_just_saved = true;
+					global.save_saved_timer = 180;
+					io_clear();
+					global.keyC = false;
+					show_debug_message("SAVE: saved to slot " + string(global.save_cursor));
+					break;
+				}
+			}
+		break;
+			
+		case SAVE_STATE.CONFIRM_OVERWRITE:
+			if (global.keyUpPressed || global.keyDownPressed) {
+				global.save_confirm_cursor = 1 - global.save_confirm_cursor;
+				io_clear();
+			}
+			
+			if (global.keyC) {
+				if (global.save_confirm_cursor == 1) {
+					//yes - overwrite
+					save_game(global.save_cursor);
+					scrSaveRefreshCache();
+					global.save_just_saved = true;
+					global.save_saved_timer = 180;
+					ds_stack_pop(global.submenu_history);
+					show_debug_message("SAVE: overwritten slot " + string(global.save_cursor));
+				} else {
+					//no - back to slot select
+					global.save_state = SAVE_STATE.SELECT_SLOT;
+					ds_stack_pop(global.submenu_history);
+				}
+				io_clear();
+				global.keyC = false;
+			}
+			break;
+	}
+}
+
+function format_playtime(_seconds) {
+	var s = floor(_seconds);
+	var h = floor( s / 36000);
+	var m = floor((s mod 3600) / 60);
+	var sec = s mod 60;
+	return string(h) + ":" + (m < 10 ? "0" : "") + string(m) + ":" + (sec < 10 ? "0" : "") + string(sec);
+}
+
+function scrSaveRefreshCache() {
+	global.save_slot_cache = [];
+	for (var i = 0; i < 3; i++) {
+		if (save_slot_exists(i)) {
+			var buf = buffer_load(save_filepath(i));
+			var raw = buffer_read(buf, buffer_string);
+			buffer_delete(buf);
+			global.save_slot_cache[i] = json_parse(raw);
+		} else {
+			global.save_slot_cache[i] = undefined;
+		}
 	}
 }

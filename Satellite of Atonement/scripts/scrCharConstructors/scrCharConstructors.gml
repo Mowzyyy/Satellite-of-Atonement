@@ -98,12 +98,10 @@ function cstrPartyMember(_name,
 	
 	//Non-Mana Combat Skills
 	skills = [];//Array of skill structs or strings - can push new ones as they level up
-	
-	//example 
-	//skills = [ { name: "Power Slash", power: 25, cooldown: 0, learned: true } ];
+	spells = [];
 	
 	//Inventory - up to 20 items not counting equipped gear
-	inventory = array_create(0);//array of cstrItem instances
+	inventory = [];
 	
 	//status effects - array of strings like poison or stun
 	status_effects = [];
@@ -210,12 +208,12 @@ function cstrPartyMember(_name,
 		current_hp = base_max_hp;
 		current_mana = base_max_mana;
 		
-		exp_to_lvup = level * 120; //simple curve, tweak as needed
+		exp_to_lvup = xp_threshold(name, level); //simple curve, tweak as needed
 		
 		show_debug_message(name + " reached level " + string(level) + "!");
 		
-		//TODO - check for new skills here
-		//eg: if level >= 5 && _bio "Yux" tthen learn skill etc
+		//Check for spells and skills
+		learn_spells_at_level(name, level);
 		
 	}
 	
@@ -326,65 +324,221 @@ function cstrPartyMember(_name,
 	}
 }
 
+//==================================XP TABLES==================================
+
+function scrInitExpTables(){
+	global.xp_table_leon = [
+// Lv1–9
+         6,     18,     51,    100,    160,    252,    393,    573,    775,
+// Lv10–18
+       950,   1164,   1409,   1692,   2020,   2400,   2878,   3479,   4202,
+// Lv19–27
+      5075,   6000,   7378,   9233,  11356,  13503,  15000,  16933,  18948,
+// Lv28–36
+     20939,  22800,  24000,  25199,  26302,  27488,  28832,  30000,  31501,
+// Lv37–45
+     33173,  35016,  37033,  38000,  40513,  43125,  45849,  48000,  51000,
+// Lv46–54
+     54267,  57816,  61660,  64344,  68312,  72575,  77132,  81990,  87154,
+// Lv55–63
+     92627,  98793, 105315, 111881, 118822, 126159, 133905, 141984, 150406,
+// Lv64–72
+    159188, 168343, 177887, 187834, 198197, 208990, 220227, 231921, 244086,
+// Lv73–81
+    256736, 269884, 283543, 297728, 312452, 327729, 343573, 360000, 376984,
+// Lv82–90
+    394603, 412876, 431819, 451450, 471785, 492843, 514641, 537198, 560533,
+// Lv91–98
+    584665, 609613, 635396, 662034, 689547, 717954, 747275, 777530
+	];
+global.xp_table_coat = [
+// Lv1–9
+        15,     75,    208,    390,    600,    905,   1345,   1853,   2360,
+// Lv10–18
+      2800,   3146,   3446,   3742,   4079,   4500,   5054,   5751,   6570,
+// Lv19–27
+      7493,   8500,  10006,  12029,  14022,  15697,  16000,  17607,  19318,
+// Lv28–36
+     20926,  22225,  22000,  22604,  23487,  24651,  26000,  27013,  27613,
+// Lv37–45
+     27880,  27990,  28011,  27913,  27990,  28082,  28187,  28304,  28433,
+// Lv46–54
+     28573,  28718,  28867,  29017,  29166,  29313,  29458,  29599,  29737,
+// Lv55–63
+     29870,  29000,  29100,  29200,  29300,  29400,  29500,  29600,  29700,
+// Lv64–72
+     29800,  29900,  30000,  30080,  30160,  30240,  30320,  30400,  29667,
+// Lv73–81
+     29750,  29833,  29917,  30000,  30084,  30168,  30252,  30336,  30420,
+// Lv82–90
+     30504,  30588,  30672,  30756,  30840,  30924,  31000,  31075,  31150,
+// Lv91–98
+     31225,  31300,  31375,  31450,  31500,  31500,  31500,  31500
+];
+
+global.xp_table_osei = [
+// Lv1–9
+         9,     30,     88,    171,    290,    453,    709,   1031,   1396,
+// Lv10–18
+      1800,   2205,   2659,   3181,   3789,   4500,   5357,   6416,   7697,
+// Lv19–27
+      9217,  11000,  13519,  17009,  21031,  25162,  29000,  32565,  36199,
+// Lv28–36
+     39743,  43047,  46000,  48421,  50507,  52481,  54569,  57000,  59849,
+// Lv37–45
+     63029,  66482,  70152,  74000,  78064,  82447,  87104,  92000,  97504,
+// Lv46–54
+    103380, 109698, 116469, 123764, 131478, 139680, 148390, 157621, 167387,
+// Lv55–63
+    177702, 192560, 204993, 217663, 230591, 243796, 257291, 271091, 285207,
+// Lv64–72
+    299652, 314438, 329577, 345080, 360960, 377228, 393896, 410977, 428483,
+// Lv73–81
+    446424, 464814, 483663, 502983, 522785, 543081, 563882, 585200, 607047,
+// Lv82–90
+    629437, 652381, 675892, 699983, 724665, 749952, 775854, 802385, 829559,
+// Lv91–98
+    857387, 885884, 915060, 944929, 975501,1006791,1038810,1071570
+];
+
+global.xp_table_anna = [
+// Lv1–9
+         3,      6,     12,     23,     35,     55,     87,    129,    181,
+// Lv10–18
+       240,    313,    410,    537,    699,    900,   1220,   1736,   2452,
+// Lv19–27
+      3372,   4500,   7187,  11942,  17503,  22609,  26000,  28024,  29817,
+// Lv28–36
+     31298,  32386,  33000,  33296,  33508,  33672,  33824,  34000,  34208,
+// Lv37–45
+     34423,  34634,  34830,  35000,  35147,  35280,  35399,  35500,  35624,
+// Lv46–54
+     35765,  35921,  36090,  36312,  36516,  36729,  36951,  37182,  37421,
+// Lv55–63
+     37670,  37927,  38193,  38466,  38748,  39000,  39186,  39384,  39593,
+// Lv64–72
+     39814,  40046,  40290,  40546,  40813,  41000,  41133,  41277,  41431,
+// Lv73–81
+     41596,  41771,  41956,  42000,  42066,  42168,  42282,  42355,  42399,
+// Lv82–90
+     42420,  42422,  42408,  42380,  42399,  42419,  42439,  42459,  42479,
+// Lv91–98
+     42499,  42500,  42500,  42500,  42500,  42500,  42500,  42500
+];
+
+global.xp_table_data = [
+// Lv1–9
+         8,     26,     75,    146,    230,    357,    550,    793,   1065,
+// Lv10–18
+      1350,   1646,   1973,   2348,   2786,   3300,   3940,   4746,   5722,
+// Lv19–27
+      6873,   8200,  10079,  12648,  15558,  18458,  21000,  23193,  25284,
+// Lv28–36
+     27278,  29182,  31000,  32685,  34243,  35757,  37315,  39000,  40838,
+// Lv37–45
+     42781,  44805,  46886,  49000,  51157,  53381,  55664,  58000,  61026,
+// Lv46–54
+     64352,  67988,  71945,  74133,  78682,  83566,  88796,  94383, 100340,
+// Lv55–63
+    106677, 108919, 115924, 123359, 131229, 139541, 148300, 157513, 167186,
+// Lv64–72
+    177325, 187937, 199028, 210604, 222671, 235234, 248300, 261874, 275963,
+// Lv73–81
+    290573, 305709, 321378, 337586, 354338, 371641, 389500, 407923, 426914,
+// Lv82–90
+    446480, 466626, 487358, 508682, 530604, 553129, 576264, 600015, 624388,
+// Lv91–98
+    649389, 675025, 701302, 728226, 755804, 784042, 812948, 842527
+];
+
+}
+//returns xp as needed to advance
+function xp_threshold(_name, _level) {
+	if (_level < 1 || _level > 98) return 0;
+	var idx = _level - 1;
+	switch (_name) {
+		case "Leon": return global.xp_table_leon[idx];
+		case "Coat": return global.xp_table_coat[idx];
+		case "Osei": return global.xp_table_osei[idx];
+		case "Anna": return global.xp_table_anna[idx];
+		case "Data": return global.xp_table_data[idx];
+		default:
+			show_debug_message("WARNING: xp_threshold — unknown character '" + _name + "'");
+			return global.xp_table_leon[idx];
+	}
+}
+//===============================EXP AWARD HANDLING===============================
+//Add to battle end/enemyt death handler
+//called once per enemy death - awards xp to all lviing party members
+function award_xp(_xp_value) {
+	var living = 0;
+	for (var i_exp = 0; i_exp < array_length(global.party); i_exp++) {
+		if (global.party[i_exp].current_hp > 0) living++;
+	}
+	if (living == 0) exit;
+	
+	//split xp as evenly as possible rounded up
+	var share = ceil(_xp_value / living);
+	
+	for (var i = 0; i < array_length(global.party); i++) {
+		var member = global.party[i];
+		if (member.current_hp > 0) {
+			member.experience += share;
+			while (member.experience >= member.exp_to_lvup) {
+				member.experience -= member.exp_to_lvup;
+				member.level_up();
+			}
+		}
+	}
+}
+
+//========================PREMADE CHARACTER CONSTRUCTIONS========================
 function cstrLeon() {						//Initialize Leon creation
-	return new cstrPartyMember("Leon", "Spearman", 20, "Human", true, 1, 
+	var c = new cstrPartyMember("Leon", "Spearman", 20, "Human", true, 1, 
 	18, 10, 21, 8, 13, 10,						//lv 1 bases - hp, mp, atk, def, spd, mental
 	7.5, 3.86, 2.43, 1.64, 2.64, 2.5,		//growth rate
 	-4, 3);													//mAtk and mDef mods
+	c.exp_to_lvup = xp_threshold("Leon", 1);
+	return c;
 }
 
 function cstrCoat() {
-	return new cstrPartyMember("Coat", "Scout", 45, "Yux", true, 1,
+	var c = new cstrPartyMember("Coat", "Scout", 45, "Yux", true, 1,
 	30, 14, 12, 12, 28, 20,
 	5.68, 4.68, 2.91, 1.09, 2.54, 1.8,
 	13, 13);
+	c.exp_to_lvup = xp_threshold("Coat", 1);
+	return c;
 }
 
 function cstrOsei() {
-	return new cstrPartyMember("Osei", "Wizard", 54, "Human", true, 21,
+	var c = new cstrPartyMember("Osei", "Wizard", 54, "Human", true, 21,
 	8, 26, 10, 14, 20, 25,
 	5.5, 6.23, 1.96, 1.18, 1.59, 2.8,
 	5, 5);
+	c.exp_to_lvup = xp_threshold("Osei", 21);
+	
+	//Osei joins at lv 21, MgMissl learned at Lv5 and already known
+	array_push(c.spells, global.sp_mgmissl);
+	
+	return c;
 }
 
 function cstrAnna() {
-	return new cstrPartyMember("Anna", "General", 30, "Human", true, 1,
+	var c = new cstrPartyMember("Anna", "General", 30, "Human", true, 1,
 	20, 4, 20, 20, 14, 8,
 	4.32, 2.64, 2.5, 1.82, 1.5, 2.0,
 	-1, -1);
+	c.exp_to_lvup = xp_threshold("Anna", 1);
+	return c;
 }
 
 function cstrData() {
-	return new cstrPartyMember("Data", "Android", 4, "Android", false, 1,
+	var c = new cstrPartyMember("Data", "Android", 4, "Android", false, 1,
 	9, 0, 25, 6, 25, 12,
 	7.02, 0.0, 2.16, 1.68, 1.98, 2.2,
 	3, 5);
+	c.exp_to_lvup = xp_threshold("Data", 1);
+	return c;
 }
 
-//====================
-//HOW TO USE
-//====================
-//Example: Create a main party in oGameController
-
-//create party members
-//array_push(global.party new cstrPartyMember("Leon", 1, "Spearman"));
-//array_push(global.party new cstrPartyMember("Coat", 1, "Yux"));
-//array_push(global.party, new, cstrPartyMember("Osei", 1, "Wizard"));
-
-//Equip some starting gear
-//var sword = new cstrEquipment("Iron Sword", "r_Hand", 15, 0, 3, 0, 0);
-//global.party[0].equip("r_Hand", sword);
-//
-//var shield = new cstrEquipment("Wooden Shield", "l_Hand, 0, 8, 0, 0, 5);
-//global.party[0].equip("l_Hand", shield);
-
-//Learn a skill later
-//global.party[0].learn_skill("Power Slash", 25, 2);
-
-//In the battle/step code
-//var stats = global.party[0].get_effective_stats();
-//damage = stats.atk + ... etc
-
-//level someone up:
-//global.party[0].level_up();
-//global.partyy[0].print_stats();

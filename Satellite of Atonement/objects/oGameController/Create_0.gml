@@ -10,12 +10,26 @@ global.partyStatus = {
 global.partyOrder = [oLeon, oCoat, oOsei, oAnna];
 
 global.party = [];
+
+//global xp init
+scrInitExpTables();
+scrInitSpellGlobals();
+
 //Party constuctor syntax: cstrPartyMember(name, level, bio, age, species, can_use_magic)
 array_push(global.party, cstrLeon());
 array_push(global.party, cstrCoat());
 array_push(global.party, cstrOsei());
 array_push(global.party, cstrAnna())
 
+var oseir = cstrOsei();
+oseir.print_stats();
+
+// Confirm spell loaded
+show_debug_message("Osei spells: " + string(array_length(oseir.spells)));
+show_debug_message("Spell 0: " + oseir.spells[0].name 
+                 + " | cost: " + string(oseir.spells[0].mp_cost)
+                 + " | power: " + string(oseir.spells[0].mpower)
+                 + " | target: " + oseir.spells[0].target_type);
 
 //==================================Economy==================================
 global.money = 0;

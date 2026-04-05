@@ -62,6 +62,7 @@
     {"id":{"name":"scrMenuFunctions","path":"scripts/scrMenuFunctions/scrMenuFunctions.yy",},},
     {"id":{"name":"scrMove","path":"scripts/scrMove/scrMove.yy",},},
     {"id":{"name":"scrPlayerAnimateSprite","path":"scripts/scrPlayerAnimateSprite/scrPlayerAnimateSprite.yy",},},
+    {"id":{"name":"scrSpellConstructors","path":"scripts/scrSpellConstructors/scrSpellConstructors.yy",},},
     {"id":{"name":"scrStoryVariables","path":"scripts/scrStoryVariables/scrStoryVariables.yy",},},
     {"id":{"name":"sndTitle","path":"sounds/sndTitle/sndTitle.yy",},},
     {"id":{"name":"sAnnaDown","path":"sprites/sAnnaDown/sAnnaDown.yy",},},

@@ -35,7 +35,7 @@ function cstrItem(_name, _type, _description = "", _value = 0) constructor {
 	//effect fields for consumables
 	effect_type			="none";		//heal_hp, heal_mp, cure_status, damage, buff_stat
 	effect_amount	= 0;					//amount healed, damaged, buffed
-	effect_state			="";					//for buff_stat - atk, def, spd, mental etc
+	effect_stat			="";					//for buff_stat - atk, def, spd, mental etc
 	
 	
 	//fluent setter allows chaining configuration after construction
@@ -43,14 +43,19 @@ function cstrItem(_name, _type, _description = "", _value = 0) constructor {
 	static set_effect = function(_type, _amount, _stat = "") {
 		effect_type			= _type;
 		effect_amount	= _amount;
-		effect_state			=  _stat;
+		effect_stat			=  _stat;
 		return self;
 	}
 }
 
 //====================================Main Party Constructor====================================
 
-function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "???", _can_use_magic = true) constructor {
+function cstrPartyMember(_name, 
+	_bio = "???", _age = 0, _species = "???", _can_use_magic = true, _level = 1,
+	_base_hp = 80, _base_mp = 30, _base_atk = 12, _base_def = 8, _base_spd = 10, _base_mental = 10,
+	_hp_growth = 12.0, _mp_growth = 8.0, _atk_growth = 3.0, _def_growth = 2.0, _spd_growth = 2.0, _mental_growth = 2.5,
+	_mAtk_mod = 0, _mDef_mod = 0
+	) constructor {
 	//Basic Info
 	name = _name;
 	bio = _bio;
@@ -61,18 +66,27 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 	experience = 0;
 	exp_to_lvup = 100;
 	
+	hp_growth = _hp_growth;
+	mp_growth = _mp_growth;
+	atk_growth = _atk_growth;
+	def_growth = _def_growth;
+	spd_growth = _spd_growth;
+	mental_growth = _mental_growth;
+	
+	//archetype mods - set once and never change
+	base_mAtk_mod = _mAtk_mod;
+	base_mDef_mod = _mDef_mod;
+	
 	///Core Stats - base values, equipment will modify these numbers
-	// HP / Mana use max + current so you can damage/heal without losing max values
-	base_max_hp = 80 + (level * 12);//Phantasy star growth default
+	base_max_hp		= _base_hp				+ round(_hp_growth			* (_level - 1));
+	base_max_mana	= _base_mp			+ round (_mp_growth			* (_level - 1));
+	base_atk					=	_base_atk			+ round (_atk_growth			* (_level - 1));
+	base_def					= _base_def				+ round (_def_growth			* (_level - 1));
+	base_spd					= _base_spd			+ round (_spd_growth		* (_level - 1));
+	base_mental			= _base_mental		+ round (_mental_growth	* (_level -1));
+	
 	current_hp = base_max_hp;
-	
-	base_max_mana = 30 + (level * 8);
 	current_mana = base_max_mana;
-	
-	base_atk = 12 + (level * 3);
-	base_def = 8 + (level * 2)
-	base_spd = 10 + (level * 2);
-	base_mental = 10 + (level * 3);
 
 	//Equip	Slots
 	head = new cstrEquipment();//starts empty
@@ -114,10 +128,10 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 		stats.atk					= base_atk + head.atk_bonus + r_Hand.atk_bonus + l_Hand.atk_bonus + body.atk_bonus + feet.atk_bonus + battle_buffs.atk + accessory.atk_bonus;
 		stats.def					= base_def + head.def_bonus + r_Hand.def_bonus + l_Hand.def_bonus + body.def_bonus + feet.def_bonus + battle_buffs.def + accessory.def_bonus;
 		stats.spd					= base_spd + head.spd_bonus + r_Hand.spd_bonus + l_Hand.spd_bonus + body.spd_bonus + feet.spd_bonus + battle_buffs.spd + accessory.spd_bonus;
-		stats.mental			= base_mental + head.mental_bonus + r_Hand.mental_bonus + l_Hand.mental_bonus + body.mental_bonus + battle_buffs.mental + accessory.mental_bonus;
+		stats.mental			= base_mental + head.mental_bonus + r_Hand.mental_bonus + l_Hand.mental_bonus + body.mental_bonus + feet.mental_bonus + battle_buffs.mental + accessory.mental_bonus;
 		
-		stats.mAtk				= floor(stats.mental * 0.6 + stats.atk * 0.4) + floor(base_max_mana / 4) + head.mAtk_bonus + r_Hand.mAtk_bonus + l_Hand.mAtk_bonus + body.mAtk_bonus + feet.mAtk_bonus + battle_buffs.mAtk + accessory.mAtk_bonus;
-		stats.mDef				= floor(stats.mental * 0.6 + stats.def * 0.4) + floor(stats.spd / 4) + head.mDef_bonus + r_Hand.mDef_bonus + l_Hand.mDef_bonus + body.mDef_bonus + feet.mDef_bonus + battle_buffs.mDef + accessory.mDef_bonus;
+		stats.mAtk				= floor(stats.mental * 0.6 + stats.atk * 0.4) + floor(base_max_mana / 4) + base_mAtk_mod + head.mAtk_bonus + r_Hand.mAtk_bonus + l_Hand.mAtk_bonus + body.mAtk_bonus + feet.mAtk_bonus + battle_buffs.mAtk + accessory.mAtk_bonus;
+		stats.mDef				= floor(stats.mental * 0.6 + stats.def * 0.4) + floor(stats.spd / 4) + base_mDef_mod + head.mDef_bonus + r_Hand.mDef_bonus + l_Hand.mDef_bonus + body.mDef_bonus + feet.mDef_bonus + battle_buffs.mDef + accessory.mDef_bonus;
 		
 		//apply multiplier effects from accessories
 		for (var i_acc = 0; i_acc < array_length(accessory.special_effects); i_acc++) {
@@ -185,18 +199,18 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 		level++;
 		
 		//Phantasy Star-style growth
-		base_max_hp += 12 + irandom(4);
-		base_max_mana += 8 + irandom(3);
-		base_atk += 3 + irandom(2);
-		base_def += 2 + irandom(2);
-		base_spd += 2 + irandom(2);
-		base_mental += 3 + irandom(2);
+		base_max_hp			+= floor(hp_growth)				+ irandom(4);
+		base_max_mana		+= floor(mp_growth) 				+ irandom(3);
+		base_atk						+= floor(atk_growth) 				+ irandom(2);
+		base_def						+= floor(def_growth)				+ irandom(2);
+		base_spd						+= floor(spd_growth)				+ irandom(2);
+		base_mental				+= floor(mental_growth)		+ irandom(2);
 		
 		//refill HP and mana on levelup
 		current_hp = base_max_hp;
 		current_mana = base_max_mana;
 		
-		exp_to_next = level * 120; //simple curve, tweak as needed
+		exp_to_lvup = level * 120; //simple curve, tweak as needed
 		
 		show_debug_message(name + " reached level " + string(level) + "!");
 		
@@ -279,7 +293,7 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 	
 	//reset battle buffs - call at the end of the battle
 	static reset_battle_buffs = function() {
-		battle_buffs = { atk: 0, def: 0, spd: 0, mental: 0 };
+		battle_buffs = { atk: 0, def: 0, spd: 0, mental: 0, mAtk: 0, mDef: 0 };
 	}
 	
 	//check if a status is present
@@ -307,9 +321,44 @@ function cstrPartyMember(_name, _level = 1, _bio = "???", _age = 0, _species = "
 		show_debug_message("=== " + name + "(Lv." + string(level) + ") ===");
 		show_debug_message("HP: " + string(current_hp) + "/" + string(s.maxhp) + " | Mana: " + string(current_mana) + "/" + string(s.max_mana));
 		show_debug_message("Atk: " + string(s.atk) + " Def:" + string(s.def) + " Spd:" + string(s.spd));
-		show_debug_message("Mental: " + string(stats.mental) + "mAtk: " +string(s.mAtk) + "mDef:" + string(s.mDef));
+		show_debug_message("Mental: " + string(s.mental) + "mAtk: " +string(s.mAtk) + "mDef:" + string(s.mDef));
 		show_debug_message("Equipment: " + head.name + " | " + r_Hand.name + " | " + l_Hand.name + " | " + body.name + " | " + feet.name);
 	}
+}
+
+function cstrLeon() {						//Initialize Leon creation
+	return new cstrPartyMember("Leon", "Spearman", 20, "Human", true, 1, 
+	18, 10, 21, 8, 13, 10,						//lv 1 bases - hp, mp, atk, def, spd, mental
+	7.5, 3.86, 2.43, 1.64, 2.64, 2.5,		//growth rate
+	-4, 3);													//mAtk and mDef mods
+}
+
+function cstrCoat() {
+	return new cstrPartyMember("Coat", "Scout", 45, "Yux", true, 1,
+	30, 14, 12, 12, 28, 20,
+	5.68, 4.68, 2.91, 1.09, 2.54, 1.8,
+	13, 13);
+}
+
+function cstrOsei() {
+	return new cstrPartyMember("Osei", "Wizard", 54, "Human", true, 21,
+	8, 26, 10, 14, 20, 25,
+	5.5, 6.23, 1.96, 1.18, 1.59, 2.8,
+	5, 5);
+}
+
+function cstrAnna() {
+	return new cstrPartyMember("Anna", "General", 30, "Human", true, 1,
+	20, 4, 20, 20, 14, 8,
+	4.32, 2.64, 2.5, 1.82, 1.5, 2.0,
+	-1, -1);
+}
+
+function cstrData() {
+	return new cstrPartyMember("Data", "Android", 4, "Android", false, 1,
+	9, 0, 25, 6, 25, 12,
+	7.02, 0.0, 2.16, 1.68, 1.98, 2.2,
+	3, 5);
 }
 
 //====================

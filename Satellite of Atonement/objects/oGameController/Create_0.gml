@@ -11,10 +11,10 @@ global.partyOrder = [oLeon, oCoat, oOsei, oAnna];
 
 global.party = [];
 //Party constuctor syntax: cstrPartyMember(name, level, bio, age, species, can_use_magic)
-array_push(global.party, new cstrPartyMember("Leon", 1, "Spearman", 20, "Human", true));
-array_push(global.party, new cstrPartyMember("Coat", 1, "Scout", 99, "Yux", true));
-array_push(global.party, new cstrPartyMember("Osei", 1, "Wizard", 45, "Human", true));
-array_push(global.party, new cstrPartyMember("Anna", 1, "General", 31, "Human", true))
+array_push(global.party, cstrLeon());
+array_push(global.party, cstrCoat());
+array_push(global.party, cstrOsei());
+array_push(global.party, cstrAnna())
 
 
 //==================================Economy==================================

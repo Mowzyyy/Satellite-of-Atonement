@@ -84,8 +84,15 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			draw_sprite(portrait_spr, 0, c.x + lpad * 3 + 4, c.y + lpad * 1);
 			
 			//HP and MP beneath protrait
-			draw_text(c.x + lpad, c.y + lh * 5 - 6, "HP " + string(member.current_hp) + "/" + string(stats.maxhp));
-			draw_text(c.x +lpad, c.y + lh * 6 - 6, "MP " + string(member.current_mana) + "/" + string(stats.max_mana));
+			draw_set_halign(fa_left);
+			draw_text(c.x + lpad, c.y + lh * 5 - 6, "H");
+			draw_set_halign(fa_right);
+			draw_text(c.x + global.card_w - lpad, c.y + lh * 5 - 6, string(member.current_hp) + "/" + string(stats.maxhp));
+			draw_set_halign(fa_left);
+			draw_text(c.x + lpad, c.y + lh * 6 - 6, "M");
+			draw_set_halign(fa_right);
+			draw_text(c.x + global.card_w - lpad, c.y + lh * 6 - 6, string(member.current_mana) + "/" + string(stats.max_mana));
+			draw_set_halign(fa_left);
 			
 			//Name left, level right
 			draw_set_halign(fa_left);
@@ -388,8 +395,14 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			
 			//hp and mp beneath portrait
 			draw_set_halign(fa_left);
-			draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 6, "HP " + string(member.current_hp) + "/" + string(stats.maxhp));
-			draw_text(bot_mid.x +lpad, bot_mid.y + lh * 7 - 6, "MP " + string(member.current_mana) + "/" + string(stats.max_mana));
+			draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 6, "H");
+			draw_set_halign(fa_right);
+			draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 6 - 6, string(member.current_hp) + "/" + string(stats.maxhp));
+			draw_set_halign(fa_left);
+			draw_text(bot_mid.x +lpad, bot_mid.y + lh * 7 - 6, "M");
+			draw_set_halign(fa_right);
+			draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 7 - 6, string(member.current_mana) + "/" + string(stats.max_mana));
+			draw_set_halign(fa_left);
 		}
 	
 	}
@@ -544,8 +557,13 @@ if (global.menu_page == MENU_PAGE.ORDER) {
 			
 			//HP, MP, name, level matching main pause menu layout
 			draw_set_halign(fa_left);
-			draw_text(bot_left.x + lpad, bot_left.y + lh * 5 - 6, "HP " + string(preview_member.current_hp) + "/" + string(preview_stats.maxhp));
-			draw_text(bot_left.x +lpad, bot_left.y + lh * 6 - 6, "MP " + string(preview_member.current_mana) + "/" + string(preview_stats.max_mana));
+			draw_text(bot_left.x + lpad, bot_left.y + lh * 5 - 6, "H");
+			draw_set_halign(fa_right);
+			draw_text(bot_left.x + global.card_w - lpad, bot_left.y + lh * 5 - 6, string(preview_member.current_hp) + "/" + string(preview_stats.maxhp));
+			draw_set_halign(fa_left);
+			draw_text(bot_left.x + lpad, bot_left.y + lh * 6 - 6, "M");
+			draw_set_halign(fa_right);
+			draw_text(bot_left.x + global.card_w - lpad, bot_left.y + lh * 6 - 6, string(preview_member.current_mana) + "/" + string(preview_stats.max_mana));
 			//Name left, level right
 			draw_set_halign(fa_left);
 			draw_text(bot_left.x + lpad, bot_left.y + lh * 7 - 6, preview_member.name);
@@ -686,8 +704,14 @@ if (global.menu_page == MENU_PAGE.EQUIP) {
 		if (p_obj == oData) portrait_spr = sChatPortData;
 		draw_sprite(portrait_spr, 0, bot_mid.x + lpad * 3 + 4, bot_mid.y + lpad * 1);
 		draw_set_halign(fa_left);
-		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 5 - 6, "HP " + string(member.current_hp) + "/" + string(stats.maxhp));
-		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 6, "MP " + string(member.current_mana) + "/" + string(stats.max_mana));
+		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 5 - 6, "H");
+		draw_set_halign(fa_right);
+		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 5 - 6, string(member.current_hp) + "/" + string(stats.maxhp));
+		draw_set_halign(fa_left);
+		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 6, "M");
+		draw_set_halign(fa_right);
+		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 6 - 6, String(member.current_mana) + "/" + string(stats.max_mana));
+		draw_set_halign(fa_left);
 		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 7 - 6, member.name);
 		draw_set_halign(fa_right);
 		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 7 - 6, "Lv" + string(member.level));

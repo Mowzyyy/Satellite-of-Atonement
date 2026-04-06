@@ -60,6 +60,13 @@ else {
 	if (slot_selecting) {
 		//count exisiting slots for clamping
 		var num_exists = 0;
+		walk_frame_timer++;
+		
+		if (walk_frame_timer >= walk_frame_speed) {
+			walk_frame_timer = 0;
+			walk_frame = (walk_frame + 1) mod 3;
+		}
+		
 		for (var s = 0; s < 3; s++) {
 			if (slot_data[s] != undefined) num_exists++;
 		}

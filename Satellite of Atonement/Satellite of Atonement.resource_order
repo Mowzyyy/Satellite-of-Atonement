@@ -77,7 +77,6 @@
     {"name":"sPortraitOsei","order":3,"path":"sprites/sPortraitOsei/sPortraitOsei.yy",},
     {"name":"sTileset_Dunes","order":1,"path":"sprites/sTileset_Dunes/sTileset_Dunes.yy",},
     {"name":"autotile_DunesGrassinSand","order":1,"path":"tilesets/autotile_DunesGrassinSand/autotile_DunesGrassinSand.yy",},
-    {"name":"TileSet3","order":3,"path":"tilesets/TileSet3/TileSet3.yy",},
     {"name":"tsDunesTown","order":2,"path":"tilesets/tsDunesTown/tsDunesTown.yy",},
   ],
 }

@@ -72,14 +72,30 @@ switch (stage) {
 				var sd = slot_data[s];
 				if (sd != undefined) {
 					// party sprites facing left normally, forward when selected
-					var spr_frame = (slot_confirming && s_idx == slot_cursor) ? directions.down : directions.left;
+					var spr_frame
+					if (slot_confirming && s_idx == slot_cursor) {
+						spr_frame = directions.down;
+					} else if (is_sel && !slot_confirming) {
+						spr_frame = walk_frame;
+					} else {
+						spr_frame = directions.left
+					}
+					
 					var spr_start_x = box_x + 4;
 					var spr_y       = row_y + 16;
 					var num_members = array_length(sd.party);
 
 					for (var p = 0; p < num_members; p++) {
-						var spr_name = "s" + sd.party[p].name + "Standing";
-						var spr_idx  = asset_get_index(spr_name);
+						var spr_name;
+						if (slot_confirming && s_idx == slot_cursor) {
+							spr_name = "s" + sd.party[p].name + "Standing";
+						} else if (is_sel) {
+							spr_name = "s" + sd.party[p].name + "Left";
+						} else {
+							spr_name = "s" + sd.party[p].name + "Standing";
+						}
+						var spr_idx = asset_get_index(spr_name);
+						
 						var slot_w     = (box_w - 8) / num_members;
 						var spr_draw_x = box_x - 4 + (p * slot_w) + (slot_w / 2);
 						var spr_draw_y = spr_y + 24;

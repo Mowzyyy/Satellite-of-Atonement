@@ -111,7 +111,6 @@
     {"id":{"name":"sTileset_Dunes","path":"sprites/sTileset_Dunes/sTileset_Dunes.yy",},},
     {"id":{"name":"autotile_DunesGrassinSand","path":"tilesets/autotile_DunesGrassinSand/autotile_DunesGrassinSand.yy",},},
     {"id":{"name":"tileset_Dunes","path":"tilesets/tileset_Dunes/tileset_Dunes.yy",},},
-    {"id":{"name":"TileSet3","path":"tilesets/TileSet3/TileSet3.yy",},},
     {"id":{"name":"tsDunesTown","path":"tilesets/tsDunesTown/tsDunesTown.yy",},},
   ],
   "resourceType":"GMProject",

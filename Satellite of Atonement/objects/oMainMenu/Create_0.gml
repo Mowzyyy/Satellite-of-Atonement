@@ -5,7 +5,7 @@ hold_time = 180;//3 seconds at 60fps
 
 walk_frame_timer = 0;
 walk_frame = 0;
-walk_frame_speed = 8;
+walk_frame_speed = 9;
 
 //Check for saves
 if (file_exists("save0.dat")) {
@@ -26,7 +26,7 @@ slot_confirming = false;//true after C is pressed
 slot_confirmed = -1;
 
 slot_confirm_timer = 0;
-slot_confirm_delay = 3;
+slot_confirm_delay = 20;
 
 
 //pre-read all 3 slots once on create so the draw event never hits disk

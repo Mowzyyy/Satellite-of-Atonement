@@ -712,7 +712,7 @@ if (global.menu_page == MENU_PAGE.EQUIP) {
 		draw_set_halign(fa_left);
 		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 6, "M");
 		draw_set_halign(fa_right);
-		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 6 - 6, String(member.current_mana) + "/" + string(stats.max_mana));
+		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 6 - 6, string(member.current_mana) + "/" + string(stats.max_mana));
 		draw_set_halign(fa_left);
 		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 7 - 6, member.name);
 		draw_set_halign(fa_right);

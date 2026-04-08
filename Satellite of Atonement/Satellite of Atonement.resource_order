@@ -29,6 +29,7 @@
     {"name":"oLeon","order":3,"path":"objects/oLeon/oLeon.yy",},
     {"name":"oMainMenu","order":6,"path":"objects/oMainMenu/oMainMenu.yy",},
     {"name":"oOsei","order":2,"path":"objects/oOsei/oOsei.yy",},
+    {"name":"rmDunes","order":3,"path":"rooms/rmDunes/rmDunes.yy",},
     {"name":"rmTest","order":1,"path":"rooms/rmTest/rmTest.yy",},
     {"name":"rmTitle","order":2,"path":"rooms/rmTitle/rmTitle.yy",},
     {"name":"scrCharConstructors","order":7,"path":"scripts/scrCharConstructors/scrCharConstructors.yy",},
@@ -75,8 +76,10 @@
     {"name":"sPortraitData","order":5,"path":"sprites/sPortraitData/sPortraitData.yy",},
     {"name":"sPortraitLeon","order":1,"path":"sprites/sPortraitLeon/sPortraitLeon.yy",},
     {"name":"sPortraitOsei","order":3,"path":"sprites/sPortraitOsei/sPortraitOsei.yy",},
+    {"name":"sTempWorld","order":14,"path":"sprites/sTempWorld/sTempWorld.yy",},
     {"name":"sTileset_Dunes","order":1,"path":"sprites/sTileset_Dunes/sTileset_Dunes.yy",},
     {"name":"autotile_DunesGrassinSand","order":1,"path":"tilesets/autotile_DunesGrassinSand/autotile_DunesGrassinSand.yy",},
     {"name":"tsDunesTown","order":2,"path":"tilesets/tsDunesTown/tsDunesTown.yy",},
+    {"name":"tsDunesWorld","order":3,"path":"tilesets/tsDunesWorld/tsDunesWorld.yy",},
   ],
 }

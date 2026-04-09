@@ -1,3 +1,9 @@
+if (instance_number(oGameController) > 1) {
+	instance_destroy();
+	exit
+}
+persistent = true;
+
 //==================================Party Data==================================
 global.partyStatus = {
 	coat: false,
@@ -44,6 +50,20 @@ global.playtime = 0;
 global.current_map_id = 0;
 global.player_map_x = 0;
 global.player_map_y = 0;
+global.load_follower_data = [];
+
+//==================================MAP Data==================================
+global.transition_active = false;
+global.transition_fade_in = false;
+global.transiiton_target_room = -1;
+global.transition_target_x = 0;
+global.transition_target_y = 0;
+global.transition_target_dir = directions.down;
+global.transition_target_map = MAP.DUNES;
+global.transition_music = -1;
+global.transition_alpha = 0;
+global.transition_phase = 0;
+global.pending_arrival = false;
 
 
 //==================================Story Var==================================

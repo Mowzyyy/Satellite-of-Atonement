@@ -15,11 +15,16 @@ var _target = instance_find(_leader_type, 0);
 if (_target != noone) {
 	x = _target.x;
 	y = _target.y;
+} else { 
+x = room_width /2;
+y = room_height / 2;
 }
 
+/*
 //store smooth subpixel center
 x = _target.x + (TILE_WIDTH /2);//initial
 y = _target.y + (TILE_HEIGHT / 2);
+*/
 
 //global frac variables
 global.cam_frac_x = 0;

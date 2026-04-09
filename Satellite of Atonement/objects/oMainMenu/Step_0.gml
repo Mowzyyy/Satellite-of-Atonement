@@ -77,9 +77,21 @@ else {
 				//waiting for c to dismiss game loaded and actually load
 				if (global.keyC) {
 					load_game(slot_confirmed);
+					var _target_room = scrMapIdToRoom(global.current_map_id);
 					global.state = GAME_STATE.OVERWORLD;
+					//set up as a transition so scrSpawnParty works correctly
+					global.transition_active = true;
+					global.pending_arrival = false;//follower_data handles positioning
+					global.transition_target_room = _target_room;
+					global.transition_target_x = global.player_map_x;
+					global.transition_target_y = global.player_map_y;
+					global.transition_target_dir = directions.down;
+					global.transition_target_map = global.current_map_id;
+					global.transition_music = -1;
+					global.transition_alpha = 0;
+					global.transition_phase = 0;
 					instance_destroy();
-					room_goto(rmTest);
+					room_goto(_target_room);
 					slot_confirm_timer = 0;
 				}
 				if (global.keyB) {
@@ -121,6 +133,7 @@ else {
 		switch(_choice) {
 			case "New Game":
 				global.state = GAME_STATE.OVERWORLD;
+				global.current_map_id = MAP.TEST;
 				instance_destroy();
 				room_goto(rmTest);
 				break;

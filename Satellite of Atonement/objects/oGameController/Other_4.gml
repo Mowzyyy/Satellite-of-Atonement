@@ -1,0 +1,2 @@
+scrHandleArrival();
+scrSpawnParty();

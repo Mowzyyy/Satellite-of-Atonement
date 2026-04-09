@@ -172,6 +172,7 @@ function deserialize_spell(_data) {
 	//add new spells as the catalogue grows
 	switch (spell_name) {
 		case "MgMissl": return global.sp_mgmissl;
+		case "Heal": return global.sp_heal;
 		default:
 			show_debug_message("WARNING: deserialize_spell — unknown spell '" + spell_name + "'");
 			return undefined;
@@ -253,6 +254,33 @@ function deserialize_flags(_data) {
 //========================================SAVE GAME========================================
 
 function save_game(_slot) {
+	//capture leader position at save time
+	var _leader = instance_find(global.partyOrder[0], 0)
+	if (_leader != noone && instance_exists(_leader)) {
+		global.player_map_x = _leader.x_pos;
+		global.player_map_y = _leader.y_pos;
+	}
+	
+	//capture follower positions at save time
+	var follower_data = [];
+	for (var i_fdata = 0; i_fdata < array_length(global.partyOrder); i_fdata++) {
+		var _inst = instance_find(global.partyOrder[i_fdata], 0);
+		show_debug_message("save follower " + string(i_fdata) + " | found: " + string(_inst != noone) + " | x_pos: " + string(_inst != noone ? _inst.x_pos : -1));
+		if (_inst != noone && instance_exists(_inst)) {
+			array_push(follower_data, {
+			x_pos			: _inst.x_pos,
+			y_pos			: _inst.y_pos,
+			last_dir			: _inst.last_dir
+			});
+		} else {
+			array_push(follower_data, {
+				x_pos			: global.player_map_x,
+				y_pos			: global.player_map_y,
+				last_dir			: directions.down
+			});
+		}
+	}
+	
 	//build the full save struct
 	var party_data = [];
 	for (var i = 0; i < array_length(global.party); i++) {
@@ -261,7 +289,7 @@ function save_game(_slot) {
 	
 	var save_data = {
 		slot						: _slot,
-		version					: 1,//increment if save format changes
+		version					: 1.1,//increment if save format changes
 		timestamp			: string(current_year)				+ "-"
 										+ string(current_month)		+ "-"
 										+ string(current_day)				+ "-"
@@ -272,6 +300,7 @@ function save_game(_slot) {
 		map_id				: global.current_map_id,
 		map_x				: global.player_map_x,
 		map_y				: global.player_map_y,
+		follower_data	: follower_data,
 		party					: party_data,
 		flags					: serialize_flags()
 	};
@@ -286,6 +315,7 @@ function save_game(_slot) {
 	show_debug_message("Game saved to slot " + string(_slot));
 }
 
+//========================================LOAD GAME========================================
 function load_game(_slot) {
 	var path = save_filepath(_slot);
 	if (!file_exists(path)) {
@@ -302,7 +332,7 @@ function load_game(_slot) {
 	
 	//restore globals
 	global.playtime					= data.playtime;
-	global.money							= data.money;
+	global.money						= data.money;
 	global.current_map_id	= data.map_id;
 	global.player_map_x		= data.map_x;
 	global.player_map_y		= data.map_y;
@@ -312,6 +342,8 @@ function load_game(_slot) {
 	for (var i = 0; i < array_length(data.party); i++) {
 		array_push(global.party, deserialize_party_member(data.party[i]));
 	}
+	
+	global.load_follower_data = data.follower_data;
 	
 	//restore flags
 	deserialize_flags(data.flags);

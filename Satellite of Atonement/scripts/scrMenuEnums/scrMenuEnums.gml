@@ -3,7 +3,8 @@ enum GAME_STATE {
 	OVERWORLD,
 	IN_GAME_MENU,//PSIII style menu
 	BATTLE,//PSIV style combat
-	CUTSCENE
+	CUTSCENE,
+	TRANSITIONING
 }
 
 enum MENU_PAGE {

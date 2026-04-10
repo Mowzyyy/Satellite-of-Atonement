@@ -10,8 +10,16 @@ if (myRank > 0) {
 			
 			x_from = x_pos;
 			y_from = y_pos;
-			x_to = _target_inst.x_from;
-			y_to = _target_inst.y_from;
+			
+			//if target just completed a slide step follow the intermediate tile
+			if (global.slide_queued && myRank < array_length(global.slide_history)) {
+				var sh = global.slide_history[myRank - 1];
+				x_to = sh.x;
+				y_to = sh.y;
+			} else {
+				x_to = _target_inst.x_from;
+				y_to = _target_inst.y_from;
+			}
 			
 			//Logical position updates immediately
 			x_pos = x_to;

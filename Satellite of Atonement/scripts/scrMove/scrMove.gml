@@ -16,6 +16,17 @@ function scrMove(_dir){
 				//queue a slide - step perpendicular then continue in original direction
 				global.slide_queued = true;
 				global.slide_follow_dir = _dir;
+				
+				//record intermediate tile for all followers to read
+				global.slide_history = [];
+				for (var sli = 0; sli < array_length(global.partyOrder); sli++) {
+					var inst = instance_find(global.partyOrder[sli], 0);
+					if (inst != noone && instance_exists(inst)) {
+						array_push(global.slide_history, { x: inst.x_pos, y: inst.y_pos });
+					} else {
+						array_push(global.slide_history, { x: x_pos, y: y_pos });
+					}
+				}
 				scrMove(slide_dir);//step perpendicular
 			} else {
 				//hard block - face the direction but don't move

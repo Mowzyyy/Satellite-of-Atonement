@@ -25,7 +25,7 @@
   ],
   "name":"sAnnaRight",
   "nineSlice":null,
-  "origin":6,
+  "origin":3,
   "parent":{
     "name":"Anna",
     "path":"folders/Sprites/Anna.yy",
@@ -84,7 +84,7 @@
     "visibleRange":null,
     "volume":1.0,
     "xorigin":0,
-    "yorigin":32,
+    "yorigin":16,
   },
   "swatchColours":null,
   "swfPrecision":0.5,

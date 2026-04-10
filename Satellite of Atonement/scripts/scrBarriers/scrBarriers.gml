@@ -5,23 +5,23 @@ function scrGetBarrierData(_tile_idx) {
 	show_debug_message("scrGetBarrierData called with: " + string(_tile_idx));
 	switch (_tile_idx) {
 		//row 1
-		case 2: return { blocked: [directions.right, directions.down] };
-		case 3: return { blocked: [directions.right, directions.down, directions.left] };
-		case 4: return { blocked: [directions.down, directions.left] };
+		case 2: return { blocked: [directions.left, directions.up] };
+		case 3: return { blocked: [directions.up, directions.right, directions.left] };
+		case 4: return { blocked: [directions.up, directions.right] };
 		
 		//row 2
-		case 7: return { blocked: [directions.right] };
-		case 8: return { blocked: [directions.left] };
-		case 9: return { blocked: [directions.up, directions.down, directions.right] };
+		case 7: return { blocked: [directions.left] };
+		case 8: return { blocked: [directions.right] };
+		case 9: return { blocked: [directions.up, directions.down, directions.left] };
 		case 10: return { blocked: [directions.up, directions.down, directions.right, directions.left] };
-		case 11: return { blocked: [directions.up, directions.down, directions.left] };
+		case 11: return { blocked: [directions.up, directions.down, directions.right] };
 		
 		//row 3
-		case 14: return { blocked: [directions.up] };
-		case 15: return { blocked: [directions.down] };
-		case 16: return { blocked: [directions.up, directions.right] };
-		case 17: return { blocked: [directions.up, directions.left, directions.right] };
-		case 18: return { blocked: [directions.up, directions.left] };
+		case 14: return { blocked: [directions.down] };
+		case 15: return { blocked: [directions.up] };
+		case 16: return { blocked: [directions.down, directions.left] };
+		case 17: return { blocked: [directions.down, directions.left, directions.right] };
+		case 18: return { blocked: [directions.down, directions.right] };
 		
 		default: return undefined;//no barrier
 	}

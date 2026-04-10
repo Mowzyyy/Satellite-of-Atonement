@@ -601,7 +601,7 @@ if (global.menu_page == MENU_PAGE.ORDER) {
 		var spr_to_draw = -1;
 		if (instance_exists(spr_obj)) spr_to_draw = instance_find(spr_obj, 0).sprite_index;
 		if (spr_to_draw != -1) {
-			draw_sprite_ext(spr_to_draw, 3, bot_right.x + global.card_w / 2 - 8, bot_right.y + lh * 7 - 6 - (i_spr * 18), 1, 1, 0, c_white, 1);
+			draw_sprite_ext(spr_to_draw, 3, bot_right.x + global.card_w / 2 - 8, bot_right.y + lh * 7 - 6 - (i_spr * 18) - 16, 1, 1, 0, c_white, 1);
 		}
 	}
 }

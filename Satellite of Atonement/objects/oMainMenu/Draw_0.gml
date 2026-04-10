@@ -98,7 +98,7 @@ switch (stage) {
 						
 						var slot_w     = (box_w - 8) / num_members;
 						var spr_draw_x = box_x - 4 + (p * slot_w) + (slot_w / 2);
-						var spr_draw_y = spr_y + 24;
+						var spr_draw_y = spr_y + 8;
 						if (spr_idx >= 0) {
 							draw_sprite(spr_idx, spr_frame, spr_draw_x, spr_draw_y);
 						} else {

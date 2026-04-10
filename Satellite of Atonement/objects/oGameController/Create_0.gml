@@ -67,6 +67,7 @@ global.pending_arrival = false;
 
 global.slide_queued = false;
 global.slide_follow_dir = -1;
+global.slide_history = [];
 //==================================Story Var==================================
 global.storyStep = PLOT.CHAPTER_ONE
 

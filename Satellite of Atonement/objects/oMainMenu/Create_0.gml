@@ -46,4 +46,4 @@ blink_timer = 0;
 prompt_start_time=0;
 
 //play looping title music
-audio_play_sound(sndTitle, 10, true);
+scrPlayMusic(sndTitle);

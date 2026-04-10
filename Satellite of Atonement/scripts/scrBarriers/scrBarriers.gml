@@ -5,23 +5,46 @@ function scrGetBarrierData(_tile_idx) {
 	show_debug_message("scrGetBarrierData called with: " + string(_tile_idx));
 	switch (_tile_idx) {
 		//row 1
-		case 2: return { blocked: [directions.left, directions.up] };
-		case 3: return { blocked: [directions.up, directions.right, directions.left] };
-		case 4: return { blocked: [directions.up, directions.right] };
+		case 2: return { blocked: [directions.left, directions.up], is_water: false };
+		case 3: return { blocked: [directions.up, directions.right, directions.left], is_water: false };
+		case 4: return { blocked: [directions.up, directions.right], is_water: false };
 		
 		//row 2
-		case 7: return { blocked: [directions.left] };
-		case 8: return { blocked: [directions.right] };
-		case 9: return { blocked: [directions.up, directions.down, directions.left] };
-		case 10: return { blocked: [directions.up, directions.down, directions.right, directions.left] };
-		case 11: return { blocked: [directions.up, directions.down, directions.right] };
+		case 7: return { blocked: [directions.left], is_water: false };
+		case 8: return { blocked: [directions.right], is_water: false };
+		case 9: return { blocked: [directions.up, directions.down, directions.left], is_water: false };
+		case 10: return { blocked: [directions.up, directions.down, directions.right, directions.left], is_water: false };
+		case 11: return { blocked: [directions.up, directions.down, directions.right], is_water: false };
 		
 		//row 3
-		case 14: return { blocked: [directions.down] };
-		case 15: return { blocked: [directions.up] };
-		case 16: return { blocked: [directions.down, directions.left] };
-		case 17: return { blocked: [directions.down, directions.left, directions.right] };
-		case 18: return { blocked: [directions.down, directions.right] };
+		case 14: return { blocked: [directions.down], is_water: false };
+		case 15: return { blocked: [directions.up], is_water: false };
+		case 16: return { blocked: [directions.down, directions.left], is_water: false };
+		case 17: return { blocked: [directions.down, directions.left, directions.right], is_water: false };
+		case 18: return { blocked: [directions.down, directions.right], is_water: false };
+		
+		//water row 1
+		case 5: return { blocked: [directions.down, directions.right], is_water: true };
+		case 6: return { blocked: [directions.down, directions.left, directions.right], is_water: true };
+		
+		//water row 2
+		case 12: return { blocked: [directions.left, directions.down, directions.up], is_water: true };
+		case 13: return { blocked: [directions.down, directions.right, directions.left, directions.up], is_water: true };
+		
+		//water row 3
+		case 19: return { blocked: [directions.down, directions.left], is_water: true };
+		case 20: return { blocked: [directions.down, directions.left, directions.right], is_water: true };
+		
+		//water row 4
+		case 21: return { blocked: [directions.down, directions.left], is_water: true };
+		case 22: return { blocked: [directions.down, directions.right], is_water: true };
+		case 23: return { blocked: [directions.down], is_water: true };
+		case 24: return { blocked: [directions.up], is_water: true };
+		
+		//water row 5
+		case 28: return { blocked: [directions.down, directions.up, directions.right], is_water: true };
+		case 29: return { blocked: [directions.right], is_water: true };
+		case 30: return { blocked: [directions.left], is_water: true };
 		
 		default: return undefined;//no barrier
 	}

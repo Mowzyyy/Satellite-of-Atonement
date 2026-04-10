@@ -104,6 +104,8 @@ global.pending_arrival = false;
 global.slide_queued = false;
 global.slide_follow_dir = -1;
 global.slide_history = [];
+
+global.current_music = -1;
 //==================================Story Var==================================
 global.storyStep = PLOT.CHAPTER_ONE
 

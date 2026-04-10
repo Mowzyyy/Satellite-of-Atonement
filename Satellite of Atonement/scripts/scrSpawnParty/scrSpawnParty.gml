@@ -5,7 +5,7 @@ function scrSpawnParty(){
 if (array_length(global.party) > 0) {
 	show_debug_message("scrSpawnParty party[0]: " + global.party[0].name + " Lv" + string(global.party[0].level) + " HP:" + string(global.party[0].current_hp));
 }
-	//destroy any existing partyy isntances to avoid duplicates
+	//destroy any existing partyy instances to avoid duplicates
 	for (var i = 0; i < array_length(global.partyOrder); i++) {
 		var existing = instance_find(global.partyOrder[i], 0);
 		if (existing != noone && instance_exists(existing)) {
@@ -53,6 +53,14 @@ if (array_length(global.load_follower_data) > 0) {
 	global.transition_phase = 2;
 	global.transition_active = false;
 	global.state = GAME_STATE.OVERWORLD;
+	
+	//play music for arrived map
+if (global.transition_music != -1) {
+	scrPlayMusic(global.transition_music);
+} else {
+	scrPlayMapMusic(global.transition_target_map);
+}
+	
 	show_debug_message("scrSpawnParty load complete");
 	return;//exit here
 }
@@ -99,6 +107,13 @@ for (var i = 0; i < array_length(global.partyOrder); i++) {
 global.transition_phase = 2;
 global.transition_active = false;
 global.state = GAME_STATE.OVERWORLD;
+
+//play music for arrived map
+if (global.transition_music != -1) {
+	scrPlayMusic(global.transition_music);
+} else {
+	scrPlayMapMusic(global.transition_target_map);
+}
 
 show_debug_message("scrSpawnParty arrival complete | leader at: " + string(global.transition_target_x) + "," + string(global.transition_target_y));
 }

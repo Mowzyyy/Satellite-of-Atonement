@@ -65,7 +65,8 @@ global.transition_alpha = 0;
 global.transition_phase = 0;
 global.pending_arrival = false;
 
-
+global.slide_queued = false;
+global.slide_follow_dir = -1;
 //==================================Story Var==================================
 global.storyStep = PLOT.CHAPTER_ONE
 

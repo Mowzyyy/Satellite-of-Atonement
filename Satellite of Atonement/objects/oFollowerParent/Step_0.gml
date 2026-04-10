@@ -59,7 +59,13 @@ if (state == states.walking){
 		image_index = last_dir;
 		x = x_pos * TILE_WIDTH;
 		y = y_pos * TILE_HEIGHT;
-		exit;
+		//exit;//commenting out to see if this allows sliding movement to work
+	
+		//fire queued slide followup step
+		if (global.slide_queued) {
+			global.slide_queued = false;
+			scrMove(global.slide_follow_dir);
+		}
 	}
 	
 	x = lerp(x_from, x_to, _t) * TILE_WIDTH;

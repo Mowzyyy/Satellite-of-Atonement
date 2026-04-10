@@ -287,6 +287,11 @@ function save_game(_slot) {
 		array_push(party_data, serialize_party_member(global.party[i]));
 	}
 	
+	var party_order_names = [];
+	for (var i = 0; i < array_length(global.partyOrder); i++) {
+		array_push(party_order_names, get_party_display_name(global.partyOrder[i]));
+	}
+	
 	var save_data = {
 		slot						: _slot,
 		version					: 1.1,//increment if save format changes
@@ -302,6 +307,7 @@ function save_game(_slot) {
 		map_y				: global.player_map_y,
 		follower_data	: follower_data,
 		party					: party_data,
+		party_order	: party_order_names,
 		flags					: serialize_flags()
 	};
 	
@@ -343,11 +349,25 @@ function load_game(_slot) {
 		array_push(global.party, deserialize_party_member(data.party[i]));
 	}
 	
+	global.partyOrder = [];
+	for (var i = 0; i < array_length(data.party_order); i++) {
+		switch (data.party_order[i]) {
+			case "LEON": array_push(global.partyOrder, oLeon); break;
+			case "COAT": array_push(global.partyOrder, oCoat); break;
+			case "OSEI": array_push(global.partyOrder, oOsei); break;
+			case "ANNA": array_push(global.partyOrder, oAnna); break;
+			case "DATA": array_push(global.partyOrder, oData); break;
+		}
+	}
+	
+	global.party_initialized = true;
+	
 	global.load_follower_data = data.follower_data;
 	
 	//restore flags
 	deserialize_flags(data.flags);
 	
 	show_debug_message("Game loaded from slot " + string(_slot));
+	show_debug_message("Loaded party[0]: " + global.party[0].name + " Lv" + string(global.party[0].level) + " HP:" + string(global.party[0].current_hp));
 	return true;
 }

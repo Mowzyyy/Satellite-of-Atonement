@@ -133,6 +133,7 @@ else {
 		switch(_choice) {
 			case "New Game":
 				global.state = GAME_STATE.OVERWORLD;
+				global.party_initialized = false;
 				global.current_map_id = MAP.TEST;
 				instance_destroy();
 				room_goto(rmTest);

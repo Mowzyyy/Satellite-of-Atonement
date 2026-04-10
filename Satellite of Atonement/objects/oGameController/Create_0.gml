@@ -5,28 +5,64 @@ if (instance_number(oGameController) > 1) {
 persistent = true;
 
 //==================================Party Data==================================
-global.partyStatus = {
-	coat: false,
-	osei: false,
-	anna: false,
-	data: false,
-}
-
-//party order index
-global.partyOrder = [oLeon, oCoat, oOsei, oAnna];
-
-global.party = [];
-
 //global xp init
 scrInitExpTables();
 scrInitSpellGlobals();
 scrInitSkillGlobals();
 
-//Party constuctor syntax: cstrPartyMember(name, level, bio, age, species, can_use_magic)
-array_push(global.party, cstrLeon());
-array_push(global.party, cstrCoat());
-array_push(global.party, cstrOsei());
-array_push(global.party, cstrAnna())
+if (!variable_global_exists("party_initialized")) {
+	global.party_initialized = true;
+	global.partyStatus = {
+		coat: false,
+		osei: false,
+		anna: false,
+		data: false,
+	}
+
+	//party order index
+	global.partyOrder = [oLeon, oCoat, oOsei, oAnna];
+
+	global.party = [];
+	
+	//Party constuctor syntax: cstrPartyMember(name, level, bio, age, species, can_use_magic)
+	array_push(global.party, cstrLeon());
+	array_push(global.party, cstrCoat());
+	array_push(global.party, cstrOsei());
+	array_push(global.party, cstrAnna())
+	
+	//Fake inventory per party member - replace later with real ds_list or array
+//global.party_inventory = ds_map_create();
+//ds_map_add_list(global.party_inventory, oLeon, ds_list_create());//example
+
+//temporary construct items and assign for testing purposes
+var potion = new cstrItem("Potion", "consumable", "Restores 50 HP", 10).set_effect("heal_hp", 50);
+var stimpak = new cstrItem("Stimpak", "consumable", "Restores 150 HP", 30).set_effect("heal_hp", 150);
+var antitox = new cstrItem("Antitox", "consumable", "Cures poison", 15).set_effect("cure_status", 0);
+var cyanide = new cstrItem("Cyanide", "consumable", "Damages you", 25).set_effect("damage", 45);
+var test_sword    = new cstrEquipment("Sword",    "r_hand",   15, 0,  2, 0,  0, 0);
+var test_dagger = new cstrEquipment("Dagger", "weapon",   8,  0,  5, 0,  0, 0);
+var test_staff     = new cstrEquipment("Staff",     "two_hand",   5,  0,  0, 0, 8,  4);
+var test_wand = new cstrEquipment("Wand", "r_hand", 3, 2, 3, 7, 1, 0);
+var test_spear    = new cstrEquipment("Spear",    "two_hand", 20, 2,  0, 0,  0, 0);
+var test_shield = new cstrEquipment("Shield", "l_Hand",   0,  8,  0, 0,  0, 5);
+var test_hat  = new cstrEquipment("Hat",  "head",     0,  4,  0, 0,  0, 2);
+var test_helm     = new cstrEquipment("Helm",     "head",     0,  8,  0, 0,  0, 3);
+var test_vest  = new cstrEquipment("Vest",  "body",     0,  6,  0, 0,  0, 3);
+var test_plate    = new cstrEquipment("Plate",    "body",     0,  14, 0, 0,  0, 6);
+var test_boots = new cstrEquipment("Boots", "feet",     0,  3,  3, 0,  0, 0);
+var test_greaves  = new cstrEquipment("Greaves",  "feet",     0,  5,  1, 0,  2, 2);
+var test_ring   = new cstrEquipment("MgcRing",   "accessory", 0, 0,  0, 5,  5, 5);
+var test_charm  = new cstrEquipment("SpdChrm",  "accessory", 0, 0,  8, 0,  0, 0);
+
+
+global.party[0].add_item(potion);
+global.party[0].add_item(stimpak);
+global.party[1].add_item(antitox);
+global.party[2].add_items(cyanide, cyanide, cyanide, potion, potion, stimpak, cyanide, antitox, antitox, cyanide, cyanide, cyanide, cyanide, potion, potion, stimpak, cyanide, antitox, antitox, cyanide);
+global.party[3].add_items(test_sword, test_dagger, test_staff, test_spear, test_shield, test_hat, test_helm, test_vest, test_plate, test_boots, test_greaves, test_ring, test_charm);
+}
+
+
 
 var oseir = cstrOsei();
 oseir.print_stats();
@@ -178,36 +214,6 @@ global.equip_hand_cursor = 0;//0 = rhand 1 = lhand for ambidextrous weapons
 global.submenu_history = ds_stack_create();
 ds_stack_push(global.submenu_history, SUBMENU_HISTORY.MAIN);//start at top level
 
-//Fake inventory per party member - replace later with real ds_list or array
-//global.party_inventory = ds_map_create();
-//ds_map_add_list(global.party_inventory, oLeon, ds_list_create());//example
-
-//temporary construct items and assign for testing purposes
-var potion = new cstrItem("Potion", "consumable", "Restores 50 HP", 10).set_effect("heal_hp", 50);
-var stimpak = new cstrItem("Stimpak", "consumable", "Restores 150 HP", 30).set_effect("heal_hp", 150);
-var antitox = new cstrItem("Antitox", "consumable", "Cures poison", 15).set_effect("cure_status", 0);
-var cyanide = new cstrItem("Cyanide", "consumable", "Damages you", 25).set_effect("damage", 45);
-var test_sword    = new cstrEquipment("Sword",    "r_hand",   15, 0,  2, 0,  0, 0);
-var test_dagger = new cstrEquipment("Dagger", "weapon",   8,  0,  5, 0,  0, 0);
-var test_staff     = new cstrEquipment("Staff",     "two_hand",   5,  0,  0, 0, 8,  4);
-var test_wand = new cstrEquipment("Wand", "r_hand", 3, 2, 3, 7, 1, 0);
-var test_spear    = new cstrEquipment("Spear",    "two_hand", 20, 2,  0, 0,  0, 0);
-var test_shield = new cstrEquipment("Shield", "l_Hand",   0,  8,  0, 0,  0, 5);
-var test_hat  = new cstrEquipment("Hat",  "head",     0,  4,  0, 0,  0, 2);
-var test_helm     = new cstrEquipment("Helm",     "head",     0,  8,  0, 0,  0, 3);
-var test_vest  = new cstrEquipment("Vest",  "body",     0,  6,  0, 0,  0, 3);
-var test_plate    = new cstrEquipment("Plate",    "body",     0,  14, 0, 0,  0, 6);
-var test_boots = new cstrEquipment("Boots", "feet",     0,  3,  3, 0,  0, 0);
-var test_greaves  = new cstrEquipment("Greaves",  "feet",     0,  5,  1, 0,  2, 2);
-var test_ring   = new cstrEquipment("MgcRing",   "accessory", 0, 0,  0, 5,  5, 5);
-var test_charm  = new cstrEquipment("SpdChrm",  "accessory", 0, 0,  8, 0,  0, 0);
-
-
-global.party[0].add_item(potion);
-global.party[0].add_item(stimpak);
-global.party[1].add_item(antitox);
-global.party[2].add_items(cyanide, cyanide, cyanide, potion, potion, stimpak, cyanide, antitox, antitox, cyanide, cyanide, cyanide, cyanide, potion, potion, stimpak, cyanide, antitox, antitox, cyanide);
-global.party[3].add_items(test_sword, test_dagger, test_staff, test_spear, test_shield, test_hat, test_helm, test_vest, test_plate, test_boots, test_greaves, test_ring, test_charm);
 
 
 //pre-read slot metadata

@@ -2,7 +2,9 @@ function scrSpawnParty(){
 	//dont spawn on main menu or if transitioning
 	if (global.state == GAME_STATE.MAIN_MENU) return;
 	if (global.state == GAME_STATE.TRANSITIONING && !global.pending_arrival) return;
-
+if (array_length(global.party) > 0) {
+	show_debug_message("scrSpawnParty party[0]: " + global.party[0].name + " Lv" + string(global.party[0].level) + " HP:" + string(global.party[0].current_hp));
+}
 	//destroy any existing partyy isntances to avoid duplicates
 	for (var i = 0; i < array_length(global.partyOrder); i++) {
 		var existing = instance_find(global.partyOrder[i], 0);

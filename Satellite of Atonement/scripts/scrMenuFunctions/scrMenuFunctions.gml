@@ -626,6 +626,7 @@ function scrQuitLogic() {
 		} else {
 			//yes - full nuke reset
 			global.is_restarting = true;
+			global.party_initialized = false;
 			global.state = GAME_STATE.MAIN_MENU;
 			ds_stack_clear(global.submenu_history);
 			menu_cursor = 0;

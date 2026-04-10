@@ -84,9 +84,11 @@
     {"name":"sPortraitOsei","order":3,"path":"sprites/sPortraitOsei/sPortraitOsei.yy",},
     {"name":"sTempWorld","order":2,"path":"sprites/sTempWorld/sTempWorld.yy",},
     {"name":"sTileset_Dunes","order":3,"path":"sprites/sTileset_Dunes/sTileset_Dunes.yy",},
+    {"name":"sZoneMap","order":5,"path":"sprites/sZoneMap/sZoneMap.yy",},
     {"name":"autotile_DunesGrassinSand","order":1,"path":"tilesets/autotile_DunesGrassinSand/autotile_DunesGrassinSand.yy",},
     {"name":"tsBarriers","order":4,"path":"tilesets/tsBarriers/tsBarriers.yy",},
     {"name":"tsDunesTown","order":2,"path":"tilesets/tsDunesTown/tsDunesTown.yy",},
     {"name":"tsDunesWorld","order":3,"path":"tilesets/tsDunesWorld/tsDunesWorld.yy",},
+    {"name":"tsZoneMap","order":5,"path":"tilesets/tsZoneMap/tsZoneMap.yy",},
   ],
 }

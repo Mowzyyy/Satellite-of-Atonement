@@ -24,6 +24,7 @@
   ],
   "ResourceOrderSettings":[
     {"name":"oAnna","order":4,"path":"objects/oAnna/oAnna.yy",},
+    {"name":"oBattleManager","order":8,"path":"objects/oBattleManager/oBattleManager.yy",},
     {"name":"oCoat","order":1,"path":"objects/oCoat/oCoat.yy",},
     {"name":"oData","order":5,"path":"objects/oData/oData.yy",},
     {"name":"oGameController","order":2,"path":"objects/oGameController/oGameController.yy",},
@@ -35,7 +36,10 @@
     {"name":"rmTest","order":1,"path":"rooms/rmTest/rmTest.yy",},
     {"name":"rmTitle","order":2,"path":"rooms/rmTitle/rmTitle.yy",},
     {"name":"scrBarriers","order":13,"path":"scripts/scrBarriers/scrBarriers.yy",},
+    {"name":"scrBattleLogic","order":17,"path":"scripts/scrBattleLogic/scrBattleLogic.yy",},
     {"name":"scrCharConstructors","order":7,"path":"scripts/scrCharConstructors/scrCharConstructors.yy",},
+    {"name":"scrEncounterZones","order":16,"path":"scripts/scrEncounterZones/scrEncounterZones.yy",},
+    {"name":"scrEnemyConstructors","order":15,"path":"scripts/scrEnemyConstructors/scrEnemyConstructors.yy",},
     {"name":"scrMapEnums","order":10,"path":"scripts/scrMapEnums/scrMapEnums.yy",},
     {"name":"scrMenuConstants","order":6,"path":"scripts/scrMenuConstants/scrMenuConstants.yy",},
     {"name":"scrMenuEnums","order":4,"path":"scripts/scrMenuEnums/scrMenuEnums.yy",},

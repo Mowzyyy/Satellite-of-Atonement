@@ -36,6 +36,15 @@ if (myRank == 0) {
 				//moveInputReceived = false; //uncomment if flag is in use
 				break;
 		}
+		
+		//battle step counter
+		if (myRank == 0 && state == states.idle && global.state == GAME_STATE.OVERWORLD) {
+			//count steps for random encounters
+			if (x_pos != x_from || y_pos != y_from) {//only count actual movement
+				scrStepEncounter(global.current_map_id);
+			}
+		}
+		
 	}
 }
 

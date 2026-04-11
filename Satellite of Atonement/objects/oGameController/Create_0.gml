@@ -157,6 +157,25 @@ blink_timer = 0;
 
 //Restart game guard flag
 global.is_restarting = false;
+//====================================Battle State====================================
+global.battle_enemies					= _enemy_list;
+global.battle_phase							= BATTLE_PHASE.SELECT_COMMAND;
+global.battle_turn_order				= [];
+global.battle_actions						= [];
+global.battle_cmd_index				= 0;
+global.battle_cmd_cursor				= 0;
+global.battle_icon_cursor				= 0;
+global.battle_sub_cursor				= 0;
+global.battle_sub_page					= 0;
+global.battle_target_cursor			= 0;
+global.battle_selecting_target		= false;
+global.battle_sub_open					= false;
+global.battle_damage_display		= [];
+global.battle_action_display			= "";
+global.battle_action_timer			= 0;
+global.battle_flee_result					= -1;
+global.encounter_steps					= 0;
+
 //============================Global Menu Drawing Settings============================
 //This makes every context menu in the game use the default font automatically
 draw_set_font(ftDefault);

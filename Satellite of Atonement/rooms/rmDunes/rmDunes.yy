@@ -96,7 +96,7 @@
           -14,7,-2,9,-171,-2147483648,-12,9,-56,-2147483648,-3,9,-12,7,1,9,-173,-2147483648,-2,9,-67,-2147483648,
           1,9,-11,7,-2,9,-242,-2147483648,1,9,-10,7,-2,9,-243,-2147483648,-2,9,-8,7,-2,9,-245,-2147483648,1,9,
           -8,7,1,9,-246,-2147483648,-3,9,-4,7,-3,9,-248,-2147483648,-6,9,-9843,-2147483648,
-        ],"TileDataFormat":1,},"tilesetId":{"name":"tsZoneMap","path":"tilesets/tsZoneMap/tsZoneMap.yy",},"userdefinedDepth":false,"visible":false,"x":0,"y":0,},
+        ],"TileDataFormat":1,},"tilesetId":{"name":"tsZoneMap","path":"tilesets/tsZoneMap/tsZoneMap.yy",},"userdefinedDepth":false,"visible":true,"x":0,"y":0,},
     {"$GMRTileLayer":"","%Name":"Barriers","depth":300,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"layers":[],"name":"Barriers","properties":[],"resourceType":"GMRTileLayer","resourceVersion":"2.0","tiles":{"SerialiseHeight":176,"SerialiseWidth":256,"TileCompressedData":[
           -7796,-2147483648,1,10,-255,-2147483648,1,10,-255,-2147483648,1,10,-255,-2147483648,-5,10,-14,-2147483648,
           -4,10,-237,-2147483648,-3,10,-12,-2147483648,4,10,-2147483648,-2147483648,10,-239,-2147483648,-3,10,

@@ -9,5 +9,6 @@ sprite_index = sprite_standing;
 image_index = directions.down;
 last_dir = directions.down;
 
+sprite_combat = sAnnaCombat;
 
 depth = -myRank * 10;

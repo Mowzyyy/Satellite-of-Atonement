@@ -12,4 +12,6 @@ sprite_index = sprite_standing;
 image_index = directions.down;
 last_dir = directions.down;
 
+sprite_combat = sOseiCombat;
+
 depth = -myRank * 10;

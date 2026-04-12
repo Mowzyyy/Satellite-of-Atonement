@@ -9,4 +9,6 @@ sprite_index = sprite_standing;
 image_index = directions.down;
 last_dir = directions.down;
 
+sprite_combat = sLeonCombat;
+
 depth = -myRank * 10;

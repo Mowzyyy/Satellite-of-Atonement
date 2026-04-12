@@ -3,6 +3,8 @@ if (global.state != GAME_STATE.BATTLE) {
 	exit;
 }
 
+blink_timer++;
+
 switch (global.battle_phase) {
 	
 	case BATTLE_PHASE.SELECT_COMMAND:

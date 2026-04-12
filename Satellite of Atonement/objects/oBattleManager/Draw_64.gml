@@ -86,9 +86,9 @@ if (global.state == GAME_STATE.BATTLE) {
 		var is_selecting = global.battle_sub_open && global.battle_cmd_index == pin && global.battle_phase == BATTLE_PHASE.SELECT_COMMAND;
 		var show_icon = !is_selecting || (blink_timer mod 40) < 20;
 		if (show_icon) {
-			draw_sprite(action_spr, 0, card_x + card_w - 20, card_y + lh * 1 - 4);
+			draw_sprite(action_spr, 0, card_x + card_w - 22, card_y + lh * 1 - 4);
 		} else {
-			draw_sprite(sCombatDefault, 0, card_x + card_w - 20, card_y + lh * 1 - 4);
+			draw_sprite(sCombatDefault, 0, card_x + card_w - 22, card_y + lh * 1 - 4);
 		}
 		
 		//hp and mp
@@ -170,7 +170,7 @@ if (global.state == GAME_STATE.BATTLE) {
 		var ebox_y = 9 + row_idx * (ebox_h + ebox_gap);
 		draw_sprite_stretched(sBasicGUI, 0, ebox_x, ebox_y, ebox_w, ebox_h);
 		draw_set_halign(fa_left);
-		draw_text(ebox_x + 8, ebox_y + 8, enemy_types[eti]);
+		draw_text(ebox_x + 8, ebox_y + 12, enemy_types[eti]);
 	}
 	
 	//damage display boxes

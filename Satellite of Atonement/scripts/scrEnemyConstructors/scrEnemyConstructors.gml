@@ -90,6 +90,14 @@ function cstrEnemy(_name, _hp, _mp, _atk, _def, _spd, _mental, _exp, _money) con
 }
 
 //===========================TEST ENEMY===========================
+function scrBuildEnemy(_name) {
+	switch (_name) {
+		case "Slime" : return cstrTestSlime();
+		default:	show_debug_message("WARNING: scrBuildEnemy — unknown enemy '" + _name + "'");
+		return undefined;
+	}
+}
+
 function cstrTestSlime() {
 	var e = new cstrEnemy("Slime", 30, 0, 8, 4, 6, 2, 10, 5);
 	e.sprite_combat = sTestSlime;//placeholder - add sprite when ready

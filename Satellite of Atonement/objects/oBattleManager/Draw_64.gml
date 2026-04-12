@@ -26,7 +26,7 @@ if (global.state == GAME_STATE.BATTLE) {
 		draw_sprite_stretched(sBasicGUI, 0, card_x, card_y, card_w, card_h);
 		
 		//name left, action icon right
-		draw_set_color(text_col);
+		draw_set_color(txt_col);
 		draw_set_halign(fa_left);
 		draw_text(card_x + lpad, card_y + lh * 1, member.name);
 		
@@ -48,7 +48,7 @@ if (global.state == GAME_STATE.BATTLE) {
 		if (show_icon) {
 			draw_sprite(action_spr, 0, card_x + card_w - 20, card_y + lh * 1 - 4);
 		} else {
-			draw_sprite(sCombatBlink, 0, card_x + card_w - 20, card_y + lh * 1 - 4);
+			draw_sprite(sBlink, 0, card_x + card_w - 20, card_y + lh * 1 - 4);
 		}
 		
 		//hp and mp
@@ -59,7 +59,7 @@ if (global.state == GAME_STATE.BATTLE) {
 		draw_set_halign(fa_left);
 		draw_text(card_x + lpad, card_y + lh * 4, "MP:");
 		draw_set_halign(fa_right);
-		draw_text(card_x + card_w = lpad, crd_y + lh * 4, string(member.current_mana) + "/" + string(s.max_mana));
+		draw_text(card_x + card_w = lpad, card_y + lh * 4, string(member.current_mana) + "/" + string(s.max_mana));
 		draw_set_halign(fa_left);
 		draw_set_color(c_white);
 	}
@@ -111,7 +111,7 @@ if (global.state == GAME_STATE.BATTLE) {
 				if (show_ic) {
 					draw_sprite(icons[ic], 0, icon_x, icon_y);
 				} else {
-					draw_sprite(sCombatBlink, 0, icon_x, icon_y);
+					draw_sprite(sBlink, 0, icon_x, icon_y);
 				}
 				
 				//yellow highlight under selected icon
@@ -142,7 +142,7 @@ if (global.state == GAME_STATE.BATTLE) {
 	var ebox_gap = 4;
 	for (var eti = 0; eti < array_length(enemy_types); eti++) {
 		var col_idx = eti mod 2;
-		var row_idxc = eti div 2;
+		var row_idx = eti div 2;
 		var ebox_x = (col_idx == 0) ? 20 : 320 - 20 - ebox_w;
 		var ebox_y = 9 + row_idx * (ebox_h + ebox_gap);
 		draw_sprite_stretched(sBasicGUI, 0, ebox_x, ebox_y, ebox_w, ebox_h);

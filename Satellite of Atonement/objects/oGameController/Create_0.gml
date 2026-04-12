@@ -158,7 +158,7 @@ blink_timer = 0;
 //Restart game guard flag
 global.is_restarting = false;
 //====================================Battle State====================================
-global.battle_enemies					= _enemy_list;
+global.battle_enemies					= [];
 global.battle_phase							= BATTLE_PHASE.SELECT_COMMAND;
 global.battle_turn_order				= [];
 global.battle_actions						= [];

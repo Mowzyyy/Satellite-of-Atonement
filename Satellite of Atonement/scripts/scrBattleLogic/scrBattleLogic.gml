@@ -70,7 +70,7 @@ function scrAttemptFlee() {
 	var party_spd = 0;
 	var enemy_spd = 0;
 	for (var i = 0; i < array_length(global.party); i++) {
-		party_spd += global.part[i].get_effective_stats().spd;
+		party_spd += global.party[i].get_effective_stats().spd;
 	}
 	for (var i = 0; i < array_length(global.battle_enemies); i++) {
 		enemy_spd += global.battle_enemies[i].spd;

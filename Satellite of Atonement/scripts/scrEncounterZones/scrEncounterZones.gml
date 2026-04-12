@@ -51,9 +51,9 @@ function scrGetZoneData(_map_id) {
 			min_steps	: 15,
 			max_steps	: 80,
 			encounters	: [
-			{ weight: 3, enemies: [cstrTestSlime(), cstrTestSlime()] },
-			{ weight: 2, enemies: [cstrTestSlime()] },
-			{ weight: 1, enemies : [cstrTestSlime(), cstrTestSlime(), cstrTestSlime()] },
+			{ weight: 3, enemies: ["Slime", "Slime"] },
+			{ weight: 2, enemies: ["Slime"] },
+			{ weight: 1, enemies : ["Slime", "Slime", "Slime"] },
 			]
 		};
 		//add more zones here
@@ -75,8 +75,8 @@ function scrPickEncounter(_zone) {
 			//instantiate the enemies from their factory functions
 			var enemy_list = [];
 			for (var j = 0; j < array_length(_zone.encounters[i].enemies); j++) {
-				var factory = _zone.encounters[i].enemies[j];
-				array_push(enemy_list, factory());
+				var enemy_name = _zone.encounters[i].enemies[j];
+				array_push(enemy_list, scrBuildEnemy(enemy_name));
 			}
 			return enemy_list;
 		}

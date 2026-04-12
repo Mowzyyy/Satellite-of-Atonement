@@ -158,6 +158,10 @@ blink_timer = 0;
 //Restart game guard flag
 global.is_restarting = false;
 //====================================Battle State====================================
+global.current_zone_tile = 0;//current tsZoneMap tile the leader is on
+global.battle_background = -1;//sprite drawn behind combat
+
+
 global.battle_enemies					= [];
 global.battle_phase							= BATTLE_PHASE.SELECT_COMMAND;
 global.battle_turn_order				= [];

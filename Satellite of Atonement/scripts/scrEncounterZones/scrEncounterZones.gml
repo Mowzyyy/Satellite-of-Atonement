@@ -4,7 +4,13 @@
 function scrStepEncounter(_map_id) {
 	global.encounter_steps++;
 	
-	var zone = scrGetZoneData(_map_id);
+	//read current zone tile
+	var tile_idx = scrGetCurrentZoneTile();
+	var zone_number = scrTileToZoneNumber(tile_idx);
+	global.current_zone_tile = zone_number;
+	
+	//get zone data for this map + zone combination
+	var zone = scrGetZoneData(_map_id, zone_number);
 	if (zone == undefined) return;//no encounters in this zone
 	
 	//calculate average steps adjusted by party level and plot stage
@@ -29,34 +35,50 @@ function scrStepEncounter(_map_id) {
 	}
 	chance = clamp(chance, 0, 1);
 
-//hard clamp at max steps
-if (global.encounter_steps >= zone.max_steps) chance = 1;
+	//hard clamp at max steps
+	if (global.encounter_steps >= zone.max_steps) chance = 1;
 
 	if (random(1) < chance) {
 		//trigger encounter
 		var encounter = scrPickEncounter(zone);
 		if (encounter != undefined) {
 			global.encounter_steps = 0;
+			global.battle_background = scrGetBattleBackground(_map_id, zone_number);
 			scrStartBattle(encounter);
 		}
 	}
 }
 
 //returns zone data struct for a given map
-function scrGetZoneData(_map_id) {
+function scrGetZoneData(_map_id, _zone_number) {
+	//default - no zone tile means no encounters
+	if (_zone_number == 0) return undefined;
+	
 	switch (_map_id) {
 		case MAP.DUNES:
-		return {
-			avg_steps	: 40,
-			min_steps	: 15,
-			max_steps	: 80,
-			encounters	: [
-			{ weight: 3, enemies: ["Slime", "Slime"] },
-			{ weight: 2, enemies: ["Slime"] },
-			{ weight: 1, enemies : ["Slime", "Slime", "Slime"] },
-			]
-		};
-		//add more zones here
+			switch (_zone_number) {
+				case 1: return {
+					avg_steps	: 40,
+					min_steps	: 15,
+					max_steps	: 80,
+					encounters	: [
+					{ weight: 3, enemies: ["Slime", "Slime"] },
+					{ weight: 2, enemies: ["Slime"] },
+					{ weight: 1, enemies : ["Slime", "Slime", "Slime"] },
+					]};
+			
+				case 2: return {
+					avg_steps	: 30,
+					min_steps	: 10,
+					max_steps	: 60,
+					encounters	: [
+					{ weight: 2, enemies: ["Slime", "Slime", "Slime"] },
+					{ weight: 1, enemies : ["Slime", "Slime", "Slime", "Slime"] },
+					]};
+			//add more zone numbers per map as needed
+			default: return undefined;
+		}
+		//add more maps here
 		default: return undefined;
 	}
 }
@@ -82,4 +104,39 @@ function scrPickEncounter(_zone) {
 		}
 	}
 	return undefined;
+}
+
+//returns the zone tile index the leader is currently standing on, returns 0 if no zone tile
+function scrGetCurrentZoneTile() {
+	var _layer = layer_get_id("ZoneMap");
+	if (_layer == -1) return 0;
+	var _tilemap = layer_tilemap_get_id(_layer);
+	if (_tilemap == -1) return 0;
+	
+	var _leader = instance_find(global.partyOrder[0], 0);
+	if (_leader == noone || !instance_exists(_leader)) return 0;
+	
+	var _tile_idx = tilemap_get(_tilemap, _leader.x_pos, _leader.y_pos);
+	_tile_idx = _tile_idx & tile_index_mask;
+	return _tile_idx;//0 = no zone, 1-20 = zone numbers
+}
+
+//returns zone number 1-20 from tile index
+function scrTileToZoneNumber(_tile_idx) {
+	if (_tile_idx <= 0) return 0;
+	return _tile_idx;
+}
+//========================COMBAT BACKGROUNDS========================
+function scrGetBattleBackground(_map_id, _zone_number) {
+	switch (_map_id) {
+		case MAP.DUNES:
+		//default dunes background for all zones, override per zone as needed
+		switch (_zone_number) {
+			case 1: return sDefaultBg;
+			case 2: return sDefaultBg;
+			default: return sDefaultBg;
+		}
+		//add more maps here
+		default: return -1;
+	}
 }

@@ -8,11 +8,21 @@ if (global.state == GAME_STATE.BATTLE) {
 	var card_h = 48;
 	var card_gap = 1;
 	var total_card_w = (4 * card_w) + (3 * card_gap);
-	var card_start_x = (320 - total_card_w) / 2;
+	var card_start_x = floor((320 - total_card_w) / 2);
 	var card_y = 240 - card_h;
 	
 	//draw order - midleft, midright, farleft, farright
 	var card_order = [1, 2, 0, 3];
+	
+	//draw the battle background behind everything
+	if (global.battle_background !=-1 && sprite_exists(global.battle_background)) {
+		draw_sprite_stretched(global.battle_background, 0, 0, 0, 320, 240);
+	} else {
+		//defauilt solid background
+		draw_set_color(c_dkgray);
+		draw_rectangle(0, 0, 320, 240, false);
+		draw_set_color(c_white);
+	}
 	
 	//enemy sprites centered drawn first
 	var enemy_spacing = 32;
@@ -114,7 +124,7 @@ if (global.state == GAME_STATE.BATTLE) {
 			
 			//five icons evenly spaced
 			var icons = [sAttackIcon, sMagicIcon, sSkillIcon, sItemIcon, sDefendIcon];
-			var icon_spacing = (sub_w - 16) / 4;
+			var icon_spacing = 24
 			for (var ic = 0; ic < 5; ic++) {
 				var icon_x = sub_x + 8 + (ic * icon_spacing);
 				var icon_y = sub_y + sub_h / 2 - 8;

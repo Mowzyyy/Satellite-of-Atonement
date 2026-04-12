@@ -233,25 +233,30 @@ function scrAdvanceCmdIndex() {
 
 //=====================================EXECUTE PHASE=====================================
 function scrBattleExecutePhase() {
-	//placeholder - iterate turn order and apply actions
-	if (array_length(global.battle_turn_order) == 0) {
-		//turn complete - check win/loss
-		var all_dead = true;
-		for (var i = 0; i < array_length(global.battle_enemies); i++) {
-			if (!global.battle_enemies[i].is_dead) { all_dead = false; break; }
+	// Temporary stub — consume one turn order entry per frame
+	if (array_length(global.battle_turn_order) > 0) {
+		var turn = global.battle_turn_order[0];
+		show_debug_message("Executing turn for: " + turn.kind + " index: " + string(turn.index));
+		array_delete(global.battle_turn_order, 0, 1);
+		return;
+	}
+
+	//turn complete - check win/loss
+	var all_dead = true;
+	for (var i = 0; i < array_length(global.battle_enemies); i++) {
+		if (!global.battle_enemies[i].is_dead) { all_dead = false; break; }
+	}
+	if (all_dead) {
+		global.battle_phase = BATTLE_PHASE.WIN_LOSS;
+	} else {
+		global.battle_phase= BATTLE_PHASE.SELECT_COMMAND;
+		global.battle_actions = [];
+		for (var i = 0; i < array_length(global.party); i++) {
+			array_push(global.battle_actions, undefined);
 		}
-		if (all_dead) {
-			global.battle_phase = BATTLE_PHASE.WIN_LOSS;
-		} else {
-			global.battle_phase= BATTLE_PHASE.SELECT_COMMAND;
-			global.battle_actions = [];
-			for (var i = 0; i < array_length(global.party); i++) {
-				array_push(global.battle_actions, undefined);
-			}
-			global.battle_cmd_index = 0;
-			global.battle_sub_open = false;
-			global.battle_flee_result = -1;
-		}
+		global.battle_cmd_index = 0;
+		global.battle_sub_open = false;
+		global.battle_flee_result = -1;
 	}
 }
 

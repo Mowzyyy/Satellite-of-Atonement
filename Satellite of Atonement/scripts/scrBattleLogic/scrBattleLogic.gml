@@ -36,7 +36,7 @@ function scrBuildTurnOrder() {
 	for (var i = 0; i < array_length(global.party); i++) {
 		var m = global.party[i];
 		if (m.current_hp <= 0) continue;
-		var s = m.get_effective_state();
+		var s = m.get_effective_stats();
 		array_push(order, {
 			kind					: "party",
 			index					: i,
@@ -57,7 +57,7 @@ function scrBuildTurnOrder() {
 	}
 	
 	//sort by spd descending, ties broken randomly
-	array_sot(order, function(a, b) {
+	array_sort(order, function(a, b) {
 		if (a.spd != b.spd) return b.spd - a.spd;
 		return random(2) > 1 ? 1 : -1;
 	});
@@ -104,6 +104,7 @@ function scrCalcMagicDamage(_mAtk, mDef, _mpower, _element, _target) {
 //==================================COMMAND PHASE==================================
 function scrBattleCommandPhase() {
 	//top level: CMND/MACRO/FLEE
+	
 	if (!global.battle_sub_open && global.battle_cmd_index == 0 && global.battle_phase == BATTLE_PHASE.SELECT_COMMAND) {
 		
 		if (global.keyUpPressed) global.battle_cmd_cursor = (global.battle_cmd_cursor - 1 + 3) mod 3;
@@ -126,10 +127,16 @@ function scrBattleCommandPhase() {
 					break;
 					
 				case 2://FLEE
-					if (scrAttemptFlee()) {
+				show_debug_message("FLEE selected | attempting flee...");
+				var flee_result = scrAttemptFlee();
+				show_debug_message("FLEE result: " + string(flee_result));
+					if (flee_result) {
+						show_debug_message("FLEE succeeded - calling scrEndBattle");
 						global.battle_flee_result = 1;
 						scrEndBattle(false);
+						exit;//stop execution immediately after destroying oBattleManager
 					} else {
+						show_debug_message("FLEE failed - executing turn");
 						global.battle_flee_result = 0;
 						global.battle_phase = BATTLE_PHASE.EXECUTE_TURN;
 						global.battle_turn_order = scrBuildTurnOrder();
@@ -227,7 +234,7 @@ function scrAdvanceCmdIndex() {
 //=====================================EXECUTE PHASE=====================================
 function scrBattleExecutePhase() {
 	//placeholder - iterate turn order and apply actions
-	if (array_length(global.battle_turn_order == 0)) {
+	if (array_length(global.battle_turn_order) == 0) {
 		//turn complete - check win/loss
 		var all_dead = true;
 		for (var i = 0; i < array_length(global.battle_enemies); i++) {
@@ -269,6 +276,7 @@ function scrBattleWinLoss() {
 }
 
 function scrEndBattle(_victory) {
+	show_debug_message("scrEndBattle called | victory: " + string(_victory));
 	global.battle_enemies = [];
 	global.battle_actions = [];
 	global.battle_turn_order = [];
@@ -276,8 +284,16 @@ function scrEndBattle(_victory) {
 	global.battle_cmd_index = 0;
 	global.battle_flee_result = -1;
 	global.encounter_steps = 0;
+	show_debug_message("scrEndBattle globals cleared");
 	global.state = GAME_STATE.OVERWORLD;
+	show_debug_message("scrEndBattle state set to OVERWORLD");
 	
-	if (instance_exists(oBattleManager)) instance_destroy(oBattleManager);
+	if (instance_exists(oBattleManager)) {
+		show_debug_message("scrEndBattle destroying oBattleManager");
+		instance_destroy(oBattleManager);
+		show_debug_message("scrEndBattle oBattleManager destroyed");
+	} else {
+		show_debug_message("scrEndBattle WARNING: oBattleManager does not exist");
+	}
 	show_debug_message("Battle ended | victory: " + string(_victory));
 }

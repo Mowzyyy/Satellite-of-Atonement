@@ -14,6 +14,36 @@ if (global.state == GAME_STATE.BATTLE) {
 	//draw order - midleft, midright, farleft, farright
 	var card_order = [1, 2, 0, 3];
 	
+	//enemy sprites centered drawn first
+	var enemy_spacing = 32;
+	var num_enemies = array_length(global.battle_enemies);
+	var enemy_start_x = 160 - (num_enemies - 1) * enemy_spacing / 2;
+	var enemy_y = 120;
+	for (var ei = 0; ei < num_enemies; ei++) {
+		var e = global.battle_enemies[ei];
+		if (e.is_dead) continue;
+		if (e.sprite_combat != -1 && sprite_exists(e.sprite_combat)) {
+			draw_sprite(e.sprite_combat, 0, enemy_start_x + ei * enemy_spacing, enemy_y);
+		}
+	}
+	
+	//character combat sprites above cards
+	for (var ci = 0; ci < array_length(global.party); ci++) {
+		var pin = card_order[ci];
+		var member = global.party[pin];
+		var card_x = card_start_x + (ci * (card_w + card_gap));
+		//sprite offset - 4px from middle-facing side
+		var spr_x = card_x + card_w / 2;
+		var spr_y = card_y;//bottom of sprite touches top of card
+		var inst = instance_find(global.partyOrder[pin], 0);
+		if (inst != noone && instance_exists(inst)) {
+			var spr_combat = inst.sprite_combat;
+			if (spr_combat != -1 && sprite_exists(spr_combat)) {
+				draw_sprite(spr_combat, 0, spr_x, spr_y);
+			}
+		}
+	}
+	
 	for (var ci = 0; ci < array_length(global.party); ci++) {
 		var pin						= card_order[ci];//partyindex
 		var member			= global.party[pin];
@@ -48,7 +78,7 @@ if (global.state == GAME_STATE.BATTLE) {
 		if (show_icon) {
 			draw_sprite(action_spr, 0, card_x + card_w - 20, card_y + lh * 1 - 4);
 		} else {
-			draw_sprite(sBlink, 0, card_x + card_w - 20, card_y + lh * 1 - 4);
+			draw_sprite(sCombatDefault, 0, card_x + card_w - 20, card_y + lh * 1 - 4);
 		}
 		
 		//hp and mp
@@ -59,28 +89,11 @@ if (global.state == GAME_STATE.BATTLE) {
 		draw_set_halign(fa_left);
 		draw_text(card_x + lpad, card_y + lh * 4, "MP:");
 		draw_set_halign(fa_right);
-		draw_text(card_x + card_w = lpad, card_y + lh * 4, string(member.current_mana) + "/" + string(s.max_mana));
+		draw_text(card_x + card_w - lpad, card_y + lh * 4, string(member.current_mana) + "/" + string(s.max_mana));
 		draw_set_halign(fa_left);
 		draw_set_color(c_white);
 	}
 	
-	//CMND/MACRO/FLEE box - only show when no subselection is active
-	if (!global.battle_sub_open) {
-		var cmd_w = 72;
-		var cmd_h = 56;
-		var cmd_x = 320 / 2 - cmd_w - 4;
-		var cmd_y = card_y - cmd_h - 4;
-		draw_sprite_stretched(sBasicGUI, 0, cmd_x, cmd_y, cmd_w, cmd_h);
-		
-		var cmd_opts = ["CMND", "MACRO", "FLEE"];
-		for (var i = 0; i < 3; i++) {
-			var col = (global.battle_cmd_cursor == i) ? c_yellow : c_white;
-			draw_text_color(cmd_x + 16, cmd_y + 8 + (i * 16), cmd_opts[i], col, col, col, col, 1);
-		}
-		//blinking cursor
-		var _blink_on = (blink_timer mod 40) < 20;
-		draw_sprite((_blink_on ? sCursor : sBlink), 0, cmd_x + 4, cmd_y + 8 + (global.battle_cmd_cursor * 16));
-	}
 	
 	//icon submenu - shown when a character is selecting their action
 	if (global.battle_sub_open && global.battle_cmd_index < array_length(global.party)) {
@@ -88,14 +101,14 @@ if (global.state == GAME_STATE.BATTLE) {
 		for (var ci = 0; ci < 4; ci++) {
 			if (card_order[ci] == global.battle_cmd_index) { ci_active = ci; break; }
 		}
-		if (ci_active >0) {
+		if (ci_active >= 0) {
 			var sub_w = 128;
 			var sub_h = 32;
 			var act_card_x = card_start_x + (ci_active * (card_w + card_gap));
 			
 			//offset left for right-side cards
 			var sub_x = (ci_active >= 2) ? act_card_x + card_w - sub_w - 12 : act_card_x + 12;
-			var sub_y = card_y - sub_h = - 1;
+			var sub_y = card_y - sub_h - 1;
 			
 			draw_sprite_stretched(sBasicGUI, 0, sub_x, sub_y, sub_w, sub_h);
 			
@@ -111,7 +124,7 @@ if (global.state == GAME_STATE.BATTLE) {
 				if (show_ic) {
 					draw_sprite(icons[ic], 0, icon_x, icon_y);
 				} else {
-					draw_sprite(sBlink, 0, icon_x, icon_y);
+					draw_sprite(sCombatDefault, 0, icon_x, icon_y);
 				}
 				
 				//yellow highlight under selected icon
@@ -150,36 +163,6 @@ if (global.state == GAME_STATE.BATTLE) {
 		draw_text(ebox_x + 8, ebox_y + 8, enemy_types[eti]);
 	}
 	
-	//enemy sprites centered
-	var enemy_spacing = 32;
-	var num_enemies = array_length(global.battle_enemies);
-	var enemy_start_x = 160 - (num_enemies - 1) * enemy_spacing / 2;
-	var enemy_y = 120;
-	for (var ei = 0; ei < num_enemies; ei++) {
-		var e = global.battle_enemies[ei];
-		if (e.is_dead) continue;
-		if (e.sprite_combat != -1 && sprite_exists(e.sprite_combat)) {
-			draw_sprite(e.sprite_combat, 0, enemy_start_x + ei * enemy_spacing, enemy_y);
-		}
-	}
-	
-	//character combat sprites above cards
-	for (var ci = 0; ci < array_length(global.party); ci++) {
-		var pin = card_order[ci];
-		var member = global.party[pin];
-		var card_x = card_start_x + (ci * (card_w + card_gap));
-		//sprite offset - 4px from middle-facing side
-		var spr_x = (ci < 2) ? card_x + card_w - 4 : card_x + 4;
-		var spr_y = card_y;//bottom of sprite touches top of card
-		var inst = instance_find(global.partyOrder[pi], 0);
-		if (inst != noone && instance_exists(inst)) {
-			var spr_combat = inst.sprite_combat;
-			if (spr_combat != -1 && sprite_exists(spr_combat)) {
-				draw_sprite(spr_combat, 0, spr_x, spr_y);
-			}
-		}
-	}
-	
 	//damage display boxes
 	for (var di = array_length(global.battle_damage_display) - 1; di >= 0; di--) {
 		var d = global.battle_damage_display[di];
@@ -192,6 +175,24 @@ if (global.state == GAME_STATE.BATTLE) {
 		draw_set_halign(fa_right);
 		draw_text(d.x + 64 - 8, d.y + 8, string(d.value));
 		draw_set_halign(fa_left);
+	}
+	
+	//CMND/MACRO/FLEE box - only show when no subselection is active
+	if (!global.battle_sub_open) {
+	var cmd_w = 72;
+	var cmd_h = 56;
+	var cmd_x = 320 / 4 - cmd_w - 4;
+	var cmd_y = 120 - cmd_h - 4;
+	draw_sprite_stretched(sBasicGUI, 0, cmd_x, cmd_y, cmd_w, cmd_h);
+		
+	var cmd_opts = ["CMND", "MACRO", "FLEE"];
+	for (var i = 0; i < 3; i++) {
+		var col = (global.battle_cmd_cursor == i) ? c_yellow : c_white;
+		draw_text_color(cmd_x + 18, cmd_y + 12 + (i * 16), cmd_opts[i], col, col, col, col, 1);
+	}
+	//blinking cursor
+	var _blink_on = (blink_timer mod 40) < 20;
+	draw_sprite((_blink_on ? sCursor : sBlink), 0, cmd_x + 6, cmd_y + 12 + (global.battle_cmd_cursor * 16));
 	}
 	
 	draw_set_halign(fa_left);

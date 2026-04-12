@@ -1,4 +1,5 @@
 if (global.state == GAME_STATE.IN_GAME_MENU) exit;
+if (global.state == GAME_STATE.BATTLE) exit;
 //If not the leader (rank = 0), follow the person in front
 if (myRank == 0) {
 	// LEADER LOGIC

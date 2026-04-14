@@ -100,7 +100,7 @@ function scrBuildEnemy(_name) {
 
 function cstrTestSlime() {
 	var e = new cstrEnemy("Slime", 30, 0, 8, 4, 6, 2, 10, 5);
-	e.sprite_combat = sTestSlime;//placeholder - add sprite when ready
+	e.sprite_combat = sCuetzpal;//placeholder - add sprite when ready
 	e.add_move(new cstrEnemyMove("Tackle", "attack", 10, 0, "single_enemy", 4));
 	e.add_move(new cstrEnemyMove("Ooze", "status", 0, 0, "single_enemy", 1));
 	return e;

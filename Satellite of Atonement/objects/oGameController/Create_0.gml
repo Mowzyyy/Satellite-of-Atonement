@@ -138,6 +138,9 @@ if (!variable_global_exists("state_initialized")) {
 	global.state = GAME_STATE.MAIN_MENU;
 	global.state_initialized = true;
 }
+
+global.skill_death_msg_timer = 0;
+
 global.menu_page = MENU_PAGE.MAIN;
 global.selected_char = 0;//0-3 for the 4 portraits
 global.stats_state = STATS_STATE.SELECT_WHO;

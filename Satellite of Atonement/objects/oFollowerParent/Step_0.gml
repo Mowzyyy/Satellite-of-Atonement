@@ -1,5 +1,33 @@
 if (global.state == GAME_STATE.IN_GAME_MENU) exit;
 if (global.state == GAME_STATE.BATTLE) exit;
+
+//death state locks to standing sprite
+var _party_idx = -1;
+for (var dei = 0; dei < array_length(global.party); dei++) {
+	if (global.partyOrder[dei] == object_index) {
+		_party_idx = dei;
+		break;
+	}
+}
+if (_party_idx >= 0 && global.party[_party_idx].is_dead) {
+	sprite_index = sprite_standing;
+	image_index = last_dir;
+	state = states.idle;
+	exit;
+}
+
+for (var ide = 0; ide < array_length(global.party); ide++) {
+	var _pm = global.party[ide];
+	if (_pm.current_hp <= 0 && !_pm.is_dead) {
+		_pm.current_hp = 0;
+		_pm.is_dead = true;
+		show_debug_message(_pm.name + " is in dying state");
+	} else if (_pm.current_hp > 0 && _pm.is_dead) {
+		_pm.is_dead = false;
+		show_debug_message(_pm.name + " has been revived");
+	}
+}
+
 //If not the leader (rank = 0), follow the person in front
 if (myRank == 0) {
 	// LEADER LOGIC

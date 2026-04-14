@@ -4,9 +4,9 @@ if (global.state == GAME_STATE.BATTLE) {
 	var lpad = 4;
 	
 	//card dimenisons
-	var card_w = 64;
+	var card_w = 80;
 	var card_h = 48;
-	var card_gap = 1;
+	var card_gap = 0;
 	var total_card_w = (4 * card_w) + (3 * card_gap);
 	var card_start_x = floor((320 - total_card_w) / 2);
 	var card_y = 240 - card_h;
@@ -93,11 +93,11 @@ if (global.state == GAME_STATE.BATTLE) {
 		
 		//hp and mp
 		draw_set_halign(fa_left);
-		draw_text(card_x + lpad, card_y + lh * 3, "HP:");
+		draw_text(card_x + lpad, card_y + lh * 3, "H:");
 		draw_set_halign(fa_right);
 		draw_text(card_x + card_w - lpad, card_y + lh * 3, string(member.current_hp) + "/" + string(s.maxhp));
 		draw_set_halign(fa_left);
-		draw_text(card_x + lpad, card_y + lh * 4, "MP:");
+		draw_text(card_x + lpad, card_y + lh * 4, "M:");
 		draw_set_halign(fa_right);
 		draw_text(card_x + card_w - lpad, card_y + lh * 4, string(member.current_mana) + "/" + string(s.max_mana));
 		draw_set_halign(fa_left);

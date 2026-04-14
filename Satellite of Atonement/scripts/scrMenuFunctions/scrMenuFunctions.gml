@@ -180,6 +180,15 @@ function scrMenuPauseLogic() {
 		scrSkillLogic();
 	}
 }
+
+function drawPortraitController(_member, _portrait_spr, _x, _y) {
+	if (_member.is_dead) {
+		//grayscale
+		draw_sprite_ext(_portrait_spr, 0, _x, _y, 1, 1, 0, c_gray, 0.7);
+	} else {
+		draw_sprite(_portrait_spr, 0, _x, _y);
+	}
+}
 //=============================Inventory Submenu=============================
 function scrInventoryLogic() {
 	var num_party = array_length(global.partyOrder);
@@ -1064,16 +1073,30 @@ function scrSkillLogic() {
 		
 		case SKILL_STATE.SELECT_WHO:
 			if (global.keyUpPressed) {
-				global.skill_char = (global.skill_char - 1 + num_party) mod num_party;
+				var tries = 0;
+				repeat (array_length(global.partyOrder)) {
+					global.skill_char = (global.skill_char - 1 + num_party) mod num_party;
+					if (!global.party[global.skill_char].is_dead) break;
+				}
 				menu_cursor = global.skill_char;
 				io_clear();
 			}
 			if (global.keyDownPressed) {
-				global.skill_char = (global.skill_char + 1) mod num_party;
+				repeat (array_length(global.partyOrder)) {
+					global.skill_char = (global.skill_char + 1) mod num_party;
+					if (!global.party[global.skill_char].is_dead) break;
+				}
 				menu_cursor = global.skill_char;
 				io_clear();
 			}
 			if (global.keyC) {
+				var chosen = global.party[global.skill_char];
+				if (chosen.is_dead) {
+					global.skill_death_msg_timer = 120;//2 seconds
+					io_clear();
+					global.keyC = false;
+					break;
+				}
 				var list = scrSkillBuildList(global.skill_char);
 				global.skill_state  = SKILL_STATE.SELECT_WHAT;
 				global.skill_cursor = 0;

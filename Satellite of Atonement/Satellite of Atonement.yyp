@@ -107,6 +107,7 @@
     {"id":{"name":"sCoatWalking","path":"sprites/sCoatWalking/sCoatWalking.yy",},},
     {"id":{"name":"sCombatDead","path":"sprites/sCombatDead/sCombatDead.yy",},},
     {"id":{"name":"sCombatDefault","path":"sprites/sCombatDefault/sCombatDefault.yy",},},
+    {"id":{"name":"sCuetzpal","path":"sprites/sCuetzpal/sCuetzpal.yy",},},
     {"id":{"name":"sCursor","path":"sprites/sCursor/sCursor.yy",},},
     {"id":{"name":"sDefaultBg","path":"sprites/sDefaultBg/sDefaultBg.yy",},},
     {"id":{"name":"sDefendIcon","path":"sprites/sDefendIcon/sDefendIcon.yy",},},

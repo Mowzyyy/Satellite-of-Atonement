@@ -78,6 +78,7 @@
     {"name":"sCoatWalking","order":5,"path":"sprites/sCoatWalking/sCoatWalking.yy",},
     {"name":"sCombatDead","order":4,"path":"sprites/sCombatDead/sCombatDead.yy",},
     {"name":"sCombatDefault","order":3,"path":"sprites/sCombatDefault/sCombatDefault.yy",},
+    {"name":"sCuetzpal","order":1,"path":"sprites/sCuetzpal/sCuetzpal.yy",},
     {"name":"sDefendIcon","order":6,"path":"sprites/sDefendIcon/sDefendIcon.yy",},
     {"name":"sDunesTownTiles","order":1,"path":"sprites/sDunesTownTiles/sDunesTownTiles.yy",},
     {"name":"sItemIcon","order":9,"path":"sprites/sItemIcon/sItemIcon.yy",},

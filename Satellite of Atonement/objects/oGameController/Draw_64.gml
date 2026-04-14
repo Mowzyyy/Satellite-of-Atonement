@@ -91,10 +91,12 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			if (party_obj == oAnna) portrait_spr = sChatPortAnna;
 			if (party_obj == oData) portrait_spr = sChatPortData;
 			//draw_sprite(portrait_spr, 0, portrait_cx, bot_mid.y + lpad * 1);
-			draw_sprite(portrait_spr, 0, c.x + lpad * 3 + 4, c.y + lpad * 1);
+			drawPortraitController(member, portrait_spr, c.x + lpad * 3 + 4, c.y + lpad * 1);
 			
 			//HP and MP beneath protrait
+			var hp_col = member.is_dead ? c_red : c_white;
 			draw_set_halign(fa_left);
+			draw_set_color(hp_col)
 			draw_text(c.x + lpad, c.y + lh * 5 - 6, "H");
 			draw_set_halign(fa_right);
 			draw_text(c.x + global.card_w - lpad, c.y + lh * 5 - 6, string(member.current_hp) + "/" + string(stats.maxhp));
@@ -102,6 +104,7 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			draw_text(c.x + lpad, c.y + lh * 6 - 6, "M");
 			draw_set_halign(fa_right);
 			draw_text(c.x + global.card_w - lpad, c.y + lh * 6 - 6, string(member.current_mana) + "/" + string(stats.max_mana));
+			draw_set_color(c_white);
 			draw_set_halign(fa_left);
 			
 			//Name left, level right
@@ -401,7 +404,7 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			if (global.partyOrder[char_idx] == oOsei) portrait_spr = sPortraitOsei;
 			if (global.partyOrder[char_idx] == oAnna) portrait_spr = sPortraitAnna;
 			if (global.partyOrder[char_idx] == oData) portrait_spr = sPortraitData;
-			draw_sprite(portrait_spr, 0, portrait_cx, bot_mid.y + lpad * 1);
+			drawPortraitController(member, portrait_spr, portrait_cx, bot_mid.y + lpad * 1);
 			
 			//hp and mp beneath portrait
 			draw_set_halign(fa_left);
@@ -563,7 +566,7 @@ if (global.menu_page == MENU_PAGE.ORDER) {
 			if (preview_obj == oOsei) prev_portrait = sChatPortOsei;
 			if (preview_obj == oAnna) prev_portrait = sChatPortAnna;
 			if (preview_obj == oData) prev_portrait = sChatPortData;
-			draw_sprite(prev_portrait, 0, bot_left.x + lpad * 3 + 4, bot_left.y + lpad * 1);
+			drawPortraitController(preview_member, prev_portrait, bot_left.x + lpad * 3 + 4, bot_left.y + lpad * 1);
 			
 			//HP, MP, name, level matching main pause menu layout
 			draw_set_halign(fa_left);
@@ -712,7 +715,7 @@ if (global.menu_page == MENU_PAGE.EQUIP) {
 		if (p_obj == oOsei) portrait_spr = sChatPortOsei;
 		if (p_obj == oAnna) portrait_spr = sChatPortAnna;
 		if (p_obj == oData) portrait_spr = sChatPortData;
-		draw_sprite(portrait_spr, 0, bot_mid.x + lpad * 3 + 4, bot_mid.y + lpad * 1);
+		drawPortraitController(member, portrait_spr, bot_mid.x + lpad * 3 + 4, bot_mid.y + lpad * 1);
 		draw_set_halign(fa_left);
 		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 5 - 6, "H");
 		draw_set_halign(fa_right);
@@ -946,6 +949,17 @@ if (global.menu_page == MENU_PAGE.SKILLS) {
 		var cursor_x = bot_mid.x + 12;
 		var _blink_on = (blink_timer mod 40) < 20;
 		draw_sprite((_blink_on ? sCursor : sBlink), 0, cursor_x, cursor_y);
+		
+		if (global.skill_death_msg_timer > 0) {
+			global.skill_death_msg_timer--;
+			draw_set_halign(fa_center);
+			draw_set_color(c_red);
+			draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 4, "Verge");
+			draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 5, "Of");
+			draw_text(top_mid.x + global.card_w / 2, top_mid.y + lh * 6, "Death!");
+			draw_set_color(c_white);
+			draw_set_halign(fa_left);
+		}
 	}
 	
 	//select what

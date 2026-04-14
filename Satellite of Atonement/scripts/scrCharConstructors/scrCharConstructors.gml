@@ -105,6 +105,7 @@ function cstrPartyMember(_name,
 	
 	//status effects - array of strings like poison or stun
 	status_effects = [];
+	is_dead = false;
 	
 	//temporary battle buffs - reset at end of battle
 	battle_buffs = {
@@ -366,6 +367,18 @@ function cstrPartyMember(_name,
 	static remove_status = function(_status) {
 		for (var i_rem = array_length(status_effects) - 1; i_rem >= 0; i_rem--) {
 			if (status_effects[i_rem] == _status) array_delete(status_effects, i_rem, 1);
+		}
+	}
+	
+	//check if the character is dead
+	static check_death = function() {
+		if (current_hp <= 0 && !is_dead) {
+			current_hp = 0;
+			is_dead = true;
+			show_debug_message(name + " is incapacitated");
+		}
+		if (current_hp > 0 && is_dead) {
+			is_dead = false;
 		}
 	}
 	

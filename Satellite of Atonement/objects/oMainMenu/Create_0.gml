@@ -7,14 +7,9 @@ walk_frame_timer = 0;
 walk_frame = 0;
 walk_frame_speed = 9;
 
-//Check for saves
-if (file_exists("save0.dat")) {
-	variant = MENU_VARIANT.RETURNING;
-	menu_options = ["Continue", "New Game", "Misc"];
-} else {
-	variant = MENU_VARIANT.NEW_PLAYER;
-	menu_options = ["New Game", "Misc"];
-}
+// Set defaults; Step event immediately corrects variant based on save_slot_exists
+variant = MENU_VARIANT.NEW_PLAYER;
+menu_options = ["New Game", "Misc"];
 
 cursor_index = 0;
 

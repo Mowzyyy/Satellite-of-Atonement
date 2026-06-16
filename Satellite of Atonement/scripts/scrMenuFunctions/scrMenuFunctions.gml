@@ -951,7 +951,7 @@ function scrEquipAutoSlot(_type) {
 		case "head":				return "head";
 		case "body":				return "body";
 		case "feet":					return "feet";
-		case "armor":			return "body;"//fallback for generic armor
+		case "armor":			return "body";//fallback for generic armor
 		case "accessory":		return "accessory";
 		case "weapon":			return "r_Hand";//default overriden by hand selection
 		case "l_Hand":			return "l_Hand";

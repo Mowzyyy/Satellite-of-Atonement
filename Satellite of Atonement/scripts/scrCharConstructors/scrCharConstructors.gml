@@ -309,7 +309,7 @@ function cstrPartyMember(_name,
 					t.status_effects = [];
 					break;
 				case "buff_stat":
-					t.battle_buffs.mental += power;
+					t.battle_buffs.mental += mpower;
 					break;
 				case "functional":
 					break;

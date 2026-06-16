@@ -183,7 +183,7 @@ function scrBattleCommandPhase() {
 					break;
 				
 				case 3://item
-					global.battle_suub_cursor = 0;
+					global.battle_sub_cursor = 0;
 					global.battle_sub_page = 0;
 					break;
 				

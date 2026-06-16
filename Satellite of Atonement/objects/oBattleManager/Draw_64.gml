@@ -1,7 +1,7 @@
 //============================BATTLE GUI============================
 if (global.state == GAME_STATE.BATTLE) {
 	var lh = 9;//line height for battle cards
-	var lpad = 4;
+	var lpad = 6;
 	
 	//card dimenisons
 	var card_w = 80;
@@ -93,13 +93,13 @@ if (global.state == GAME_STATE.BATTLE) {
 		
 		//hp and mp
 		draw_set_halign(fa_left);
-		draw_text(card_x + lpad, card_y + lh * 3, "H:");
+		draw_text(card_x + lpad, card_y + lh * 3, "HP:");
 		draw_set_halign(fa_right);
-		draw_text(card_x + card_w - lpad, card_y + lh * 3, string(member.current_hp) + "/" + string(s.maxhp));
+		draw_text(card_x + card_w - lpad, card_y + lh * 3, string(member.current_hp));
 		draw_set_halign(fa_left);
-		draw_text(card_x + lpad, card_y + lh * 4, "M:");
+		draw_text(card_x + lpad, card_y + lh * 4, "MP:");
 		draw_set_halign(fa_right);
-		draw_text(card_x + card_w - lpad, card_y + lh * 4, string(member.current_mana) + "/" + string(s.max_mana));
+		draw_text(card_x + card_w - lpad, card_y + lh * 4, string(member.current_mana));
 		draw_set_halign(fa_left);
 		draw_set_color(c_white);
 	}

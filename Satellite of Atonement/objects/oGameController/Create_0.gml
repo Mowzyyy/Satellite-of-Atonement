@@ -91,7 +91,7 @@ global.load_follower_data = [];
 //==================================MAP Data==================================
 global.transition_active = false;
 global.transition_fade_in = false;
-global.transiiton_target_room = -1;
+global.transition_target_room = -1;
 global.transition_target_x = 0;
 global.transition_target_y = 0;
 global.transition_target_dir = directions.down;

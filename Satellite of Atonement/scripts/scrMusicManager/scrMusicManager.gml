@@ -37,7 +37,7 @@ function scrPlayMusic(_track) {
 		audio_stop_all();
 		global.current_music = -1;
 		return;
-	}
+		}
 	if (global.current_music == _track && audio_is_playing(_track)) return;
 	audio_stop_all();
 	audio_play_sound(_track, 10, true);

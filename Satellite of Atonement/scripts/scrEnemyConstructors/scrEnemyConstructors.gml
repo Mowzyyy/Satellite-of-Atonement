@@ -82,7 +82,7 @@ function cstrEnemy(_name, _hp, _mp, _atk, _def, _spd, _mental, _exp, _money) con
 	}
 	
 	static is_resistant_to = function(_element) {
-		for (var i = 0; i < array_length(reesistances); i++) {
+		for (var i = 0; i < array_length(resistances); i++) {
 			if (resistances[i] == _element) return true;
 		}
 		return false;

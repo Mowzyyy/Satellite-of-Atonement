@@ -55,25 +55,10 @@ if (myRank > 0) {
 	}
 }
 
-//Contextual occlusion
-for (var mRaCheck = 1; mRaCheck < array_length(global.partyOrder); mRaCheck++) {
-		var _follower = instance_find(global.partyOrder[mRaCheck], 0);
-		var _ahead = instance_find(global.partyOrder[mRaCheck-1], 0);
-		
-		if (_follower == noone || _ahead == noone) continue;
-		if (_ahead.last_dir == directions.down) {
-			//person ahead facing down, follower draws behind - no standing on head
-			_follower.depth = _ahead.depth+10;
-		}
-		else if (_ahead.last_dir == directions.up) {
-			//person ahead facing up, follower draws in front
-			_follower.depth = _ahead.depth - 10;
-		}
-		else {
-			//left/right = neutral, slightly ahead as to not overlap
-			_follower.depth = _ahead.depth + 2;
-		}
+// Contextual occlusion
+for (var mRaCheck = 0; mRaCheck < array_length(global.partyOrder); mRaCheck++) {
+    var _inst = instance_find(global.partyOrder[mRaCheck], 0);
+    if (_inst == noone || !instance_exists(_inst)) continue;
+    // Lower on screen (higher y) = drawn on top = lower depth
+    _inst.depth = -_inst.y;
 }
-
-var _leader = instance_find(global.partyOrder[0], 0);
-if (_leader != noone) _leader.depth = 0;

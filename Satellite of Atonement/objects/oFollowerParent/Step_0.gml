@@ -36,6 +36,12 @@ if (myRank == 0) {
 	//Inspired directly by how Phantasy Star IV movement
 	if (state == states.idle) {
 		
+		//queued slide takes place before reading new input
+	if (global.slide_followup) {
+		global.slide_followup = false;
+		scrMove(global.slide_follow_dir);
+	}
+		
 		var input_dir = -1;
 		
 		if (global.keyLeft) input_dir = directions.left;
@@ -93,7 +99,7 @@ if (state == states.walking){
 		if (global.slide_queued) {
 			global.slide_queued = false;
 			global.slide_history = [];
-			scrMove(global.slide_follow_dir);
+			global.slide_followup = true;
 		}
 		
 		//count this completed step for random encounters

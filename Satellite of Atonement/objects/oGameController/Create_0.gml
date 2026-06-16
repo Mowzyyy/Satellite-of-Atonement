@@ -104,6 +104,7 @@ global.pending_arrival = false;
 global.slide_queued = false;
 global.slide_follow_dir = -1;
 global.slide_history = [];
+global.slide_followup = false;
 
 global.current_music = -1;
 //==================================Story Var==================================

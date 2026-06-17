@@ -64,6 +64,27 @@ function scrBuildTurnOrder() {
 	
 	return order;
 }
+
+function scrEnemyPickAllActions() {
+	for (var i = 0; i < array_length(global.battle_enemies); i++) {
+		var e = global.battle_enemies[i];
+		if (e.is_dead) continue;
+		
+		//filter moves by MP availability
+		var valid_moves = [];
+		for (var j = 0; j < array_length(e.moves); j++) {
+			var m = e.moves[j];
+			if (m.type == "magic" && e.current_mp < m.mp_cost) continue;
+			array_push(valid_moves, m);
+		}
+		
+		if (array_length(valid_moves) > 0) {
+			e.action = e.choose_move();//uses filtered list
+		} else {
+			e.action = undefined;
+		}
+	}
+}
 	
 //============================================FLEE============================================
 function scrAttemptFlee() {
@@ -104,6 +125,11 @@ function scrCalcMagicDamage(_mAtk, mDef, _mpower, _element, _target) {
 //==================================COMMAND PHASE==================================
 function scrBattleCommandPhase() {
 	//top level: CMND/MACRO/FLEE
+	
+	if (global.battle_target_active) {
+		scrBattleTargetSelectionPhase();
+		return;
+	}
 	
 	if (!global.battle_sub_open && global.battle_cmd_index == 0 && global.battle_phase == BATTLE_PHASE.SELECT_COMMAND) {
 		
@@ -233,32 +259,127 @@ function scrAdvanceCmdIndex() {
 
 //=====================================EXECUTE PHASE=====================================
 function scrBattleExecutePhase() {
-	// Temporary stub — consume one turn order entry per frame
-	if (array_length(global.battle_turn_order) > 0) {
-		var turn = global.battle_turn_order[0];
-		show_debug_message("Executing turn for: " + turn.kind + " index: " + string(turn.index));
-		array_delete(global.battle_turn_order, 0, 1);
+
+	if (global.battle_action_delay > 0) {
+		global.battle_action_delay--;
 		return;
 	}
-
-	//turn complete - check win/loss
-	var all_dead = true;
-	for (var i = 0; i < array_length(global.battle_enemies); i++) {
-		if (!global.battle_enemies[i].is_dead) { all_dead = false; break; }
+	
+	if (array_length(global.battle_turn_order) == 0) {
+		//turn complete, check win/loss
+		scrCheckBattleEnd();
+		return;
 	}
-	if (all_dead) {
-		global.battle_phase = BATTLE_PHASE.WIN_LOSS;
-	} else {
-		global.battle_phase= BATTLE_PHASE.SELECT_COMMAND;
-		global.battle_actions = [];
-		for (var i = 0; i < array_length(global.party); i++) {
-			array_push(global.battle_actions, undefined);
+	
+	var turn = global.battle_turn_order[0];
+	
+	if (turn.kind == "party") {
+		if (global.party[turn.index].current_hp <= 0) {
+			array_delete(global.battle_turn_order, 0, 1);
+			return;
 		}
-		global.battle_cmd_index = 0;
-		global.battle_sub_open = false;
-		global.battle_flee_result = -1;
+		scrResolvePartyAction(turn);
+	} else {
+		scrResolveEnemyAction(turn);
+	}
+	
+	array_delete(global.battle_turn_order, 0, 1);
+	
+	//after each action, set delay for visual feedback
+	global.battle_action_delay = 30;//0.5s at 60fps
+}
+
+function scrResolvePartyAction(_turn) {
+	var member = global.party[_turn.index];
+	if (member.current_hp <= 0) return;//dead skip
+	
+	var action = global.battle_actions[_turn.index];
+	if (!action) return;
+	
+	switch (action.type) {
+		case "attack":
+			var enemy = global.battle_enemies[action.target];
+			if (!enemy || enemy.is_dead) return;
+			
+			var dmg = scrCalcPhysicalDamage(member.get_effective_stats().atk, enemy.def);
+			enemy.current_hp -= dmg;
+			if (enemy.current_hp < 0) enemy.current_hp = 0;
+			
+			//damage popup
+			array_push(global.battle_damage_display, {
+				x: enemy_draw_x,//calculate from enemy position
+				y: enemy_draw_y - 16,
+				value: dmg,
+				timer: 90
+			});
+			
+			//check death
+			if (enemy.current_hp <= 0) {
+				enemy.is_dead = true;
+				//death message handled in draw
+			}
+			break;
+			//other action types later
 	}
 }
+
+function scrResolveEnemyAction(_turn) {
+	var enemy = global.battle_enemies[_turn.index];
+	if (enemy.is_dead) return;
+	
+	//enemy.action was set at turn start by scrEnemyPickAllActions()
+	var move = enemy.action;
+	if (!move) return;
+	
+	//pick random alive party member
+	var alive = [];
+	for (var i = 0; i < array_length(global.party); i++) {
+		if (global.party[1].current_hp > 0) array_push(alive, i);
+	}
+	if (array_length(alive) == 0) return;
+	var target_idx = choose[alive];
+	
+	//damage calc
+	var dmg = scrCalcPhysicalDamage(enemy.atk, global.party[target_idx].get_effective_stats().def);
+	global.party[target_idx].current_hp -= dmg;
+	if (global.party[target_idx].current_hp < 0) global.party[target_idx].current_hp = 0;
+	
+	//damage popup on party card
+	//calculate position from card layout
+	
+	//check death
+	if (global.party[target_idx].current_hp <= 0) {
+		global.party[target_idx].check_death();
+	}
+}
+function scrCheckBattleEnd() {
+	var enemies_dead = true;
+	for (var i = 0; i < array_length(global.battle_enemeis); i++) {
+		if (!global.battle_enemies[i].is_dead) { enemies_dead = false; break; }
+	}
+	if (enemies_dead) {
+		global.battle_phase = BATTLE_PHASE.WIN_LOSS;
+		return;
+	}
+	
+	var party_dead = true;
+	for (var i = 0; i < array_length(global.party); i++) {
+		if (global.party[i].current_hp > 0) { party_dead = false; break; }
+	}
+	if (party_dead) {
+		global.battle_phase = BATTLE_PHASE.WIN_LOSS;//will handle as loss in winloss
+		return;
+	}
+	
+	//next turn
+	global.battle_phase = BATTLE_PHASE.SELECT_COMMAND;
+	global.battle_actions = [];
+	for (var i = 0; i < array_length(global.party); i++) array_push(global.battle_actions, undefined);
+	global.battle_cmd_inxed = 0;
+	global.battle_sub_open = false;
+	global.battle_flee_result = -1;
+}
+			
 
 //============================================WIN/LOSS=============================================
 function scrBattleWinLoss() {
@@ -301,4 +422,10 @@ function scrEndBattle(_victory) {
 		show_debug_message("scrEndBattle WARNING: oBattleManager does not exist");
 	}
 	show_debug_message("Battle ended | victory: " + string(_victory));
+}
+//====================================TARGET SELECTION=====================================
+function scrBattleTargetSelectionPhase() {
+	//left/right cycles through targets
+	//C confirms and stores action with target index for scrAdvanceCmdIndex()
+	//B cancels and returns to icon slection for current character
 }

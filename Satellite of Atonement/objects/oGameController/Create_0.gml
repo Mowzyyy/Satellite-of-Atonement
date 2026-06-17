@@ -183,6 +183,10 @@ global.battle_action_display			= "";
 global.battle_action_timer			= 0;
 global.battle_flee_result					= -1;
 global.encounter_steps					= 0;
+global.battle_target_list					= [];
+global.battle_target_cursor			= 0;
+global.battle_target_active			= false;
+global.battle_action_delay			= 0;
 
 //============================Global Menu Drawing Settings============================
 //This makes every context menu in the game use the default font automatically

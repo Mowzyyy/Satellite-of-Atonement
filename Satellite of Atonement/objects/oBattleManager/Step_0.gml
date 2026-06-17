@@ -19,3 +19,5 @@ switch (global.battle_phase) {
 		scrBattleWinLoss();
 		break;
 }
+
+if (global.battle_action_delay > 0) return;//pause all battle logic during the delay

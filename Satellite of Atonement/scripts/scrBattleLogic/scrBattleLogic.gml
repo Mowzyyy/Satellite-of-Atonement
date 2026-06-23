@@ -132,6 +132,7 @@ function scrBattleCommandPhase() {
 	}
 	
 	if (!global.battle_sub_open && global.battle_cmd_index == 0 && global.battle_phase == BATTLE_PHASE.SELECT_COMMAND) {
+		scrEnemyPickAllActions();
 		
 		if (global.keyUpPressed) global.battle_cmd_cursor = (global.battle_cmd_cursor - 1 + 3) mod 3;
 		if (global.keyDownPressed) global.battle_cmd_cursor = (global.battle_cmd_cursor + 1) mod 3;
@@ -259,6 +260,18 @@ function scrAdvanceCmdIndex() {
 
 //=====================================EXECUTE PHASE=====================================
 function scrBattleExecutePhase() {
+	if (array_length(global.battle_turn_order) > 0) {
+		var turn = global.battle_turn_order[0];
+		show_debug_message("Executing turn for: " + turn.kind + " index: " + string(turn.index));
+		
+		if (turn.kind == "party") {
+			scrResolvePartyAction(turn);
+		} else {
+			scrResolveEnemyAction(turn);
+	}
+	array_delete(global.battle_turn_order, 0, 1);
+	return;
+	}
 
 	if (global.battle_action_delay > 0) {
 		global.battle_action_delay--;
@@ -269,18 +282,6 @@ function scrBattleExecutePhase() {
 		//turn complete, check win/loss
 		scrCheckBattleEnd();
 		return;
-	}
-	
-	var turn = global.battle_turn_order[0];
-	
-	if (turn.kind == "party") {
-		if (global.party[turn.index].current_hp <= 0) {
-			array_delete(global.battle_turn_order, 0, 1);
-			return;
-		}
-		scrResolvePartyAction(turn);
-	} else {
-		scrResolveEnemyAction(turn);
 	}
 	
 	array_delete(global.battle_turn_order, 0, 1);
@@ -295,6 +296,7 @@ function scrResolvePartyAction(_turn) {
 	
 	var action = global.battle_actions[_turn.index];
 	if (!action) return;
+	if (action.target < 0 || action.target >= array_length(global.battle_enemies)) return;
 	
 	switch (action.type) {
 		case "attack":
@@ -334,10 +336,10 @@ function scrResolveEnemyAction(_turn) {
 	//pick random alive party member
 	var alive = [];
 	for (var i = 0; i < array_length(global.party); i++) {
-		if (global.party[1].current_hp > 0) array_push(alive, i);
+		if (global.party[i].current_hp > 0) array_push(alive, i);
 	}
 	if (array_length(alive) == 0) return;
-	var target_idx = choose[alive];
+	var target_idx = alive[irandom(array_length(alive) - 1)];
 	
 	//damage calc
 	var dmg = scrCalcPhysicalDamage(enemy.atk, global.party[target_idx].get_effective_stats().def);
@@ -354,7 +356,7 @@ function scrResolveEnemyAction(_turn) {
 }
 function scrCheckBattleEnd() {
 	var enemies_dead = true;
-	for (var i = 0; i < array_length(global.battle_enemeis); i++) {
+	for (var i = 0; i < array_length(global.battle_enemies); i++) {
 		if (!global.battle_enemies[i].is_dead) { enemies_dead = false; break; }
 	}
 	if (enemies_dead) {
@@ -375,7 +377,7 @@ function scrCheckBattleEnd() {
 	global.battle_phase = BATTLE_PHASE.SELECT_COMMAND;
 	global.battle_actions = [];
 	for (var i = 0; i < array_length(global.party); i++) array_push(global.battle_actions, undefined);
-	global.battle_cmd_inxed = 0;
+	global.battle_cmd_index = 0;
 	global.battle_sub_open = false;
 	global.battle_flee_result = -1;
 }

@@ -26,6 +26,8 @@ function cstrEnemy(_name, _hp, _mp, _atk, _def, _spd, _mental, _exp, _money) con
 	xp						= _exp;
 	money				= _money;
 	
+	action = undefined;
+	
 	moves				= [];//array of cstrEnemyMove
 	weaknesses	= [];//array of element strings ie "fire"
 	resistances		= [];//array of element strings

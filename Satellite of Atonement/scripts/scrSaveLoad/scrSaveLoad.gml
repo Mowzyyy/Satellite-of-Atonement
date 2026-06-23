@@ -15,6 +15,7 @@ DELETE - call detele save slot
 */
 
 //=========================================HELPERS=========================================
+#macro SAVE_VERSION 1.2
 function save_filepath(_slot) {
 	return working_directory + "soa_save_" + string(_slot) + ".json";
 }
@@ -65,6 +66,9 @@ function serialize_item(_item) {
 function serialize_spell(_spell) {
 	return { name: _spell.name };
 }
+function serialize_skill(_skill) {
+	return { name: _skill.name, uses_left: _skill.uses_left };
+}
 
 //converts one full party member struct
 function serialize_party_member(_m) {
@@ -78,6 +82,12 @@ function serialize_party_member(_m) {
 	var sp = [];
 	for (var i = 0; i < array_length(_m.spells); i++) {
 		array_push(sp, serialize_spell(_m.spells[i]));
+	}
+	
+	//serialize spells (name + uses remaining)
+	var sk = [];
+	for (var i = 0; i < array_length(_m.skills); i++) {
+		array_push(sk, serialize_skill(_m.skills[i]));
 	}
 	
 	return {
@@ -124,7 +134,8 @@ function serialize_party_member(_m) {
 		status_effects : _m.status_effects,
 		
 		inventory : inv,
-		spells			: sp
+		spells			: sp,
+		skills			: sk
 		//battle_buffs ommitted, always reset fresh on load
 	};
 }
@@ -177,6 +188,23 @@ function deserialize_spell(_data) {
 			show_debug_message("WARNING: deserialize_spell — unknown spell '" + spell_name + "'");
 			return undefined;
 	}
+}
+
+function deserialize_skill(_data) {
+	var skill_name = _data.name;
+	var sk = undefined;
+	switch (skill_name) {
+		case "Teleport":				sk = global.sk_teleport;				break;
+		case "TrpThrt":					sk = global.sk_triplethrust;		break;
+		case "Essentia":				sk = global.sk_essentia;				break;
+		
+		default:
+			show_debug_message("WARNING: deserialize_skill — unknown skill '" + skill_name + "'");
+			return undefined;
+	}
+	var skill_copy = new cstrSkill(sk.name, sk.uses_max, sk.target_type, sk.effect_type, sk.description);
+	skill_copy.uses_left = _data.uses_left;
+	return skill_copy;
 }
 
 function deserialize_party_member(_data) {
@@ -239,6 +267,13 @@ function deserialize_party_member(_data) {
 			if (sp != undefined) array_push(m.spells, sp);
 		}
 		
+		//restore skills
+		m.skills = [];
+		for (var i = 0; i < array_length(_data.skills); i++) {
+			var sk = deserialize_skill(_data.skills[i]);
+			if (sk != undefined) array_push(m.skills, sk);
+		}
+		
 		return m;
 }
 
@@ -294,7 +329,7 @@ function save_game(_slot) {
 	
 	var save_data = {
 		slot						: _slot,
-		version					: 1.1,//increment if save format changes
+		version					: 1.2,//increment if save format changes
 		timestamp			: string(current_year)				+ "-"
 										+ string(current_month)		+ "-"
 										+ string(current_day)				+ "-"
@@ -326,7 +361,7 @@ function load_game(_slot) {
 	var path = save_filepath(_slot);
 	if (!file_exists(path)) {
 		show_debug_message("ERROR: No save file found at slot " + string(_slot));
-		return false;
+		return "nosave";
 	}
 	
 	//read buffer and parse JSON
@@ -335,6 +370,8 @@ function load_game(_slot) {
 	buffer_delete(buf);
 	
 	var data = json_parse(json_string);
+	
+	if (!variable_struct_exists(data, "version") || data.version != SAVE_VERSION) return "mismatch";
 	
 	//restore globals
 	global.playtime					= data.playtime;
@@ -369,5 +406,5 @@ function load_game(_slot) {
 	
 	show_debug_message("Game loaded from slot " + string(_slot));
 	show_debug_message("Loaded party[0]: " + global.party[0].name + " Lv" + string(global.party[0].level) + " HP:" + string(global.party[0].current_hp));
-	return true;
+	return "ok";
 }

@@ -12,7 +12,7 @@ if (global.state == GAME_STATE.BATTLE) {
 	var card_y = 240 - card_h;
 	
 	//draw order - midleft, midright, farleft, farright
-	var card_order = [1, 2, 0, 3];
+	var card_order = [2, 1, 0, 3];
 	
 	//draw the battle background behind everything
 	if (global.battle_background !=-1 && sprite_exists(global.battle_background)) {
@@ -24,14 +24,20 @@ if (global.state == GAME_STATE.BATTLE) {
 		draw_set_color(c_white);
 	}
 	
+	//target selection helpers
+	var _tgt_sel = global.battle_selecting_target;
+	var _tgt_enemy = _tgt_sel && (global.battle_sub_mode == "attack" || (global.battle_pending_entry != undefined && global.battle_pending_entry.data.target_type == "single_enemy"));
+	var _tgt_ally = _tgt_sel && !_tgt_enemy;
+	
 	//enemy sprites centered drawn first
-	var enemy_spacing = 32;
+	var enemy_spacing = 64;
 	var num_enemies = array_length(global.battle_enemies);
 	var enemy_start_x = 160 - (num_enemies - 1) * enemy_spacing / 2;
 	var enemy_y = 120;
 	for (var ei = 0; ei < num_enemies; ei++) {
 		var e = global.battle_enemies[ei];
 		if (e.is_dead) continue;
+		if (_tgt_enemy && global.battle_target_list[global.battle_target_cursor] == ei && (blink_timer mod 50) >= 25) continue;
 		if (e.sprite_combat != -1 && sprite_exists(e.sprite_combat)) {
 			draw_sprite(e.sprite_combat, 0, enemy_start_x + ei * enemy_spacing, enemy_y);
 		}
@@ -49,7 +55,11 @@ if (global.state == GAME_STATE.BATTLE) {
 		if (inst != noone && instance_exists(inst)) {
 			var spr_combat = inst.sprite_combat;
 			if (spr_combat != -1 && sprite_exists(spr_combat)) {
-				draw_sprite(spr_combat, 0, spr_x, spr_y);
+				var _show_sprite = !global.battle_sub_open || pin == global.battle_cmd_index;
+				if (_tgt_ally && global.battle_target_list[global.battle_target_cursor] == pin) {
+					_show_sprite = (blink_timer mod 50) < 25;
+				}
+				draw_sprite_ext(spr_combat, 0, spr_x, spr_y, 1, 1, 0, c_white, _show_sprite ? 1 : 0);
 			}
 		}
 	}
@@ -61,6 +71,13 @@ if (global.state == GAME_STATE.BATTLE) {
 		var s							= member.get_effective_stats();
 		var is_dead				= member.current_hp <= 0;
 		var txt_col				= is_dead ? c_red : c_white;
+		
+		if (global.battle_sub_open && pin != global.battle_cmd_index && !is_dead) {
+			txt_col = c_gray;
+		}
+		if (_tgt_ally && global.battle_target_list[global.battle_target_cursor] == pin) { 
+			txt_col = c_yellow;
+		}
 		
 		//card background
 		draw_sprite_stretched(sBasicGUI, 0, card_x, card_y, card_w, card_h);
@@ -117,7 +134,7 @@ if (global.state == GAME_STATE.BATTLE) {
 			var act_card_x = card_start_x + (ci_active * (card_w + card_gap));
 			
 			//offset left for right-side cards
-			var sub_x = (ci_active >= 2) ? act_card_x + card_w - sub_w - 12 : act_card_x + 12;
+			var sub_x = (ci_active >= 2) ? act_card_x - sub_w - 4 : act_card_x + card_w + 4;
 			var sub_y = card_y - sub_h - 1;
 			
 			draw_sprite_stretched(sBasicGUI, 0, sub_x, sub_y, sub_w, sub_h);
@@ -142,10 +159,84 @@ if (global.state == GAME_STATE.BATTLE) {
 					draw_set_color(c_yellow);
 					draw_rectangle(icon_x - 1, icon_y + 17, icon_x + 15, icon_y + 18, false);
 					draw_set_color(c_white);
+					if (_tgt_enemy && global.battle_target_cursor < array_length(global.battle_target_list)) {
+						var t_ei = global.battle_target_list[global.battle_target_cursor];
+						var _flash = (blink_timer mod 30) < 15;
+						if (_flash) {
+							draw_sprite_ext(global.battle_enemies[t_ei].sprite_combat, 0, enemy_start_x + t_ei * enemy_spacing, enemy_y, 1, 1, 0, c_white, 1);
+						}
+					}
 				}
 			}
 		}
 	}
+	
+	//sublist panel - spells/skills/items
+	if (global.battle_sub_open && !global.battle_selecting_target && array_length(global.battle_sub_list) > 0) {
+		var sl_list = global.battle_sub_list;
+		var sl_size = array_length(sl_list);
+		var sl_page = global.battle_sub_page;
+		var sl_page_start = sl_page * 5;
+		var sl_has_next = (sl_page_start + 5) < sl_size;
+		var sl_is_last = !sl_has_next && sl_page > 0;
+		var sl_show_next = sl_has_next || (sl_page > 0);
+		
+		//dynamic height
+		var sl_item_h = 9;
+		var sl_top_pad = 12;
+		var sl_items_on_page = min(5, sl_size - sl_page_start);
+		var sl_w = 100;
+		var sl_h = sl_top_pad + (sl_show_next ? sl_item_h : 0) + sl_items_on_page * sl_item_h + 4;
+		
+		//align to icon submenu
+		var _ci_active = -1;
+		for (var _ci = 0; _ci < 4; _ci++) {
+			if (card_order[_ci] == global.battle_cmd_index) { _ci_active = _ci; break; }
+		}
+		var _sub_w = 128, _sub_h = 32;
+		var _act_card_x = card_start_x + (_ci_active * (card_w + card_gap));
+		var _sub_x = (_ci_active >= 2) ? _act_card_x - _sub_w - 4 : _act_card_x + card_w + 4;
+		var _sub_y = card_y - _sub_h - 1;
+
+		var sl_x = _sub_x + (_sub_w - sl_w) / 2;
+		var sl_y = _sub_y + (_sub_h - sl_h) / 2;
+		
+		draw_sprite_stretched(sBasicGUI, 0, sl_x, sl_y, sl_w, sl_h);
+		
+		//next/first label
+		if (sl_show_next) {
+			var next_lbl = sl_page > 0 && !sl_has_next ? "*FIRST*" : "*NEXT*";
+			var next_col = (global.battle_sub_cursor == 0) ? c_yellow : c_white;
+			draw_text_color(sl_x + 18, sl_y + sl_top_pad, next_lbl, next_col, next_col, next_col, next_col, 1);
+		}
+		
+		//item rows
+		for (var sli = 0; sli < 5; sli++) {
+			var slot_idx = sl_page_start + sli;
+			if (slot_idx >= sl_size) break;
+			var entry = sl_list[slot_idx];
+			var cursor_i = sl_show_next ? sli + 1 : sli;
+			var line_col = (global.battle_sub_cursor == cursor_i) ? c_yellow : c_white;
+			draw_text_color(sl_x + 18, sl_y + sl_top_pad + (cursor_i * sl_item_h), entry.label, line_col, line_col, line_col, line_col, 1);
+		 }
+		 
+		 //blinking cursor
+		var _blink_on = (blink_timer mod 40) < 20;
+		draw_sprite((_blink_on ? sCursor : sBlink), 0, sl_x + 6, sl_y + sl_top_pad + (global.battle_sub_cursor * sl_item_h));
+	}
+	
+	//target highlight
+	if (global.battle_selecting_target) {
+		var _is_enemy = (global.battle_sub_mode == "attack" || (global.battle_pending_entry != undefined && global.battle_pending_entry.data.target_type == "single_enemy"));
+		if (_is_enemy && global.battle_target_cursor < array_length(global.battle_target_list)) {
+			var t_ei = global.battle_target_list[global.battle_target_cursor];
+			var _flash = (blink_timer mod 30) < 15;
+			if (_flash) {
+				draw_sprite_ext(global.battle_enemies[t_ei].sprite_combat, 0, enemy_start_x + t_ei * enemy_spacing, enemy_y, 1, 1, 0, c_yellow, 1);
+			}
+		}
+	}
+				
 	
 	//enemy name boxes
 	var enemy_types = [];
@@ -181,9 +272,11 @@ if (global.state == GAME_STATE.BATTLE) {
 			array_delete(global.battle_damage_display, di, 1);
 			continue;
 		}
-		draw_sprite_stretched(sBasicGUI, 0, d.x, d.y, 64, 32);
-		draw_set_halign(fa_right);
-		draw_text(d.x + 64 - 8, d.y + 8, string(d.value));
+		var d_w = 48;
+		var d_h = 20;
+		draw_sprite_stretched(sBasicGUI, 0, d.x - d_w / 2, d.y, d_w, d_h);
+		draw_set_halign(fa_center);
+		draw_text(d.x, d.y + 6, string(d.value));
 		draw_set_halign(fa_left);
 	}
 	

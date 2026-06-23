@@ -61,19 +61,20 @@ function cstrEnemy(_name, _hp, _mp, _atk, _def, _spd, _mental, _exp, _money) con
 	}
 	
 	//weighted random move selection
-	static choose_move = function() {
-		if (array_length(moves) == 0) return undefined;
+	static choose_move = function(_move_list) {
+		var list = (_move_list != undefined) ? _move_list : moves;
+		if (array_length(list) == 0) return undefined;
 		var total_weight = 0;
-		for (var i = 0; i < array_length(moves); i++) {
-			total_weight += moves[i].weight;
+		for (var i = 0; i < array_length(list); i++) {
+			total_weight += list[i].weight;
 		}
 		var roll = random(total_weight);
 		var cumulative = 0;
-		for (var i = 0; i < array_length(moves); i++) {
-			cumulative += moves[i].weight;
-			if (roll < cumulative) return moves[i];
+		for (var i = 0; i < array_length(list); i++) {
+			cumulative += list[i].weight;
+			if (roll < cumulative) return list[i];
 		}
-		return moves[array_length(moves) - 1];//fallback
+		return list[array_length(list) - 1];//fallback
 	}
 	
 	static is_weak_to = function(_element) {
@@ -95,6 +96,7 @@ function cstrEnemy(_name, _hp, _mp, _atk, _def, _spd, _mental, _exp, _money) con
 function scrBuildEnemy(_name) {
 	switch (_name) {
 		case "Slime" : return cstrTestSlime();
+		case "Cuetzpal" : return cstrCuetzpal();
 		default:	show_debug_message("WARNING: scrBuildEnemy — unknown enemy '" + _name + "'");
 		return undefined;
 	}
@@ -102,8 +104,16 @@ function scrBuildEnemy(_name) {
 
 function cstrTestSlime() {
 	var e = new cstrEnemy("Slime", 30, 0, 8, 4, 6, 2, 10, 5);
-	e.sprite_combat = sCuetzpal;//placeholder - add sprite when ready
+	e.sprite_combat = sTestSlime;
 	e.add_move(new cstrEnemyMove("Tackle", "attack", 10, 0, "single_enemy", 4));
 	e.add_move(new cstrEnemyMove("Ooze", "status", 0, 0, "single_enemy", 1));
+	return e;
+}
+
+function cstrCuetzpal() {
+	var e = new cstrEnemy("Cuetzpal", 50, 4, 10, 6, 8, 4, 15, 8);
+	e.sprite_combat = sCuetzpal;
+	e.add_move(new cstrEnemyMove("Spear Thrust", "attack", 18, 0, "single_enemy", 2));
+	e.add_move(new cstrEnemyMove("Bite","attack",12,0,"single_enemy",3));
 	return e;
 }

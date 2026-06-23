@@ -81,6 +81,22 @@ function scrInitSkillGlobals() {
 	"functional",
 	"Warps the party - no effect yet"
 	);
+	
+	global.sk_triplethrust = new cstrSkill (
+	"TrpThrt", 
+	5,
+	"single_enemy", 
+	"damage",
+	"Thrusts the spear three times"
+	);
+	
+	global.sk_essentia = new cstrSkill ( 
+	"Essentia",
+	2,
+	"single_ally",
+	"restore_mp",
+	"Restores a moderate amount of MP"
+	);
 }
 //==========================================Spell Learn Table==========================================
 //called automatically from level)up(), add new cases here as spells are designed

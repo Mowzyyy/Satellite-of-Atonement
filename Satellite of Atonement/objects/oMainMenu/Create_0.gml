@@ -13,6 +13,8 @@ menu_options = ["New Game", "Misc"];
 
 cursor_index = 0;
 
+slot_error = "";//error message for load failure
+
 slot_selecting = false;//true when slot subscreen is open
 slot_cursor = 0; //which slot is highlighted0;
 slot_data = [];//cached save metadata for drawing

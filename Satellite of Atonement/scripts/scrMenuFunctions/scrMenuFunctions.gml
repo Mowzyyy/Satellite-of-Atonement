@@ -202,6 +202,7 @@ function scrInventoryLogic() {
 			
 			if (global.keyC) {
 				global.selected_party = menu_cursor;
+				global.selected_item = 0;
 				global.inventory_state = INVENTORY_STATE.SELECT_ITEM;
 				ds_stack_push(global.submenu_history, SUBMENU_HISTORY.INVENTORY_SELECT_ITEM);
 				menu_cursor = 0;
@@ -338,6 +339,7 @@ function scrInventoryLogic() {
 					global.inventory_state = INVENTORY_STATE.SELECT_ITEM;
 					var new_size = array_length(global.party[global.selected_party].inventory);
 					menu_cursor = clamp(global.selected_item, 0, max(0, new_size - 1));
+					global.selected_item = menu_cursor;
 					io_clear();
 					global.keyC = false;
 					break;
@@ -365,6 +367,7 @@ function scrInventoryLogic() {
 				global.inventory_state = INVENTORY_STATE.SELECT_ITEM;
 				var new_size = array_length(global.party[global.selected_party].inventory);
 				menu_cursor = clamp(global.selected_item, 0, max(0, new_size - 1));
+				global.selected_item = menu_cursor;
 				show_debug_message("Auto-back to SELECT_ITEM after use");
 			}
 		break;
@@ -421,6 +424,7 @@ function scrInventoryLogic() {
 				global.inventory_state = INVENTORY_STATE.SELECT_ITEM;
 				var new_size = array_length(global.party[global.selected_party].inventory);
 				menu_cursor = clamp(global.selected_item, 0, max(0, new_size - 1));
+				global.selected_item = menu_cursor;
 			}
 		}
 		break;
@@ -471,13 +475,15 @@ function submenu_back() {
 			
 		case SUBMENU_HISTORY.INVENTORY_SELECT_WHO:
 			global.inventory_state = INVENTORY_STATE.SELECT_WHO;
-			show_debug_message("Set to SELECT_WHO - cursor: " + string(menu_cursor) + " | history size: " + string(ds_stack_size(global.submenu_history)));
-			menu_cursor = global.selected_party;//restore previous selection
+			//global.selected_party = 0;
+			global.selected_item = 0;
+			menu_cursor = global.selected_party;
 			break;
 			
 		case SUBMENU_HISTORY.INVENTORY_SELECT_ITEM:
 			global.inventory_state = INVENTORY_STATE.SELECT_ITEM;
-			menu_cursor = global.selected_item;//restore item cursor
+			var _inv_sz = array_length(global.party[global.selected_party].inventory);
+			menu_cursor = clamp(global.selected_item, 0, max(0, _inv_sz - 1));
 			break;
 		
 		case SUBMENU_HISTORY.INVENTORY_SELECT_ACTION:
@@ -1197,7 +1203,7 @@ function scrSkillLogic() {
 			}
 			
 			if (global.keyC) {
-				var list  = scrSkillBuildList(global.skill_char);
+				list  = scrSkillBuildList(global.skill_char);
 				var entry = list[global.skill_selected];
 				var target = global.party[global.skill_target_cursor];
 

@@ -62,8 +62,12 @@ function scrGetZoneData(_map_id, _zone_number) {
 					min_steps	: 15,
 					max_steps	: 80,
 					encounters	: [
+					{ weight: 3, enemies: ["Cuetzpal", "Cuetzpal"]},
 					{ weight: 3, enemies: ["Slime", "Slime"] },
+					{ weight: 2, enemies: ["Slime", "Cuetzpal", "Cuetzpal"]},
 					{ weight: 2, enemies: ["Slime"] },
+					{ weight: 1, enemies: ["Cuetzpal"]},
+					{ weight: 1, enemies: ["Cuetzpal", "Cuetzpal", "Slime", "Slime"]},
 					{ weight: 1, enemies : ["Slime", "Slime", "Slime"] },
 					]};
 			
@@ -72,6 +76,7 @@ function scrGetZoneData(_map_id, _zone_number) {
 					min_steps	: 10,
 					max_steps	: 60,
 					encounters	: [
+					{ weight: 3, enemies: ["Cuetzpal", "Cuetzpal", "Slime", "Slime"]},
 					{ weight: 2, enemies: ["Slime", "Slime", "Slime"] },
 					{ weight: 1, enemies : ["Slime", "Slime", "Slime", "Slime"] },
 					]};

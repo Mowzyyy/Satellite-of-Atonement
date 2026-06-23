@@ -145,6 +145,27 @@ switch (stage) {
 					draw_set_color(c_white);
 				}
 			}
+			
+			if (slot_error != "") {
+						draw_set_alpha(0.5);
+						draw_set_color(c_black);
+						draw_rectangle(0, 0, room_width, room_height, false);
+						draw_set_alpha(1.0);
+						draw_set_color(c_white);
+						
+						var dlg_w = 120;
+						var dlg_h = 32;
+						var dlg_x = room_width / 2 - dlg_w / 2;
+						var dlg_y = room_height / 2 - dlg_h / 2;
+						draw_sprite_stretched(sBasicGUI, 0, dlg_x, dlg_y, dlg_w, dlg_h);
+    
+						draw_set_halign(fa_center);
+						draw_set_color(c_red);
+						draw_text(room_width / 2, dlg_y + 10, "Load Failed!");
+						draw_set_color(c_white);
+						draw_text(room_width / 2, dlg_y + 22, slot_error);
+						draw_set_halign(fa_left);
+					}
 
 			draw_set_halign(fa_left);
 			exit;

@@ -76,23 +76,30 @@ else {
 			if (slot_confirm_timer >= slot_confirm_delay) {
 				//waiting for c to dismiss game loaded and actually load
 				if (global.keyC) {
-					load_game(slot_confirmed);
-					var _target_room = scrMapIdToRoom(global.current_map_id);
-					global.state = GAME_STATE.OVERWORLD;
-					//set up as a transition so scrSpawnParty works correctly
-					global.transition_active = true;
-					global.pending_arrival = false;//follower_data handles positioning
-					global.transition_target_room = _target_room;
-					global.transition_target_x = global.player_map_x;
-					global.transition_target_y = global.player_map_y;
-					global.transition_target_dir = directions.down;
-					global.transition_target_map = global.current_map_id;
-					global.transition_music = -1;
-					global.transition_alpha = 0;
-					global.transition_phase = 0;
-					instance_destroy();
-					room_goto(_target_room);
-					slot_confirm_timer = 0;
+					var result = load_game(slot_confirmed);
+					if (result != "ok") {
+						slot_error = (result == "mismatch") ? "Bad Version" : "No Save";
+						slot_confirming = false;
+						slot_confirmed = -1;
+						slot_confirm_timer = 0;
+					} else {
+						var _target_room = scrMapIdToRoom(global.current_map_id);
+						global.state = GAME_STATE.OVERWORLD;
+						//set up as a transition so scrSpawnParty works correctly
+						global.transition_active = true;
+						global.pending_arrival = false;//follower_data handles positioning
+						global.transition_target_room = _target_room;
+						global.transition_target_x = global.player_map_x;
+						global.transition_target_y = global.player_map_y;
+						global.transition_target_dir = directions.down;
+						global.transition_target_map = global.current_map_id;
+						global.transition_music = -1;
+						global.transition_alpha = 0;
+						global.transition_phase = 0;
+						instance_destroy();
+						room_goto(_target_room);
+						slot_confirm_timer = 0;
+					}
 				}
 				if (global.keyB) {
 					//cancel load - back to slot select
@@ -100,6 +107,12 @@ else {
 					slot_confirmed = -1;
 					slot_confirm_timer = 0;
 				}
+			}
+			exit;
+		}
+		if (slot_error != "") {
+			if (global.keyC) {
+				slot_error = "";
 			}
 			exit;
 		}

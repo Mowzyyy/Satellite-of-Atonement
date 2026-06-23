@@ -122,7 +122,7 @@ function cstrPartyMember(_name,
 	static get_effective_stats = function() {
 		var stats = {};
 		
-		stats.maxhp			= base_max_hp;
+		stats.max_hp			= base_max_hp;
 		stats.max_mana	= base_max_mana;
 		stats.atk					= base_atk + head.atk_bonus + r_Hand.atk_bonus + l_Hand.atk_bonus + body.atk_bonus + feet.atk_bonus + battle_buffs.atk + accessory.atk_bonus;
 		stats.def					= base_def + head.def_bonus + r_Hand.def_bonus + l_Hand.def_bonus + body.def_bonus + feet.def_bonus + battle_buffs.def + accessory.def_bonus;
@@ -150,6 +150,7 @@ function cstrPartyMember(_name,
 		&& _item.slot_type != "none" 
 		&& _item.slot_type != "weapon" 
 		&& _item.slot_type != "armor"
+		&& _item.slot_type != "two_hand"
 		&& _item.slot_type != "r_hand"
 		&& _item.slot_type != "l_hand") {
 			show_debug_message("WARNING: " + _item.name + " is not for " + _slot + " slot!")
@@ -386,7 +387,7 @@ function cstrPartyMember(_name,
 	static print_stats = function() {
 		var s = get_effective_stats();
 		show_debug_message("=== " + name + "(Lv." + string(level) + ") ===");
-		show_debug_message("HP: " + string(current_hp) + "/" + string(s.maxhp) + " | Mana: " + string(current_mana) + "/" + string(s.max_mana));
+		show_debug_message("HP: " + string(current_hp) + "/" + string(s.max_hp) + " | Mana: " + string(current_mana) + "/" + string(s.max_mana));
 		show_debug_message("Atk: " + string(s.atk) + " Def:" + string(s.def) + " Spd:" + string(s.spd));
 		show_debug_message("Mental: " + string(s.mental) + "mAtk: " +string(s.mAtk) + "mDef:" + string(s.mDef));
 		show_debug_message("Equipment: " + head.name + " | " + r_Hand.name + " | " + l_Hand.name + " | " + body.name + " | " + feet.name);
@@ -568,6 +569,9 @@ function cstrLeon() {						//Initialize Leon creation
 	7.5, 3.86, 2.43, 1.64, 2.64, 2.5,		//growth rate
 	-4, 3);													//mAtk and mDef mods
 	c.exp_to_lvup = xp_threshold("Leon", 1);
+	
+	array_push(c.skills, global.sk_triplethrust);
+	
 	return c;
 }
 
@@ -604,6 +608,9 @@ function cstrAnna() {
 	4.32, 2.64, 2.5, 1.82, 1.5, 2.0,
 	-1, -1);
 	c.exp_to_lvup = xp_threshold("Anna", 1);
+	
+	array_push(c.skills, global.sk_essentia);
+	
 	return c;
 }
 

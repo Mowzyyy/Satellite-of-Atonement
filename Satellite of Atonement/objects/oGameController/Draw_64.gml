@@ -99,7 +99,7 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			draw_set_color(hp_col)
 			draw_text(c.x + lpad, c.y + lh * 5 - 6, "H");
 			draw_set_halign(fa_right);
-			draw_text(c.x + global.card_w - lpad, c.y + lh * 5 - 6, string(member.current_hp) + "/" + string(stats.maxhp));
+			draw_text(c.x + global.card_w - lpad, c.y + lh * 5 - 6, string(member.current_hp) + "/" + string(stats.max_hp));
 			draw_set_halign(fa_left);
 			draw_text(c.x + lpad, c.y + lh * 6 - 6, "M");
 			draw_set_halign(fa_right);
@@ -197,10 +197,10 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 				var card_index = floor(menu_cursor / items_per_card);
 				var local_i = menu_cursor mod items_per_card;
 				var cursor_card = global.card_positions[cards[card_index]];
-				var cursor_y = cursor_card.y + 12 + (local_i * 20);
-				var cursor_x = cursor_card.x + 8; // 4px left of text
-				var _blink_on = (blink_timer mod 40) < 20;
-				var _cursor_spr = _blink_on ? sCursor : sBlink;
+				cursor_y = cursor_card.y + 12 + (local_i * 20);
+				cursor_x = cursor_card.x + 8; // 4px left of text
+				_blink_on = (blink_timer mod 40) < 20;
+				_cursor_spr = _blink_on ? sCursor : sBlink;
 				draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
 			break;
 				
@@ -226,10 +226,10 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 				}
 				
 				//blinking cursor
-				var cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
-				var cursor_x = bot_mid.x + 12;//12 pixels left of text
-				var _blink_on = (blink_timer mod 40) < 20;
-				var _cursor_spr = _blink_on ? sCursor : sBlink;
+				cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
+				cursor_x = bot_mid.x + 12;//12 pixels left of text
+				_blink_on = (blink_timer mod 40) < 20;
+				_cursor_spr = _blink_on ? sCursor : sBlink;
 				draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
 			break;
 				
@@ -247,10 +247,10 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 				}
 				
 				//blinking cursor
-				var cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
-				var cursor_x = bot_mid.x + 24 -12;//12 pixels left of text
-				var _blink_on = (blink_timer mod 40) < 20;
-				var _cursor_spr = _blink_on ? sCursor : sBlink;
+				cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
+				cursor_x = bot_mid.x + 24 -12;//12 pixels left of text
+				_blink_on = (blink_timer mod 40) < 20;
+				_cursor_spr = _blink_on ? sCursor : sBlink;
 				draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
 			break;
 			
@@ -276,9 +276,9 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 					var col = is_giver ? c_dkgray : ((menu_cursor == i_give) ? c_yellow : c_white);
 					draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i_give * 20), get_party_display_name(global.partyOrder[i_give]), col, col, col, col, 1);
 				}
-				var cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
-				var cursor_x = bot_mid.x + 12;
-				var _blink_on = (blink_timer mod 40) < 20;
+				cursor_y = bot_mid.y + 20 + (menu_cursor * 20);
+				cursor_x = bot_mid.x + 12;
+				_blink_on = (blink_timer mod 40) < 20;
 				draw_sprite((_blink_on ? sCursor : sBlink), 0, cursor_x, cursor_y);
 				break;
 		}
@@ -410,7 +410,7 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			draw_set_halign(fa_left);
 			draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 6, "H");
 			draw_set_halign(fa_right);
-			draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 6 - 6, string(member.current_hp) + "/" + string(stats.maxhp));
+			draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 6 - 6, string(member.current_hp) + "/" + string(stats.max_hp));
 			draw_set_halign(fa_left);
 			draw_text(bot_mid.x +lpad, bot_mid.y + lh * 7 - 6, "M");
 			draw_set_halign(fa_right);
@@ -572,7 +572,7 @@ if (global.menu_page == MENU_PAGE.ORDER) {
 			draw_set_halign(fa_left);
 			draw_text(bot_left.x + lpad, bot_left.y + lh * 5 - 6, "H");
 			draw_set_halign(fa_right);
-			draw_text(bot_left.x + global.card_w - lpad, bot_left.y + lh * 5 - 6, string(preview_member.current_hp) + "/" + string(preview_stats.maxhp));
+			draw_text(bot_left.x + global.card_w - lpad, bot_left.y + lh * 5 - 6, string(preview_member.current_hp) + "/" + string(preview_stats.max_hp));
 			draw_set_halign(fa_left);
 			draw_text(bot_left.x + lpad, bot_left.y + lh * 6 - 6, "M");
 			draw_set_halign(fa_right);
@@ -646,6 +646,18 @@ if (global.menu_page == MENU_PAGE.EQUIP) {
 	if (global.equip_state == EQUIP_STATE.SELECT_SLOT || global.equip_state == EQUIP_STATE.SELECT_HAND) {
 		var member = global.party[global.equip_char];
 		var stats = member.get_effective_stats();
+		var equip_list = [];
+		var list_size = 0;
+		var page_start = 0;
+		var show_next = false;
+		var has_next = false;
+		var is_last_page = false;
+		equip_list = scrEquipBuildList(global.equip_char);
+		list_size  = array_length(equip_list);
+		page_start = global.equip_scroll_page * 5;
+		has_next   = (page_start + 5) < list_size;
+		is_last_page = !has_next && page_start > 0;
+		show_next = has_next || is_last_page;
 		
 		//topmid - character name and What? prompt
 		draw_set_halign(fa_center);
@@ -708,36 +720,70 @@ if (global.menu_page == MENU_PAGE.EQUIP) {
 		}
 		draw_set_halign(fa_left);	
 		//botmid - character portrait
-		var portrait_spr = sChatPortDefault;
-		var p_obj = global.partyOrder[global.equip_char];
-		if (p_obj == oLeon) portrait_spr = sChatPortLeon;
-		if (p_obj == oCoat) portrait_spr = sChatPortCoat;
-		if (p_obj == oOsei) portrait_spr = sChatPortOsei;
-		if (p_obj == oAnna) portrait_spr = sChatPortAnna;
-		if (p_obj == oData) portrait_spr = sChatPortData;
-		drawPortraitController(member, portrait_spr, bot_mid.x + lpad * 3 + 4, bot_mid.y + lpad * 1);
-		draw_set_halign(fa_left);
-		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 5 - 6, "H");
-		draw_set_halign(fa_right);
-		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 5 - 6, string(member.current_hp) + "/" + string(stats.maxhp));
-		draw_set_halign(fa_left);
-		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 6, "M");
-		draw_set_halign(fa_right);
-		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 6 - 6, string(member.current_mana) + "/" + string(stats.max_mana));
-		draw_set_halign(fa_left);
-		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 7 - 6, member.name);
-		draw_set_halign(fa_right);
-		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 7 - 6, "Lv" + string(member.level));
+		var _show_item = (global.equip_state == EQUIP_STATE.SELECT_SLOT && list_size > 0 && (!show_next || global.equip_cursor !=0));
+		if (_show_item) {
+			//resolve which item is highlighed in the topright
+			var _ic = show_next ? global.equip_cursor - 1 : global.equip_cursor;
+			var _idx = page_start + _ic;
+			if (_idx >= 0 && _idx < list_size) {
+				var _entry = equip_list[_idx];
+				var _item = _entry.item;
+				var _iname = _item.name;
+				//show item name and stat bonuses
+				draw_set_halign(fa_center);
+				draw_text(bot_mid.x + global.card_w / 2, bot_mid.y + lh * 1 - 4, _iname);
+				draw_set_halign(fa_left);
+				draw_text(bot_mid.x + lpad, bot_mid.y + lh * 2 - 4, "Atk");
+				draw_set_halign(fa_right);
+				draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 2 - 4, string(_item.atk_bonus));
+				draw_set_halign(fa_left);
+				draw_text(bot_mid.x + lpad, bot_mid.y + lh * 3 - 4, "Def");
+				draw_set_halign(fa_right);
+				draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 3 - 4, string(_item.def_bonus));
+				draw_set_halign(fa_left);
+				draw_text(bot_mid.x + lpad, bot_mid.y + lh * 4 - 4, "Spd");
+				draw_set_halign(fa_right);
+				draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 4 - 4, string(_item.spd_bonus));
+				draw_set_halign(fa_left);
+				draw_text(bot_mid.x + lpad, bot_mid.y + lh * 5 - 4, "Mtl");
+				draw_set_halign(fa_right);
+				draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 5 - 4, string(_item.mental_bonus));
+				draw_set_halign(fa_left);
+				draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 4, "mAtk");
+				draw_set_halign(fa_right);
+				draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 6 - 4, string(_item.mAtk_bonus));
+				draw_set_halign(fa_left);
+				draw_text(bot_mid.x + lpad, bot_mid.y + lh * 7 - 4, "mDef");
+				draw_set_halign(fa_right);
+				draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 7 - 4, string(_item.mDef_bonus));
+			}
+		} else {
+			//portrait + HP/MP/Name/Level
+			var portrait_spr = sChatPortDefault;
+			var p_obj = global.partyOrder[global.equip_char];
+			if (p_obj == oLeon) portrait_spr = sChatPortLeon;
+			if (p_obj == oCoat) portrait_spr = sChatPortCoat;
+			if (p_obj == oOsei) portrait_spr = sChatPortOsei;
+			if (p_obj == oAnna) portrait_spr = sChatPortAnna;
+			if (p_obj == oData) portrait_spr = sChatPortData;
+			drawPortraitController(member, portrait_spr, bot_mid.x + lpad * 3 + 4, bot_mid.y + lpad * 1);
+			draw_set_halign(fa_left);
+			draw_text(bot_mid.x + lpad, bot_mid.y + lh * 5 - 6, "H");
+			draw_set_halign(fa_right);
+			draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 5 - 6, string(member.current_hp) + "/" + string(stats.max_hp));
+			draw_set_halign(fa_left);
+			draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 6, "M");
+			draw_set_halign(fa_right);
+			draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 6 - 6, string(member.current_mana) + "/" + string(stats.max_mana));
+			draw_set_halign(fa_left);
+			draw_text(bot_mid.x + lpad, bot_mid.y + lh * 7 - 6, member.name);
+			draw_set_halign(fa_right);
+			draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 7 - 6, "Lv" + string(member.level));
+		}
 		draw_set_halign(fa_left);
 		
 		//topright - scrollable equipment inventory
 		if (global.equip_state == EQUIP_STATE.SELECT_SLOT) {
-			var equip_list = scrEquipBuildList(global.equip_char);
-			var list_size  = array_length(equip_list);
-			var page_start = global.equip_scroll_page * 5;
-			var has_next   = (page_start + 5) < list_size;
-			var is_last_page = !has_next && page_start > 0;
-			var show_next = has_next || is_last_page;
 			
 			//line 1 - shows NEXT if there are more pages
 			if (list_size == 0) {
@@ -1046,7 +1092,7 @@ if (global.menu_page == MENU_PAGE.SKILLS) {
 		draw_set_halign(fa_left);
 		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 5 - 6, "H");
 		draw_set_halign(fa_right);
-		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 5 - 6, string(member.current_hp) + "/" + string(s_stats.maxhp));
+		draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 5 - 6, string(member.current_hp) + "/" + string(s_stats.max_hp));
 		draw_set_halign(fa_left);
 		draw_text(bot_mid.x + lpad, bot_mid.y + lh * 6 - 6, "M");
 		draw_set_halign(fa_right);

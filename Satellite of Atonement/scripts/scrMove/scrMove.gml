@@ -6,7 +6,7 @@ function scrMove(_dir){
     if (state == states.idle) {
 		var dest_x = x_pos + dx;
 		var dest_y = y_pos + dy;
-		
+
 		//check for barrier on destination tile
 		if (scrIsBarrierBlocked(dest_x, dest_y, _dir)) {
 			show_debug_message("BLOCKED at " + string(dest_x) + "," + string(dest_y) + " from dir " + string(_dir));

@@ -43,6 +43,7 @@
     {"name":"scrCharConstructors","order":7,"path":"scripts/scrCharConstructors/scrCharConstructors.yy",},
     {"name":"scrEncounterZones","order":16,"path":"scripts/scrEncounterZones/scrEncounterZones.yy",},
     {"name":"scrEnemyConstructors","order":15,"path":"scripts/scrEnemyConstructors/scrEnemyConstructors.yy",},
+    {"name":"scrItemConstructors","order":18,"path":"scripts/scrItemConstructors/scrItemConstructors.yy",},
     {"name":"scrMapEnums","order":10,"path":"scripts/scrMapEnums/scrMapEnums.yy",},
     {"name":"scrMenuConstants","order":6,"path":"scripts/scrMenuConstants/scrMenuConstants.yy",},
     {"name":"scrMenuEnums","order":4,"path":"scripts/scrMenuEnums/scrMenuEnums.yy",},

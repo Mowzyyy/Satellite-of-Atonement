@@ -93,6 +93,17 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			//draw_sprite(portrait_spr, 0, portrait_cx, bot_mid.y + lpad * 1);
 			drawPortraitController(member, portrait_spr, c.x + lpad * 3 + 4, c.y + lpad * 1);
 			
+			if (member.has_status("poison")) {
+				draw_set_color(c_purple);
+				var pw = sprite_get_width(portrait_spr);
+				var px = (card_idx == 0 || card_idx == 3)
+					? c.x + lpad * 3 + 4 + pw + 2//right of portrait
+					: c.x + lpad * 3 + 4 - string_width("P") - 2; //left of portrait
+				draw_text(px, c.y + lh * 4 - 7, "P");
+				draw_set_color(c_white);
+			}
+
+			
 			//HP and MP beneath protrait
 			var hp_col = member.is_dead ? c_red : c_white;
 			draw_set_halign(fa_left);
@@ -332,6 +343,13 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			var mid_cx = top_mid.x + global.card_w / 2;
 			draw_text(mid_cx, top_mid.y + lh * 1, "Stats");
 			draw_text(mid_cx, top_mid.y + lh * 2, member.name);
+			
+			if (member.has_status("poison")) {
+				draw_set_color(c_purple);
+				draw_text(mid_cx, top_mid.y + lh * 3, "Poisoned");
+				draw_set_color(c_white);
+			}
+			
 			draw_set_halign(fa_left);
 			draw_text(top_mid.x + lpad, top_mid.y + lh * 5, "MONEY");
 			draw_set_halign(fa_right);

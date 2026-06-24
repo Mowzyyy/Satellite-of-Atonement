@@ -246,6 +246,7 @@ function cstrPartyMember(_name,
 		
 		switch (item.effect_type) {
 			case "heal_hp":
+				if (_target.has_status("poison")) break;
 				if (_target.current_hp < _target.base_max_hp) {
 					_target.current_hp = min(_target.current_hp + item.effect_amount, _target.base_max_hp);
 					used = true;
@@ -253,6 +254,7 @@ function cstrPartyMember(_name,
 			break;
 			
 			case "heal_mp":
+				if (_target.has_status("poison")) break;
 				if (_target.current_mana < _target.base_max_mana) {
 					_target.current_mana = min(_target.current_mana + item.effect_amount, _target.base_max_mana);
 					used = true;
@@ -260,8 +262,13 @@ function cstrPartyMember(_name,
 			break;
 			
 			case "cure_status":
-				if (array_length(_target.status_effects) > 0) {
-					_target.status_effects = [];	
+				if (item.effect_stat != "") {
+					if (_target.has_status(item.effect_stat)) {
+						_target.remove_status(item.effect_stat);
+						used = true;
+					}
+				} else if (array_length(_target.status_effects > 0)) {
+					_target.status_effects = [];
 					used = true;
 				}
 			break;
@@ -298,10 +305,14 @@ function cstrPartyMember(_name,
 			var t = _targets[i];
 			switch (spell.effect_type) {
 				case "heal_hp":
-					t.current_hp = min(t.current_hp + mpower, t.base_max_hp);
+					if (!t.has_status("poison")) {
+						t.current_hp = min(t.current_hp + mpower, t.base_max_hp);
+					}
 					break;
 				case "heal_mp":
-					t.current_mana = min(t.current_mana + mpower, t.base_max_mana);
+					if (!t.has_status("poison")) {
+						t.current_mana = min(t.current_mana + mpower, t.base_max_mana);
+					}
 					break;
 				case "damage":
 					t.current_hp = max(t.current_hp - mpower, 0);

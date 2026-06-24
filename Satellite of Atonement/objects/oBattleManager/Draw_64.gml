@@ -108,6 +108,14 @@ if (global.state == GAME_STATE.BATTLE) {
 			draw_sprite(sCombatDefault, 0, card_x + card_w - 22, card_y + lh * 1 - 4);
 		}
 		
+		if (member.has_status("poison")) {
+			draw_set_halign(fa_right);
+			draw_set_color(c_purple);
+			draw_text(card_x + card_w - lpad - 16, card_y + lh * 2, "P");
+			draw_set_color(txt_col);
+			draw_set_halign(fa_left);
+		}
+		
 		//hp and mp
 		draw_set_halign(fa_left);
 		draw_text(card_x + lpad, card_y + lh * 3, "HP:");
@@ -274,9 +282,14 @@ if (global.state == GAME_STATE.BATTLE) {
 		}
 		var d_w = 48;
 		var d_h = 20;
-		draw_sprite_stretched(sBasicGUI, 0, d.x - d_w / 2, d.y, d_w, d_h);
+		var display_txt = (variable_struct_exists(d, "label") && d.label != "") ? d.label : string(d.value);
+		var txt_w = string_width(display_txt) + 12;
+		var box_w = max(d_w, txt_w);
+		draw_sprite_stretched(sBasicGUI, 0, d.x - box_w / 2, d.y, box_w, d_h);
 		draw_set_halign(fa_center);
-		draw_text(d.x, d.y + 6, string(d.value));
+		draw_set_valign(fa_center);
+		draw_text(d.x, d.y + d_h / 2, display_txt);
+		draw_set_valign(fa_top);
 		draw_set_halign(fa_left);
 	}
 	

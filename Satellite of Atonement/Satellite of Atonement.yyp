@@ -68,6 +68,7 @@
     {"id":{"name":"scrCharConstructors","path":"scripts/scrCharConstructors/scrCharConstructors.yy",},},
     {"id":{"name":"scrEncounterZones","path":"scripts/scrEncounterZones/scrEncounterZones.yy",},},
     {"id":{"name":"scrEnemyConstructors","path":"scripts/scrEnemyConstructors/scrEnemyConstructors.yy",},},
+    {"id":{"name":"scrItemConstructors","path":"scripts/scrItemConstructors/scrItemConstructors.yy",},},
     {"id":{"name":"scrMapEnums","path":"scripts/scrMapEnums/scrMapEnums.yy",},},
     {"id":{"name":"scrMenuConstants","path":"scripts/scrMenuConstants/scrMenuConstants.yy",},},
     {"id":{"name":"scrMenuEnums","path":"scripts/scrMenuEnums/scrMenuEnums.yy",},},

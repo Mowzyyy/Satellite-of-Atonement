@@ -515,8 +515,10 @@ function applyBattleAction(_user, _action, _target) {
 					timer: 60
 				});
 			} else if (spell.effect_type == "heal_hp") {
-				var heal_amt = floor(spell.mpower * 0.5);
-				_target.current_hp = min(_target.current_hp + heal_amt, _target.base_max_hp);
+				if (!_target.has_status("poison")) {
+					var heal_amt = floor(spell.mpower * 0.5);
+					_target.current_hp = min(_target.current_hp + heal_amt, _target.base_max_hp);
+				}
 			}
 		break;
 		
@@ -538,11 +540,15 @@ function applyBattleAction(_user, _action, _target) {
 					value: dmg, timer: 60
 				});
 			} else if (skill.effect_type == "restore_mp") {
-				var rest_amt = floor(10 + _user.get_effective_stats().mental * 0.5);
-				_target.current_mana = min(_target.current_mana + rest_amt, _target.base_max_mana);
+				if (!_target.has_status("poison")) {
+					var rest_amt = floor(10 + _user.get_effective_stats().mental * 0.5);
+					_target.current_mana = min(_target.current_mana + rest_amt, _target.base_max_mana);
+				}
 			} else if (skill.effect_type == "heal_hp") {
-				var heal_amt = floor(10 + _user.get_effective_stats().mental * 0.5);
-				_target.current_hp = min(target.current_hp + heal_amt, _target.base_max_hp);
+				if (!_target.has_status("poison")) {
+					var heal_amt = floor(10 + _user.get_effective_stats().mental * 0.5);
+					_target.current_hp = min(target.current_hp + heal_amt, _target.base_max_hp);
+				}
 			}
 			//functional skills handled elsewhere
 		break;
@@ -570,19 +576,53 @@ function scrResolveEnemyAction(_turn) {
 	}
 	if (array_length(alive) == 0) return;
 	var target_idx = alive[irandom(array_length(alive) - 1)];
+	var target = global.party[target_idx];
 	
+	//poison
+	if (move.type == "status") {
+		global.party[target_idx].add_status("poison");
+		show_debug_message(target.name + " poisoned!");
+		//status popup on party card
+		var _co = [2, 1, 0, 3];
+		var _ci = -1;
+		for (var _c = 0; _c < 4; _c++) {
+			if (_co[_c] == target_idx) { _ci = _c; break; }
+		}
+		if (_ci >= 0) {
+			array_push(global.battle_damage_display, {
+				x: floor((320 - (4 * 80)) / 2) + (_ci * 80) + 40,
+				y: 170,
+				value: 0, label: "Poison!", timer: 90
+			});
+		}
+		return;
+	}
+	
+	var dmg = 0;
 	//damage calc
-	var dmg = scrCalcPhysicalDamage(enemy.atk, global.party[target_idx].get_effective_stats().def);
-	if (global.party[target_idx].battle_defending) dmg = floor(dmg * 0.5);
-	global.party[target_idx].current_hp -= dmg;
-	if (global.party[target_idx].current_hp < 0) global.party[target_idx].current_hp = 0;
+	if (move.type == "magic") {
+		dmg = scrCalcMagicDamage(enemy.mAtk, target.get_effective_stats().mDef, move.enPower, "none", target);
+	} else {
+		dmg = scrCalcPhysicalDamage(enemy.atk, global.party[target_idx].get_effective_stats().def);
+	}
+	
+	if (target.battle_defending) dmg = floor(dmg * 0.5);
+	target.current_hp -= dmg;
+	if (target.current_hp < 0)  target.curent_hp = 0;
+	if (target.current_hp <= 0) target.check_death();
 	
 	//damage popup on party card
-	//calculate position from card layout
-	
-	//check death
-	if (global.party[target_idx].current_hp <= 0) {
-		global.party[target_idx].check_death();
+	var _co = [2, 1, 0, 3];
+	var _ci = -1;
+	for (var _c = 0; _c < 4; _c++) {
+		if (_co[_c] == target_idx) { _ci = _c; break; }
+	}
+	if (_ci >= 0) {
+		array_push(global.battle_damage_display, {
+			x: floor((320 - (4 * 80)) / 2) + (_ci * 80) + 40,
+			y: 170,
+			value: dmg, timer: 60
+		});
 	}
 }
 function scrCheckBattleEnd() {

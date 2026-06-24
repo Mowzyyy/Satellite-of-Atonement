@@ -7,6 +7,7 @@ persistent = true;
 //==================================Party Data==================================
 //global xp init
 scrInitExpTables();
+scrInitItemGlobals();
 scrInitSpellGlobals();
 scrInitSkillGlobals();
 
@@ -30,36 +31,22 @@ if (!variable_global_exists("party_initialized")) {
 	array_push(global.party, cstrOsei());
 	array_push(global.party, cstrAnna())
 	
-	//Fake inventory per party member - replace later with real ds_list or array
-//global.party_inventory = ds_map_create();
-//ds_map_add_list(global.party_inventory, oLeon, ds_list_create());//example
 
-//temporary construct items and assign for testing purposes
-var potion = new cstrItem("Potion", "consumable", "Restores 50 HP", 10).set_effect("heal_hp", 50);
-var stimpak = new cstrItem("Stimpak", "consumable", "Restores 150 HP", 30).set_effect("heal_hp", 150);
-var antitox = new cstrItem("Antitox", "consumable", "Cures poison", 15).set_effect("cure_status", 0);
-var cyanide = new cstrItem("Cyanide", "consumable", "Damages you", 25).set_effect("damage", 45);
-var test_sword    = new cstrEquipment("Sword",    "r_hand",   15, 0,  2, 0,  0, 0);
-var test_dagger = new cstrEquipment("Dagger", "weapon",   8,  0,  5, 0,  0, 0);
-var test_staff     = new cstrEquipment("Staff",     "two_hand",   5,  0,  0, 0, 8,  4);
-var test_wand = new cstrEquipment("Wand", "r_hand", 3, 2, 3, 7, 1, 0);
-var test_spear    = new cstrEquipment("Spear",    "two_hand", 20, 2,  0, 0,  0, 0);
-var test_shield = new cstrEquipment("Shield", "l_Hand",   0,  8,  0, 0,  0, 5);
-var test_hat  = new cstrEquipment("Hat",  "head",     0,  4,  0, 0,  0, 2);
-var test_helm     = new cstrEquipment("Helm",     "head",     0,  8,  0, 0,  0, 3);
-var test_vest  = new cstrEquipment("Vest",  "body",     0,  6,  0, 0,  0, 3);
-var test_plate    = new cstrEquipment("Plate",    "body",     0,  14, 0, 0,  0, 6);
-var test_boots = new cstrEquipment("Boots", "feet",     0,  3,  3, 0,  0, 0);
-var test_greaves  = new cstrEquipment("Greaves",  "feet",     0,  5,  1, 0,  2, 2);
-var test_ring   = new cstrEquipment("MgcRing",   "accessory", 0, 0,  0, 5,  5, 5);
-var test_charm  = new cstrEquipment("SpdChrm",  "accessory", 0, 0,  8, 0,  0, 0);
+//testing items spawnin
+global.party[0].add_item(global.it_potion);
+global.party[0].add_item(global.it_stimpak);
+global.party[0].add_item(global.it_antidote);
 
+global.party[1].add_item(global.it_antitox);
 
-global.party[0].add_item(potion);
-global.party[0].add_item(stimpak);
-global.party[1].add_item(antitox);
-global.party[2].add_items(cyanide, cyanide, cyanide, potion, potion, stimpak, cyanide, antitox, antitox, cyanide, cyanide, cyanide, cyanide, potion, potion, stimpak, cyanide, antitox, antitox, cyanide);
-global.party[3].add_items(test_sword, test_dagger, test_staff, test_spear, test_shield, test_hat, test_helm, test_vest, test_plate, test_boots, test_greaves, test_ring, test_charm);
+global.party[2].add_items(global.it_cyanide, global.it_cyanide, global.it_cyanide, global.it_potion, global.it_potion, 
+	global.it_stimpak, global.it_cyanide, global.it_antitox, global.it_antitox, global.it_cyanide, global.it_cyanide, 
+	global.it_cyanide, global.it_cyanide, global.it_potion, global.it_potion, global.it_stimpak, global.it_cyanide, 
+	global.it_antitox, global.it_antitox, global.it_cyanide);
+	
+global.party[3].add_items(global.it_sword, global.it_dagger, global.it_staff, global.it_spear, global.it_shield, 
+	global.it_hat, global.it_helm, global.it_vest, global.it_plate, global.it_boots, global.it_greaves, global.it_mgcring, 
+	global.it_spdchrm);
 }
 
 

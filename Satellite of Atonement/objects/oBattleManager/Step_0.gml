@@ -5,6 +5,19 @@ if (global.state != GAME_STATE.BATTLE) {
 
 blink_timer++;
 
+//battle intro timer - shows the field before command box appears
+if (global.battle_intro_timer > 0) {
+	global.battle_intro_timer--;
+	return;
+}
+
+for (var di = array_length(global.battle_damage_display) - 1; di >= 0; di--) {
+	global.battle_damage_display[di].timer--;
+	if (global.battle_damage_display[di].timer <= 0) {
+		array_delete(global.battle_damage_display, di, 1);
+	}
+}
+
 switch (global.battle_phase) {
 	
 	case BATTLE_PHASE.SELECT_COMMAND:
@@ -19,5 +32,3 @@ switch (global.battle_phase) {
 		scrBattleWinLoss();
 		break;
 }
-
-if (global.battle_action_delay > 0) return;//pause all battle logic during the delay

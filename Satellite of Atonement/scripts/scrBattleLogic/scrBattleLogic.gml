@@ -16,6 +16,7 @@ function scrStartBattle(_enemy_list) {
 	global.battle_action_display			= "";//current action name display
 	global.battle_action_timer			= 0;
 	global.battle_flee_result					= -1;// -1 = not tried, 0 = failed, 1 = success
+	global.battle_intro_timer				= 45;
 	
 	//initialize party actions array
 	global.battle_actions = [];
@@ -121,8 +122,8 @@ function scrCalcPhysicalDamage(_atk, _def) {
 	return floor(base * (0.9 + random(0.2)));
 }
 
-function scrCalcMagicDamage(_mAtk, mDef, _mpower, _element, _target) {
-	var base = floor(_mAtk * (mpower / 100)) - _mDef;
+function scrCalcMagicDamage(_mAtk, _mDef, _mpower, _element, _target) {
+	var base = floor(_mAtk * (_mpower / 100)) - _mDef;
 	base = max(1, base);
 	//apply weakness/resistance
 	if (_target.is_weak_to != undefined && _target.is_weak_to(_element)) base = floor(base * 1.5);
@@ -172,7 +173,7 @@ function scrBattleCommandPhase() {
 								continue;
 							}
 							var tgt = alive_enemies[irandom(array_length(alive_enemies) - 1)];
-							global.battle_actions[mi] = { type: "attack", target: tgt };
+							global.battle_actions[mi] = { type: "attack", target: tgt, target_side: "enemy", all_targets: false };
 						}
 					}
 					global.battle_sub_open = false;
@@ -264,7 +265,8 @@ function scrBattleCommandPhase() {
 				
 				case 4://defend
 					global.battle_actions[global.battle_cmd_index] = {
-						type: "defend", target: -1
+						type: "defend", target: -1,
+						target_side: "ally", all_targets: false
 					};
 					scrAdvanceCmdIndex();
 					io_clear();
@@ -308,10 +310,11 @@ function scrBattleCommandPhase() {
 							
 						//"all" target types apply immediately
 						if (entry.data.target_type == "all_enemies" || entry.data.target_type == "all_allies" || entry.data.target_type == "all_party" || entry.data.target_type == "functional") {
-							var all_targets = (entry.data.target_type == "all_enemies") ? global.battle_enemies : global.party;
+							var _side = (entry.data.target_type == "all_enemies") ? "enemy" : "ally";
 							global.battle_actions[global.battle_cmd_index] = {
 								type: global.battle_sub_mode,
 								target: -1,
+								target_side: _side,
 								all_targets: true,
 								spell_index: entry.kind == "spell" ? entry.index : -1,
 								skill_index: entry.kind == "skill" ? entry.index : -1,
@@ -388,34 +391,44 @@ function scrAdvanceCmdIndex() {
 
 //=====================================EXECUTE PHASE=====================================
 function scrBattleExecutePhase() {
-	if (array_length(global.battle_turn_order) > 0) {
-		var turn = global.battle_turn_order[0];
-		show_debug_message("Executing turn for: " + turn.kind + " index: " + string(turn.index));
-		
-		if (turn.kind == "party") {
-			scrResolvePartyAction(turn);
-		} else {
-			scrResolveEnemyAction(turn);
+	//wait until all damage popups are cleared before the next action
+	if (array_length(global.battle_damage_display) > 0) {
+		return;
 	}
-	array_delete(global.battle_turn_order, 0, 1);
-	return;
-	}
-
+	
+	if (array_length(global.battle_damage_display) == 0 && global.battle_action_delay <= 0) {
+	global.battle_attack_target = -1;
+	global.battle_attack_target_side = "";
+	global.battle_attacker = -1;
+	global.battle_attacker_side = "";
+	global.battle_all_target_side = "";
+}
+	
+	//short pause after popups clear before next action
 	if (global.battle_action_delay > 0) {
 		global.battle_action_delay--;
 		return;
 	}
 	
+	//all turns resolved - check for win/loss
 	if (array_length(global.battle_turn_order) == 0) {
-		//turn complete, check win/loss
 		scrCheckBattleEnd();
 		return;
 	}
 	
+	//resolve the next combatant's action
+	var turn = global.battle_turn_order[0];
 	array_delete(global.battle_turn_order, 0, 1);
+	show_debug_message("Executing turn for: " + turn.kind + " index: " + string(turn.index));
 	
-	//after each action, set delay for visual feedback
-	global.battle_action_delay = 30;//0.5s at 60fps
+	if (turn.kind == "party") {
+		scrResolvePartyAction(turn);
+	} else {
+		scrResolveEnemyAction(turn);
+	}
+	
+	//pause before the next action
+	global.battle_action_delay = 15;//0.25s at 60fps
 }
 
 function scrResolvePartyAction(_turn) {
@@ -424,12 +437,20 @@ function scrResolvePartyAction(_turn) {
 	
 	var action = global.battle_actions[_turn.index];
 	if (!action) return;
-	if (action.target < 0 || action.target >= array_length(global.battle_enemies)) return;
+	
+	//acting party member stays visible
+	global.battle_attacker = _turn.index;
+	global.battle_attacker_side = "ally";
 	
 	switch (action.type) {
 		case "attack":
+			if (action.target < 0 || action.target >= array_length(global.battle_enemies)) return;
 			var enemy = global.battle_enemies[action.target];
 			if (!enemy || enemy.is_dead) return;
+			
+			//mark who is being attacked so only they are visible
+			global.battle_attack_target = action.target;
+			global.battle_attack_target_side = "enemy";
 			
 			var dmg = scrCalcPhysicalDamage(member.get_effective_stats().atk, enemy.def);
 			enemy.current_hp -= dmg;
@@ -460,10 +481,11 @@ function scrResolvePartyAction(_turn) {
 		case "skill":
 		case "item":
 			var target_entity = undefined;
-			var is_enemy_target = (action.target >= 0 && action.target < array_length(global.battle_enemies));
+			var _hits_enemy = (action.target_side == "enemy");
 			
 			if (action.all_targets) {
-				if (is_enemy_target) {
+				global.battle_all_target_side = action.target_side;
+				if (_hits_enemy) {
 					for (var ei = 0; ei < array_length(global.battle_enemies); ei++) {
 						if (!global.battle_enemies[ei].is_dead) {
 							applyBattleAction(member, action, global.battle_enemies[ei]);
@@ -479,8 +501,10 @@ function scrResolvePartyAction(_turn) {
 				return;
 			}
 			
-			if (is_enemy_target) {
-				target_entity = global.battle_enemies[action.target];
+			if (_hits_enemy) {
+				if (action.target >= 0 && action.target < array_length(global.battle_enemies)) {
+					target_entity = global.battle_enemies[action.target];
+				}
 			} else {
 				if (action.target >= 0 && action.target < array_length(global.party)) {
 					target_entity = global.party[action.target];
@@ -488,6 +512,8 @@ function scrResolvePartyAction(_turn) {
 			}
 			
 			if (target_entity != undefined) {
+				global.battle_attack_target = action.target;
+				global.battle_attack_target_side = action.target_side;
 				applyBattleAction(member, action, target_entity);
 			}
 			break;
@@ -547,14 +573,14 @@ function applyBattleAction(_user, _action, _target) {
 			} else if (skill.effect_type == "heal_hp") {
 				if (!_target.has_status("poison")) {
 					var heal_amt = floor(10 + _user.get_effective_stats().mental * 0.5);
-					_target.current_hp = min(target.current_hp + heal_amt, _target.base_max_hp);
+					_target.current_hp = min(_target.current_hp + heal_amt, _target.base_max_hp);
 				}
 			}
 			//functional skills handled elsewhere
 		break;
 			
 		case "item":
-			if (_action.item_index < 0 || _action.item_index >= array_length(_user.intentory)) return;
+			if (_action.item_index < 0 || _action.item_index >= array_length(_user.inventory)) return;
 			_user.use_item(_action.item_index, _target);
 			break;
 	}
@@ -564,6 +590,12 @@ function applyBattleAction(_user, _action, _target) {
 function scrResolveEnemyAction(_turn) {
 	var enemy = global.battle_enemies[_turn.index];
 	if (enemy.is_dead) return;
+	
+	//acting enemy stays visible
+	global.battle_attacker = _turn.index;
+	global.battle_attacker_side = "enemy";
+	//future all-allies enemy attack
+	//global.battle_all_target_side = "ally";
 	
 	//enemy.action was set at turn start by scrEnemyPickAllActions()
 	var move = enemy.action;
@@ -577,6 +609,10 @@ function scrResolveEnemyAction(_turn) {
 	if (array_length(alive) == 0) return;
 	var target_idx = alive[irandom(array_length(alive) - 1)];
 	var target = global.party[target_idx];
+	
+	//mark who is being attacked so only they stay visible
+	global.battle_attack_target = target_idx;
+	global.battle_attack_target_side = "ally";
 	
 	//poison
 	if (move.type == "status") {
@@ -608,7 +644,7 @@ function scrResolveEnemyAction(_turn) {
 	
 	if (target.battle_defending) dmg = floor(dmg * 0.5);
 	target.current_hp -= dmg;
-	if (target.current_hp < 0)  target.curent_hp = 0;
+	if (target.current_hp < 0)  target.current_hp = 0;
 	if (target.current_hp <= 0) target.check_death();
 	
 	//damage popup on party card
@@ -719,14 +755,25 @@ function scrBattleTargetSelectionPhase() {
 	
 	if (global.keyC) {
 		var target = global.battle_target_list[global.battle_target_cursor];
+		
+		var _side = "enemy";
+		if (global.battle_sub_mode != "attack" && global.battle_pending_entry != undefined) {
+			var _tt = global.battle_pending_entry.data.target_type;
+			_side = (_tt == "single_ally" || _tt == "single_party") ? "ally" : "enemy";
+		}
+		
 		var action = { 
 			type: global.battle_sub_mode,
-			target: target, 
-			all_targets: false };
+			target: target,
+			target_side: _side,
+			all_targets: false,
+			spell_index: -1,
+			skill_index: -1,
+			item_index: -1
+			};
 		
-		if (global.battle_sub_mode == "attack") {
+		if (global.battle_sub_mode == "attack" && global.battle_pending_entry != undefined) {
 			//plain attack
-		} else if (global.battle_pending_entry != undefined) {
 			action.spell_index = global.battle_pending_entry.kind == "spell" ? global.battle_pending_entry.index : -1;
 			action.skill_index = global.battle_pending_entry.kind == "skill" ? global.battle_pending_entry.index : -1;
 			action.item_index = global.battle_pending_entry.kind == "item" ? global.battle_pending_entry.index : -1;

@@ -37,6 +37,16 @@ if (global.state == GAME_STATE.BATTLE) {
 	for (var ei = 0; ei < num_enemies; ei++) {
 		var e = global.battle_enemies[ei];
 		if (e.is_dead) continue;
+		
+		//during an attack only show the targeted enemy
+		if (global.battle_attack_target != -1 || global.battle_attacker != -1 || global.battle_all_target_side != "") {
+			var _is_target   = (global.battle_attack_target_side == "enemy" && global.battle_attack_target == ei);
+			var _is_attacker = (global.battle_attacker_side == "enemy" && global.battle_attacker == ei);
+			var _is_all_side  = (global.battle_all_target_side == "enemy");
+			if (!_is_target && !_is_attacker) continue;
+		}
+		
+		//target select flash
 		if (_tgt_enemy && global.battle_target_list[global.battle_target_cursor] == ei && (blink_timer mod 50) >= 25) continue;
 		if (e.sprite_combat != -1 && sprite_exists(e.sprite_combat)) {
 			draw_sprite(e.sprite_combat, 0, enemy_start_x + ei * enemy_spacing, enemy_y);
@@ -47,6 +57,15 @@ if (global.state == GAME_STATE.BATTLE) {
 	for (var ci = 0; ci < array_length(global.party); ci++) {
 		var pin = card_order[ci];
 		var member = global.party[pin];
+		
+		//during an attack only show the targeted ally
+		if (global.battle_attack_target != -1 || global.battle_attacker != -1 || global.battle_all_target_side != "") {
+			var _is_target   = (global.battle_attack_target_side == "ally" && global.battle_attack_target == pin);
+			var _is_attacker = (global.battle_attacker_side == "ally" && global.battle_attacker == pin);
+			var _is_all_side  = (global.battle_all_target_side == "ally");
+			if (!_is_target && !_is_attacker) continue;
+		}
+		
 		var card_x = card_start_x + (ci * (card_w + card_gap));
 		//sprite offset - 4px from middle-facing side
 		var spr_x = card_x + card_w / 2;
@@ -232,18 +251,6 @@ if (global.state == GAME_STATE.BATTLE) {
 		var _blink_on = (blink_timer mod 40) < 20;
 		draw_sprite((_blink_on ? sCursor : sBlink), 0, sl_x + 6, sl_y + sl_top_pad + (global.battle_sub_cursor * sl_item_h));
 	}
-	
-	//target highlight
-	if (global.battle_selecting_target) {
-		var _is_enemy = (global.battle_sub_mode == "attack" || (global.battle_pending_entry != undefined && global.battle_pending_entry.data.target_type == "single_enemy"));
-		if (_is_enemy && global.battle_target_cursor < array_length(global.battle_target_list)) {
-			var t_ei = global.battle_target_list[global.battle_target_cursor];
-			var _flash = (blink_timer mod 30) < 15;
-			if (_flash) {
-				draw_sprite_ext(global.battle_enemies[t_ei].sprite_combat, 0, enemy_start_x + t_ei * enemy_spacing, enemy_y, 1, 1, 0, c_yellow, 1);
-			}
-		}
-	}
 				
 	
 	//enemy name boxes
@@ -273,13 +280,8 @@ if (global.state == GAME_STATE.BATTLE) {
 	}
 	
 	//damage display boxes
-	for (var di = array_length(global.battle_damage_display) - 1; di >= 0; di--) {
+	for (var di = 0; di < array_length(global.battle_damage_display); di++) {
 		var d = global.battle_damage_display[di];
-		d.timer--;
-		if (d.timer <= 0) {
-			array_delete(global.battle_damage_display, di, 1);
-			continue;
-		}
 		var d_w = 48;
 		var d_h = 20;
 		var display_txt = (variable_struct_exists(d, "label") && d.label != "") ? d.label : string(d.value);
@@ -294,23 +296,33 @@ if (global.state == GAME_STATE.BATTLE) {
 	}
 	
 	//CMND/MACRO/FLEE box - only show when no subselection is active
-	if (!global.battle_sub_open) {
-	var cmd_w = 72;
-	var cmd_h = 56;
-	var cmd_x = 320 / 4 - cmd_w - 4;
-	var cmd_y = 120 - cmd_h - 4;
-	draw_sprite_stretched(sBasicGUI, 0, cmd_x, cmd_y, cmd_w, cmd_h);
+	//hidden during command selection, target selection, damage, etc
+	var _show_cmd_box = (global.battle_phase == BATTLE_PHASE.SELECT_COMMAND)
+											&& (global.battle_intro_timer <= 0)
+											&& !global.battle_sub_open
+											&& !global.battle_selecting_target
+											&& (global.battle_cmd_index == 0)
+											&& (array_length(global.battle_sub_list) == 0);
+	if (_show_cmd_box) {
+		draw_set_halign(fa_left);
+		draw_set_valign(fa_top);
 		
-	var cmd_opts = ["CMND", "MACRO", "FLEE"];
-	for (var i = 0; i < 3; i++) {
-		var col = (global.battle_cmd_cursor == i) ? c_yellow : c_white;
-		draw_text_color(cmd_x + 18, cmd_y + 12 + (i * 16), cmd_opts[i], col, col, col, col, 1);
+		var cmd_w = 72;
+		var cmd_h = 56;
+		var cmd_x = 320 / 4 - cmd_w - 4;
+		var cmd_y = 120 - cmd_h - 4;
+		draw_sprite_stretched(sBasicGUI, 0, cmd_x, cmd_y, cmd_w, cmd_h);
+		
+		var cmd_opts = ["CMND", "MACRO", "FLEE"];
+		for (var i = 0; i < 3; i++) {
+			var col = (global.battle_cmd_cursor == i) ? c_yellow : c_white;
+			draw_text_color(cmd_x + 18, cmd_y + 8 + (i * 16), cmd_opts[i], col, col, col, col, 1);
+		}
+		
+		var _blink_on = (blink_timer mod 40) < 20;
+		draw_sprite((_blink_on ? sCursor : sBlink), 0, cmd_x + 6, cmd_y + 12 + (global.battle_cmd_cursor * 16));
+		
+		draw_set_halign(fa_left);
+		draw_set_valign(fa_top);
 	}
-	//blinking cursor
-	var _blink_on = (blink_timer mod 40) < 20;
-	draw_sprite((_blink_on ? sCursor : sBlink), 0, cmd_x + 6, cmd_y + 12 + (global.battle_cmd_cursor * 16));
-	}
-	
-	draw_set_halign(fa_left);
-	draw_set_color(c_white);
 }

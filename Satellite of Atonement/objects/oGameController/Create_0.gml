@@ -176,6 +176,12 @@ global.battle_action_delay			= 0;
 global.battle_sub_list						= [];
 global.battle_sub_mode				= "";
 global.battle_pending_entry		= undefined;
+global.battle_attack_target			= -1;
+global.battle_attack_target_side	= "";
+global.battle_attacker						= -1;
+global.battle_attacker_side			= "";
+global.battle_intro_timer				= 0;
+global.battle_all_target_side			= "";
 
 //============================Global Menu Drawing Settings============================
 //This makes every context menu in the game use the default font automatically

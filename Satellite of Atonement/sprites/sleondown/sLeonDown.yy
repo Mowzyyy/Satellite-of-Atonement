@@ -28,7 +28,7 @@
   "origin":3,
   "parent":{
     "name":"Leon",
-    "path":"folders/Sprites/Leon.yy",
+    "path":"folders/Sprites/Playable/Leon.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

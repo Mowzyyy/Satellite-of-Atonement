@@ -28,7 +28,7 @@
   "origin":3,
   "parent":{
     "name":"Osei",
-    "path":"folders/Sprites/Osei.yy",
+    "path":"folders/Sprites/Playable/Osei.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

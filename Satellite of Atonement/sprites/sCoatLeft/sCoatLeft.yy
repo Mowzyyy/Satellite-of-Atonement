@@ -28,7 +28,7 @@
   "origin":3,
   "parent":{
     "name":"Coat",
-    "path":"folders/Sprites/Coat.yy",
+    "path":"folders/Sprites/Playable/Coat.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

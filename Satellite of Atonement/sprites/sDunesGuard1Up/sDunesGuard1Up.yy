@@ -27,8 +27,8 @@
   "nineSlice":null,
   "origin":3,
   "parent":{
-    "name":"Guard 1",
-    "path":"folders/Sprites/Dunes NPCs/Guard 1.yy",
+    "name":"Dunes Guard 1",
+    "path":"folders/Sprites/NPCs/Dunes/Dunes Guard 1.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

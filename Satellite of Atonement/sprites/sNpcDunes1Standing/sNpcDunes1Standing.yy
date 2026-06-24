@@ -28,8 +28,8 @@
   "nineSlice":null,
   "origin":3,
   "parent":{
-    "name":"NPC 1",
-    "path":"folders/Sprites/Dunes NPCs/NPC 1.yy",
+    "name":"Dunes NPC 1",
+    "path":"folders/Sprites/NPCs/Dunes/Dunes NPC 1.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

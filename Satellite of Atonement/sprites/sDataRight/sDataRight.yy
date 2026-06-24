@@ -28,7 +28,7 @@
   "origin":3,
   "parent":{
     "name":"Data",
-    "path":"folders/Sprites/Data.yy",
+    "path":"folders/Sprites/Playable/Data.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

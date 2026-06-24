@@ -26,7 +26,7 @@
   "origin":7,
   "parent":{
     "name":"Anna",
-    "path":"folders/Sprites/Anna.yy",
+    "path":"folders/Sprites/Playable/Anna.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

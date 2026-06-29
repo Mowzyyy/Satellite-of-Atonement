@@ -58,9 +58,9 @@ function scrGetZoneData(_map_id, _zone_number) {
 		case MAP.DUNES:
 			switch (_zone_number) {
 				case 1: return {
-					avg_steps	: 40,
-					min_steps	: 15,
-					max_steps	: 80,
+					avg_steps	: 7,
+					min_steps	: 5,
+					max_steps	: 10,
 					encounters	: [
 					{ weight: 3, enemies: ["Cuetzpal", "Cuetzpal"]},
 					{ weight: 3, enemies: ["Slime", "Slime"] },
@@ -72,13 +72,37 @@ function scrGetZoneData(_map_id, _zone_number) {
 					]};
 			
 				case 2: return {
-					avg_steps	: 30,
-					min_steps	: 10,
-					max_steps	: 60,
+					avg_steps	: 5,
+					min_steps	: 2,
+					max_steps	: 10,
 					encounters	: [
 					{ weight: 3, enemies: ["Cuetzpal", "Cuetzpal", "Slime", "Slime"]},
 					{ weight: 2, enemies: ["Slime", "Slime", "Slime"] },
 					{ weight: 1, enemies : ["Slime", "Slime", "Slime", "Slime"] },
+					]};
+				
+				case 3: return {
+					avg_steps	: 5,
+					min_steps	: 2,
+					max_steps	: 7,
+					encounters: [
+					{ weight: 3, enemies: ["CapMage", "CapMage"]},
+					{ weight: 3, enemies: ["Slime", "Slime", "Slime"] },
+					{ weight: 2, enemies: ["Slime", "CapMage", "CapMage"] },
+					{ weight: 2, enemies: ["CapMage"] },
+					{ weight: 1, enemies: ["CapMage", "CapMage", "CapMage"] },
+					]};
+					
+				case 4: return {
+					avg_steps	: 5,
+					min_steps	: 2,
+					max_steps	: 7,
+					encounters: [
+					{ weight: 3, enemies: ["Cuetzpal", "CapMage"]},
+					{ weight: 3, enemies: ["Cuetzpal", "Cuetzpal", "Slime"] },
+					{ weight: 2, enemies: ["Cuetzpal", "CapMage", "CapMage"] },
+					{ weight: 2, enemies: ["Cuetzpal", "Cuetzpal", "Cuetzpal", "Slime"] },
+					{ weight: 1, enemies: ["Cuetzpal", "CapMage", "CapMage", "CapMage"] },
 					]};
 			//add more zone numbers per map as needed
 			default: return undefined;

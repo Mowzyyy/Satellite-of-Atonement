@@ -35,6 +35,11 @@ if (global.transition_phase == 2) {
 scrUpdateRollups();
 
 switch (global.state) {
+	
+	case GAME_STATE.GAME_OVER:
+				scrGameOverLogic();
+				break;
+				
 	case GAME_STATE.MAIN_MENU:
 		scrMenuMainLogic();
 		break;

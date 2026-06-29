@@ -246,7 +246,7 @@ function cstrPartyMember(_name,
 		
 		switch (item.effect_type) {
 			case "heal_hp":
-				if (_target.has_status("poison")) break;
+				if (_target.is_dead || _target.has_status("poison")) break;
 				if (_target.current_hp < _target.base_max_hp) {
 					_target.current_hp = min(_target.current_hp + item.effect_amount, _target.base_max_hp);
 					used = true;
@@ -254,11 +254,19 @@ function cstrPartyMember(_name,
 			break;
 			
 			case "heal_mp":
-				if (_target.has_status("poison")) break;
+				if (_target.is_dead || _target.has_status("poison")) break;
 				if (_target.current_mana < _target.base_max_mana) {
 					_target.current_mana = min(_target.current_mana + item.effect_amount, _target.base_max_mana);
 					used = true;
 				}
+			break;
+			
+			case "revive":
+				if (!_target.is_dead) break;
+				_target.is_dead = false;
+				_target.current_hp = item.effect_amount > 0 ? item.effect_amount : _target.base_max_hp;
+				_target.cheack_death();
+				used = true;
 			break;
 			
 			case "cure_status":
@@ -388,9 +396,6 @@ function cstrPartyMember(_name,
 			current_hp = 0;
 			is_dead = true;
 			show_debug_message(name + " is incapacitated");
-		}
-		if (current_hp > 0 && is_dead) {
-			is_dead = false;
 		}
 	}
 	
@@ -597,7 +602,7 @@ global.partyStatus = {
 //testing items spawnin
 global.party[0].add_item(global.it_potion);
 global.party[0].add_item(global.it_stimpak);
-global.party[0].add_item(global.it_antidote);
+global.party[0].add_items(global.it_antidote, global.it_revive, global.it_phoenix);
 
 global.party[1].add_item(global.it_antitox);
 

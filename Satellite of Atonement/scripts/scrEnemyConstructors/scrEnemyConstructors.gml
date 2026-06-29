@@ -97,6 +97,7 @@ function scrBuildEnemy(_name) {
 	switch (_name) {
 		case "Slime" : return cstrTestSlime();
 		case "Cuetzpal" : return cstrCuetzpal();
+		case "CapMage" : return cstrCapMage();
 		default:	show_debug_message("WARNING: scrBuildEnemy — unknown enemy '" + _name + "'");
 		return undefined;
 	}
@@ -115,5 +116,13 @@ function cstrCuetzpal() {
 	e.sprite_combat = sCuetzpal;
 	e.add_move(new cstrEnemyMove("Spear Thrust", "attack", 18, 0, "single_enemy", 2));
 	e.add_move(new cstrEnemyMove("Bite","attack",12,0,"single_enemy",3));
+	return e;
+}
+
+function cstrCapMage() {
+	var e = new cstrEnemy("CapMage", 40, 20, 6, 4, 3, 10, 20, 12);
+	e.sprite_combat = sCapMage;
+	e.add_move(new cstrEnemyMove("Flail", "attack", 8, 0, "single_enemy", 5));
+	e.add_move(new cstrEnemyMove("Kazam", "magic", 15, 6, "all_enemies", 3));
 	return e;
 }

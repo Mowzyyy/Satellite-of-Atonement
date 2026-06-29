@@ -334,9 +334,14 @@ function scrBattleCommandPhase() {
 									if (!global.battle_enemies[ei].is_dead) array_push(global.battle_target_list, ei);
 								}
 							} else if (entry.data.target_type == "single_ally") {
+								var is_revive = (entry.kind == "item" && entry.data.effect_type == "revive");
 								for (var ci = 0; ci < 4; ci++) {
 									var pai = _ct_order[ci];// [2, 1, 0, 3]
-									if (global.party[pai].current_hp > 0) array_push(global.battle_target_list, pai);
+									if (is_revive) {
+										if (global.party[pai].is_dead) array_push(global.battle_target_list, pai);
+									} else {
+										if (global.party[pai].current_hp > 0) array_push(global.battle_target_list, pai);
+									}
 								}
 							} else {
 								for (var ci = 0; ci < 4; ci++) {
@@ -659,6 +664,34 @@ function scrResolveEnemyAction(_turn) {
 		return;
 	}
 	
+	//all-party attack
+	if (move.target == "all_enemies") {
+		for (var ai = 0; ai < array_length(alive); ai++) {
+			var at = alive[ai];
+			var ally = global.party[at];
+			var ad = (move.type == "magic")
+				? scrCalcMagicDamage(enemy.mAtk, ally.get_effective_stats().mDef, move.enPower, "none", ally)
+				: scrCalcPhysicalDamage(move.enPower, ally.get_effective_stats().def);
+			if (ally.battle_defending) ad = floor(ad * 0.5);
+			ally.current_hp -= ad;
+			if (ally.current_hp < 0) ally.current_hp = 0;
+			if (ally.current_hp <= 0) ally.check_death();
+			var _co = [2, 1, 0, 3];
+			var _ci = -1;
+			for (var _c = 0; _c < 4; _c++) {
+				if (_co[_c] == at) { _ci = _c; break; }
+			}
+			if (_ci >= 0) {
+				array_push(global.battle_damage_display, {
+					x: floor((320 - (4 * 80)) / 2) + (_ci * 80) + 40,
+					y: 170,
+					value: ad, timer : 60
+				});
+			}
+		}
+		return;
+	}
+	
 	var dmg = 0;
 	//damage calc
 	if (move.type == "magic") {
@@ -706,7 +739,7 @@ function scrCheckBattleEnd() {
 		if (global.party[i].current_hp > 0) { party_dead = false; break; }
 	}
 	if (party_dead) {
-		global.battle_phase = BATTLE_PHASE.WIN_LOSS;//will handle as loss in winloss
+		scrCheckGameOver();
 		return;
 	}
 	

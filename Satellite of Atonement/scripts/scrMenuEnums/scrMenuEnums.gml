@@ -4,7 +4,8 @@ enum GAME_STATE {
 	IN_GAME_MENU,//PSIII style menu
 	BATTLE,//PSIV style combat
 	CUTSCENE,
-	TRANSITIONING
+	TRANSITIONING,
+	GAME_OVER
 }
 
 enum MENU_PAGE {

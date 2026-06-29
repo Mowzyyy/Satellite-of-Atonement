@@ -3,8 +3,10 @@ function scrInitItemGlobals(){
 	global.it_potion					= new cstrItem("Potion",			"consumable", "Restores 20 HP", 10).set_effect("heal_hp",			20);
 	global.it_stimpak				=	new cstrItem("Stimpak",		"consumable", "Restores 80 HP", 50).set_effect("heal_hp",			80);
 	global.it_antitox				= new cstrItem("Antitox",			"consumable","Cures all status", 75).set_effect("cure_status",		0);
-	global.it_antidote				= new cstrItem("Antidote",		"consumable","Cures poison", 40).set_effect("cure_status",			0, "poison");
+	global.it_antidote				= new cstrItem("Antidte",			"consumable","Cures poison", 40).set_effect("cure_status",			0, "poison");
 	global.it_cyanide				= new cstrItem("Cyanide",		"consumable", "Damages you", 25).set_effect("damage",				45);
+	global.it_revive					= new cstrItem("Revive",			"consumable", "Revives with 15HP", 100).set_effect("revive",		15);
+	global.it_phoenix				= new cstrItem("Phoenix",		"consumable", "Fully Revives", 500).set_effect("revive",					0);
 	
 	//equipment
 	global.it_sword					= new cstrEquipment("Sword",			"r_hand",				15, 0, 2, 0, 0, 0);

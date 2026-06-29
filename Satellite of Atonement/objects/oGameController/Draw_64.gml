@@ -484,6 +484,42 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 	draw_set_valign(fa_center);
 	draw_set_color(c_white);
 }
+
+if (global.state == GAME_STATE.GAME_OVER) {
+	draw_set_alpha(0.8);
+	draw_set_color(c_black);
+	draw_rectangle(0, 0, display_get_gui_width(), display_get_gui_height(), false);
+	draw_set_alpha(1);
+	
+	//lookup for character specific gameover screen, otherwise fallback to generic
+	var go_spr = asset_get_index("s" + global.party[0].name + "GameOver");
+	if (go_spr == -1) go_spr = asset_get_index("sGameOver");
+	if (go_spr != -1) draw_sprite(go_spr, 0, 0, 0);
+	
+	draw_set_halign(fa_center);
+	
+	var fail_txt = string(global.party[0].name) + " has failed!";
+	var fail_box_w = string_width(fail_txt) + 24;
+	var fail_box_h = 24;
+	var fail_box_x = display_get_gui_width() / 2 - fail_box_w / 2;
+	var fail_box_y = display_get_gui_height() / 2 + 40 - 8;
+	
+	draw_sprite_stretched(sBasicGUI, 0, fail_box_x, fail_box_y, fail_box_w, fail_box_h);
+	
+	draw_set_color(c_red);
+	draw_text(display_get_gui_width() / 2, display_get_gui_height() / 2 + 44, fail_txt);
+	draw_set_color(c_white);
+	
+	
+	if (global.game_over_timer > 90 && (global.game_over_timer mod 40) < 20) {
+		draw_set_color(c_black);
+		draw_text(display_get_gui_width() / 2 - 1, display_get_gui_height() / 2 + 79, "Press C to continue");
+		draw_set_color(c_yellow);
+		draw_text(display_get_gui_width() / 2, display_get_gui_height() / 2 + 78, "Press C to continue");
+	}
+	draw_set_color(c_white);
+	draw_set_halign(fa_left);
+}
 //==============================ORDER SUBMENU DRAWING==============================
 if (global.menu_page == MENU_PAGE.ORDER) {
 	var top_left = global.card_positions[0];

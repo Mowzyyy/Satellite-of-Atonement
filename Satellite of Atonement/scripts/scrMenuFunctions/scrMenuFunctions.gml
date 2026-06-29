@@ -196,8 +196,6 @@ function scrSyncDeathFlags() {
 		if (_pm.current_hp <= 0 && !_pm.is_dead) {
 			_pm.current_hp = 0;
 			_pm.is_dead = true;
-		} else if (_pm.current_hp > 0 && _pm.is_dead) {
-			_pm.is_dead = false;
 		}
 	}
 }
@@ -221,7 +219,11 @@ function scrInventoryLogic() {
 		if (_still_rolling) {
 			return;//rollup still animating, keep waiting
 		}
-		//rollup done, perform autoback
+		//rollup done, wait for hold timer
+		global.item_use_wait_timer--;
+		if (global.item_use_wait_timer > 0) return;
+		
+		//hold time over, perform autoback
 		global.item_use_wait = false;
 		global.item_use_wait_key = "";
 		
@@ -401,6 +403,9 @@ function scrInventoryLogic() {
 				var used = user.use_item(global.selected_item, target);
 				scrSyncDeathFlags();
 				
+				scrCheckGameOver();
+				if (global.state == GAME_STATE.GAME_OVER) exit;
+				
 				var _key = "hp_" + string(menu_cursor);
 				scrStartRollup("hp_" + string(menu_cursor), _hp_before, target.current_hp);
 				
@@ -409,7 +414,7 @@ function scrInventoryLogic() {
 				//begin waiting for the rollup to finish before returning
 				global.item_use_wait = true;
 				global.item_use_wait_key = _key;
-				global.item_use_wait_timer = 60;
+				global.item_use_wait_timer = 30;
 			}
 		break;
 		

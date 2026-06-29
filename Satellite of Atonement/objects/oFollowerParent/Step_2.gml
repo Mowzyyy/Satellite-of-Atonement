@@ -1,3 +1,10 @@
+var _my_idx = -1;
+for (var _di = 0; _di < array_length(global.party); _di++) {
+	if (global.partyOrder[_di] == object_index) { _my_idx = _di; break; }
+}
+
+var _i_am_dead = (_my_idx >= 0 && global.party[_my_idx].is_dead);
+
 if (myRank > 0) {
 	var _target_obj = global.partyOrder[myRank - 1];
 	var _target_inst = instance_find(_target_obj, 0);
@@ -35,7 +42,12 @@ if (myRank > 0) {
 			else if (dy <0) move_dir = directions.up;
 			
 			last_dir = move_dir;
-			sprite_index = sprite[move_dir];
+			if (_i_am_dead) {
+				sprite_index = sprite_standing;
+				image_index = last_dir;
+			} else {
+				sprite_index = sprite[move_dir];
+			}
 		}
 		// --- The Master Sync ---
 		if (state == states.walking) {

@@ -189,9 +189,52 @@ function drawPortraitController(_member, _portrait_spr, _x, _y) {
 		draw_sprite(_portrait_spr, 0, _x, _y);
 	}
 }
+
+function scrSyncDeathFlags() {
+	for (var i = 0; i < array_length(global.party); i++) {
+		var _pm = global.party[i];
+		if (_pm.current_hp <= 0 && !_pm.is_dead) {
+			_pm.current_hp = 0;
+			_pm.is_dead = true;
+		} else if (_pm.current_hp > 0 && _pm.is_dead) {
+			_pm.is_dead = false;
+		}
+	}
+}
 //=============================Inventory Submenu=============================
 function scrInventoryLogic() {
 	var num_party = array_length(global.partyOrder);
+	
+	//waiting for item use rollup to finish before autobacking
+	if (global.item_use_wait) {
+		//block input during the wait
+		io_clear();
+		
+		//check if the rollup for this key is still active
+		var _still_rolling = false;
+		for (var _r = 0; _r < array_length(global.stat_rollups); _r++) {
+			if (global.stat_rollups[_r].key == global.item_use_wait_key) {
+				_still_rolling = true;
+				break;
+			}
+		}
+		if (_still_rolling) {
+			return;//rollup still animating, keep waiting
+		}
+		//rollup done, perform autoback
+		global.item_use_wait = false;
+		global.item_use_wait_key = "";
+		
+		while (ds_stack_top(global.submenu_history) != SUBMENU_HISTORY.INVENTORY_SELECT_ITEM && ds_stack_size(global.submenu_history) > 1) {
+			ds_stack_pop(global.submenu_history);
+		}
+		global.inventory_state = INVENTORY_STATE.SELECT_ITEM;
+		var new_size = array_length(global.party[global.selected_party].inventory);
+		menu_cursor = clamp(global.selected_item, 0, max(0, new_size - 1));
+		global.selected_item = menu_cursor;
+		show_debug_message("Autoback to SELECT_ITEM after item use wait");
+		return;
+	}
 	
 	switch (global.inventory_state) {
 		
@@ -354,21 +397,19 @@ function scrInventoryLogic() {
 			if (global.keyC) {
 				var user = global.party[global.selected_party];
 				var target = global.party[menu_cursor];
+				var _hp_before = target.current_hp;
 				var used = user.use_item(global.selected_item, target);
+				scrSyncDeathFlags();
+				
+				var _key = "hp_" + string(menu_cursor);
+				scrStartRollup("hp_" + string(menu_cursor), _hp_before, target.current_hp);
+				
 				show_debug_message("Used item on " + target.name + " | success: " + string(used));
-			
-				io_clear()
-				global.keyC = false;
-			
-				//autoback to select item
-				while (ds_stack_top(global.submenu_history) != SUBMENU_HISTORY.INVENTORY_SELECT_ITEM && ds_stack_size(global.submenu_history) > 1) {
-					ds_stack_pop(global.submenu_history);
-				}
-				global.inventory_state = INVENTORY_STATE.SELECT_ITEM;
-				var new_size = array_length(global.party[global.selected_party].inventory);
-				menu_cursor = clamp(global.selected_item, 0, max(0, new_size - 1));
-				global.selected_item = menu_cursor;
-				show_debug_message("Auto-back to SELECT_ITEM after use");
+				
+				//begin waiting for the rollup to finish before returning
+				global.item_use_wait = true;
+				global.item_use_wait_key = _key;
+				global.item_use_wait_timer = 60;
 			}
 		break;
 		
@@ -841,6 +882,7 @@ function scrEquipLogic() {
 				
 				var inv_idx = equip_list[actual_idx].inv_idx;
 				var item = member.inventory[inv_idx];
+				var _s_before = member.get_effective_stats();
 				
 				//if already equipped, unequip item first
 				if (member.is_equipped(item.name)) {
@@ -854,6 +896,7 @@ function scrEquipLogic() {
 						member.unequip(slot);
 						show_debug_message("EQUIP: unequipped " + item.name + " from " + slot);
 					}
+					scrFireEquipRollup(_s_before, global.equip_char);
 					io_clear();
 					global.keyC = false;
 					break;
@@ -866,6 +909,7 @@ function scrEquipLogic() {
 					member.equip("r_Hand", item);
 					member.equip("l_Hand", item);
 					show_debug_message("EQUIP: equipped two-hander " + item.name);
+					scrFireEquipRollup(_s_before, global.equip_char);
 					 io_clear();
 					 global.keyC = false;
 					break;
@@ -882,6 +926,7 @@ function scrEquipLogic() {
 					}
 					member.equip("l_Hand", item);
 					show_debug_message("EQUIP: equipped offhand " + item.name + " to l_Hand");
+					scrFireEquipRollup(_s_before, global.equip_char);
 					io_clear();
 					global.keyC = false;
 					break;
@@ -895,9 +940,11 @@ function scrEquipLogic() {
 						member.unequip("l_Hand");
 						show_debug_message("EQUIP: cleared two-hander before equipping weapon");
 					}
+					global.equip_stats_before = member.get_effective_stats();
 					//only go to hand selection if neither hand already holds this item
 					global.equip_pending_item = inv_idx;
 					global.equip_hand_cursor = 0;
+
 					global.equip_state = EQUIP_STATE.SELECT_HAND;
 					ds_stack_push(global.submenu_history, SUBMENU_HISTORY.EQUIP_SELECT_HAND);
 					io_clear();
@@ -912,6 +959,7 @@ function scrEquipLogic() {
 					member.equip(auto_slot, item);
 					show_debug_message("EQUIP: equipped " + item.name + " to " + auto_slot);
 				}
+				scrFireEquipRollup(_s_before, global.equip_char);
 				io_clear();
 				global.keyC = false;
 			}
@@ -927,6 +975,7 @@ function scrEquipLogic() {
 				var slot = (global.equip_hand_cursor == 0) ? "r_Hand" : "l_Hand";
 				member.equip(slot, item);
 				show_debug_message("EQUIP: equipped " + item.name + " to " + slot);
+				scrFireEquipRollup(global.equip_stats_before, global.equip_char);
 				global.equip_state        = EQUIP_STATE.SELECT_SLOT;
 				ds_stack_pop(global.submenu_history);
 				global.equip_pending_item = -1;
@@ -1264,4 +1313,89 @@ function scrSkillCursorNext(_list, _cursor, _dir) {
 		tries++;
 	}
 	return next;
+}
+//=====================================Stat Rollups=====================================
+function scrStartRollup(_key, _from, _to) {
+	if (_from == _to) {
+		scrClearRollup(_key);
+		return;
+	}
+	//replace any existing rollup for this key
+	for (var i = 0; i < array_length(global.stat_rollups); i++) {
+		if (global.stat_rollups[i].key == _key) {
+			global.stat_rollups[i].from = global.stat_rollups[i].current;
+			global.stat_rollups[i].to = _to;
+			global.stat_rollups[i].elapsed = 0;
+			return;
+		}
+	}
+	array_push(global.stat_rollups, {
+		key				: _key,
+		from			: _from,
+		to				: _to,
+		current		: _from,
+		elapsed	: 0,
+		duration : 30
+	});
+}
+
+function scrClearRollup(_key) {
+	for (var i = array_length(global.stat_rollups) - 1; i >= 0; i--) {
+		if (global.stat_rollups[i].key == _key) array_delete(global.stat_rollups, i, 1);
+	}
+}
+
+//advance all rollups - call once per frame from oGameController Step
+function scrUpdateRollups() {
+	for (var i = array_length(global.stat_rollups) - 1; i >= 0; i--) {
+		var r = global.stat_rollups[i];
+		r.elapsed++;
+		var t = clamp(r.elapsed / r.duration, 0, 1);
+		r.current = round(lerp(r.from, r.to, t));
+		if (t >= 1) {
+			r.current = r.to;
+			array_delete(global.stat_rollups, i, 1);//falls back to real value
+		}
+	}
+}
+
+//returns the value and color for drawing a stat
+function scrGetStatDisplay(_key, _real_value) {
+	for (var i = 0; i < array_length(global.stat_rollups); i++) {
+		var r = global.stat_rollups[i];
+		if (r.key == _key) {
+			var col = (r.to > r.from) ? c_lime : c_orange;
+			return { value: r.current, color: col };
+		}
+	}
+	return { value: _real_value, color: c_white };
+}
+
+//draws a right-aligned stat value at (_x, _y) animating and coloring iof a rollup is active
+function draw_stat_value(_key, _real_value, _x, _y) {
+	var d = scrGetStatDisplay(_key, _real_value);
+	var prev_halign = draw_get_halign();
+	draw_set_halign(fa_right);
+	draw_text_color(_x, _y, string(d.value), d.color, d.color, d.color, d.color, 1);
+	draw_set_halign(prev_halign);
+}
+
+function draw_hp_value(_key, _current, _max, _x, _y, _dead) {
+	var d = scrGetStatDisplay(_key, _current);
+	var base_col = _dead ? c_red : c_white;
+	var cur_col = (d.value != _current) ? d.color : base_col;
+	var prev = draw_get_halign();
+	draw_set_halign(fa_right);
+	draw_text_color(_x, _y, string(d.value) + "/" + string(_max), cur_col, cur_col, cur_col, cur_col, 1);
+	draw_set_halign(prev);
+}
+
+function scrFireEquipRollup (_before, _char) {
+var _after = global.party[_char].get_effective_stats();
+	scrStartRollup("atk_" + string(_char), _before.atk, _after.atk);
+	scrStartRollup("def_" + string(_char), _before.def, _after.def);
+	scrStartRollup("spd_" + string(_char), _before.spd, _after.spd);
+	scrStartRollup("mental_" + string(_char), _before.mental, _after.mental);
+	scrStartRollup("matk_" + string(_char), _before.mAtk, _after.mAtk);
+	scrStartRollup("mdef_" + string(_char), _before.mDef, _after.mDef);
 }

@@ -36,7 +36,18 @@ if (global.state == GAME_STATE.BATTLE) {
 	var enemy_y = 120;
 	for (var ei = 0; ei < num_enemies; ei++) {
 		var e = global.battle_enemies[ei];
-		if (e.is_dead) continue;
+		//keep dead enemy visible while its damage popup is still showing
+		if (e.is_dead) {
+			var _popup_active = false;
+			for (var _dp = 0; _dp < array_length(global.battle_damage_display); _dp++) {
+				var _d = global.battle_damage_display[_dp];
+				if (variable_struct_exists(_d, "enemy_idx") && _d.enemy_idx == ei) {
+					_popup_active = true;
+					break;
+				}
+			}
+			if (!_popup_active) continue;
+		}
 		
 		//during an attack only show the targeted enemy
 		if (global.battle_attack_target != -1 || global.battle_attacker != -1 || global.battle_all_target_side != "") {

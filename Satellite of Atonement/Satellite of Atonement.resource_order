@@ -4,7 +4,7 @@
     {"name":"Fonts","order":1,"path":"folders/Fonts.yy",},
     {"name":"Notes","order":2,"path":"folders/Notes.yy",},
     {"name":"Objects","order":3,"path":"folders/Objects.yy",},
-    {"name":"Characters","order":5,"path":"folders/Objects/Characters.yy",},
+    {"name":"Playable Characters","order":5,"path":"folders/Objects/Playable Characters.yy",},
     {"name":"Paths","order":4,"path":"folders/Paths.yy",},
     {"name":"Rooms","order":5,"path":"folders/Rooms.yy",},
     {"name":"Scripts","order":6,"path":"folders/Scripts.yy",},

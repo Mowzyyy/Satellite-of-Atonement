@@ -32,6 +32,8 @@ if (global.transition_phase == 2) {
 }
 
 //===================================Menus===================================
+scrUpdateRollups();
+
 switch (global.state) {
 	case GAME_STATE.MAIN_MENU:
 		scrMenuMainLogic();

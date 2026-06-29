@@ -11,55 +11,14 @@ scrInitItemGlobals();
 scrInitSpellGlobals();
 scrInitSkillGlobals();
 
+//initialize party
 if (!variable_global_exists("party_initialized")) {
-	global.party_initialized = true;
-	global.partyStatus = {
-		coat: false,
-		osei: false,
-		anna: false,
-		data: false,
-	}
-
-	//party order index
-	global.partyOrder = [oLeon, oCoat, oOsei, oAnna];
-
-	global.party = [];
-	
-	//Party constuctor syntax: cstrPartyMember(name, level, bio, age, species, can_use_magic)
-	array_push(global.party, cstrLeon());
-	array_push(global.party, cstrCoat());
-	array_push(global.party, cstrOsei());
-	array_push(global.party, cstrAnna())
-	
-
-//testing items spawnin
-global.party[0].add_item(global.it_potion);
-global.party[0].add_item(global.it_stimpak);
-global.party[0].add_item(global.it_antidote);
-
-global.party[1].add_item(global.it_antitox);
-
-global.party[2].add_items(global.it_cyanide, global.it_cyanide, global.it_cyanide, global.it_potion, global.it_potion, 
-	global.it_stimpak, global.it_cyanide, global.it_antitox, global.it_antitox, global.it_cyanide, global.it_cyanide, 
-	global.it_cyanide, global.it_cyanide, global.it_potion, global.it_potion, global.it_stimpak, global.it_cyanide, 
-	global.it_antitox, global.it_antitox, global.it_cyanide);
-	
-global.party[3].add_items(global.it_sword, global.it_dagger, global.it_staff, global.it_spear, global.it_shield, 
-	global.it_hat, global.it_helm, global.it_vest, global.it_plate, global.it_boots, global.it_greaves, global.it_mgcring, 
-	global.it_spdchrm);
+	global.party_initialized = false;
+}
+if (!global.party_initialized) {
+	scrInitPartyFresh();
 }
 
-
-
-var oseir = cstrOsei();
-oseir.print_stats();
-
-// Confirm spell loaded
-show_debug_message("Osei spells: " + string(array_length(oseir.spells)));
-show_debug_message("Spell 0: " + oseir.spells[0].name 
-                 + " | cost: " + string(oseir.spells[0].mp_cost)
-                 + " | power: " + string(oseir.spells[0].mpower)
-                 + " | target: " + oseir.spells[0].target_type);
 
 //==================================SaveLoad==================================
 global.save_state = SAVE_STATE.SELECT_SLOT;
@@ -143,6 +102,10 @@ global.skill_cursor = 0;
 global.skill_selected = -1;
 global.skill_cannot_timer = 0;
 global.skill_target_cursor = 0;
+global.stat_rollups = [];//active animations: { key, from, to, current, elapsed, duration }
+global.item_use_wait = false;
+global.item_use_wait_timer = 0;
+global.item_use_wait_key = "";
 menu_cursor = 0;//Which menu option is highlighted
 blink_timer = 0;
 

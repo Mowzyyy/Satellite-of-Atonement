@@ -110,11 +110,11 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			draw_set_color(hp_col)
 			draw_text(c.x + lpad, c.y + lh * 5 - 6, "H");
 			draw_set_halign(fa_right);
-			draw_text(c.x + global.card_w - lpad, c.y + lh * 5 - 6, string(member.current_hp) + "/" + string(stats.max_hp));
+			draw_hp_value("hp_" + string(p), member.current_hp, stats.max_hp, c.x + global.card_w - lpad, c.y + lh * 5 - 6, member.is_dead);
 			draw_set_halign(fa_left);
 			draw_text(c.x + lpad, c.y + lh * 6 - 6, "M");
 			draw_set_halign(fa_right);
-			draw_text(c.x + global.card_w - lpad, c.y + lh * 6 - 6, string(member.current_mana) + "/" + string(stats.max_mana));
+			draw_hp_value("mp_" + string(p), member.current_mana, stats.max_mana, c.x + global.card_w - lpad, c.y + lh * 6 - 6, member.is_dead);
 			draw_set_color(c_white);
 			draw_set_halign(fa_left);
 			
@@ -373,29 +373,29 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 			//bot left card - spd atk def
 			draw_text(bot_left.x + lpad, bot_left.y + lh * 1, "Speed");
 			draw_set_halign(fa_right);
-			draw_text(bot_left.x + rpad, bot_left.y + lh * 2, string(stats.spd));
+			draw_stat_value("spd_" + string(global.selected_stat_char), stats.spd, bot_left.x + rpad, bot_left.y + lh * 2);
 			draw_set_halign(fa_left);
 			draw_text(bot_left.x + lpad, bot_left.y + lh * 3, "Attack");
 			draw_set_halign(fa_right);
-			draw_text(bot_left.x + rpad, bot_left.y + lh * 4, string(stats.atk));
+			draw_stat_value("atk_" + string(global.selected_stat_char), stats.atk, bot_left.x + rpad, bot_left.y + lh * 4);
 			draw_set_halign(fa_left);
 			draw_text(bot_left.x + lpad, bot_left.y + lh * 5, "Defense");
 			draw_set_halign(fa_right);
-			draw_text(bot_left.x + rpad, bot_left.y + lh * 6, string(stats.def));
+			draw_stat_value("def_" + string(global.selected_stat_char), stats.def, bot_left.x + rpad, bot_left.y + lh * 6);
 			draw_set_halign(fa_left);
 			
 			//top right card - mental matk mdef
 			draw_text(top_right.x + lpad, top_right.y + lh * 1, "Mental");
 			draw_set_halign(fa_right);
-			draw_text(top_right.x + rpad, top_right.y + lh * 2, string(stats.mental));
+			draw_stat_value("mental_" + string(global.selected_stat_char), stats.mental, top_right.x + rpad, top_right.y + lh * 2);
 			draw_set_halign(fa_left);
 			draw_text(top_right.x + lpad, top_right.y + lh * 3, "M. Atk");
 			draw_set_halign(fa_right);
-			draw_text(top_right.x + rpad, top_right.y + lh * 4, string(stats.mAtk));
+			draw_stat_value("matk_" + string(global.selected_stat_char), stats.mAtk, top_right.x + rpad, top_right.y + lh * 4);
 			draw_set_halign(fa_left);
 			draw_text(top_right.x + lpad, top_right.y + lh * 5, "M. Def");
 			draw_set_halign(fa_right);
-			draw_text(top_right.x + rpad, top_right.y + lh * 6, string(stats.mDef));
+			draw_stat_value("mdef_" + string(global.selected_stat_char), stats.mDef, top_right.x + rpad, top_right.y + lh * 6);
 			draw_set_halign(fa_left);
 			
 			//bot right card - bio age species
@@ -730,11 +730,12 @@ if (global.menu_page == MENU_PAGE.EQUIP) {
 		//bot-right - live stats
 		var stat_labels = ["Atk", "Def", "Spd", "Mntl", "mAtk", "mDef"];
 		var stat_values = [stats.atk, stats.def, stats.spd, stats.mental, stats.mAtk, stats.mDef];
+		var stat_keys   = ["atk", "def", "spd", "mental", "matk", "mdef"];
 		for (var i_st = 0; i_st < 6; i_st++) {
 			draw_set_halign(fa_left);
-			draw_text(bot_right.x + lpad, bot_right.y + lh * (1 + i_st), stat_labels[i_st]);
-			draw_set_halign(fa_right);
-			draw_text(bot_right.x + rpad, bot_right.y + lh * (1 + i_st), string(stat_values[i_st]));
+			draw_text(bot_right.x + lpad, bot_right.y + lh * (2 + i_st) - 4, stat_labels[i_st]);
+			var _key = stat_keys[i_st] + "_" + string(global.equip_char);
+			draw_stat_value(_key, stat_values[i_st], bot_right.x + rpad, bot_right.y + lh * (2 + i_st) - 4);
 		}
 		draw_set_halign(fa_left);	
 		//botmid - character portrait

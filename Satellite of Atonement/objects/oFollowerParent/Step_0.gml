@@ -9,12 +9,7 @@ for (var dei = 0; dei < array_length(global.party); dei++) {
 		break;
 	}
 }
-if (_party_idx >= 0 && global.party[_party_idx].is_dead) {
-	sprite_index = sprite_standing;
-	image_index = last_dir;
-	state = states.idle;
-	exit;
-}
+var _i_am_dead = (_party_idx >= 0 && global.party[_party_idx].is_dead);
 
 for (var ide = 0; ide < array_length(global.party); ide++) {
 	var _pm = global.party[ide];
@@ -113,7 +108,11 @@ if (state == states.walking){
 	x = lerp(x_from, x_to, _t) * TILE_WIDTH;
 	y = lerp(y_from, y_to, _t) * TILE_HEIGHT;
 	
-	if (is_array(frames) && array_length(frames) > 0) {
+	if (_i_am_dead) {
+		//slide without animating
+		sprite_index = sprite_standing;
+		image_index = last_dir;
+	} else if (is_array(frames) && array_length(frames) > 0) {
 		image_index = frames[floor((array_length(frames) - 1) * _t)];
 	}
 }

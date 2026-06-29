@@ -463,13 +463,14 @@ function scrResolvePartyAction(_turn) {
 				x: _start_x + action.target * 64,//calculate from enemy position
 				y: 120 -16,
 				value: dmg,
-				timer: 90
+				timer: 90,
+				enemy_idx: action.target
 			});
 			
 			//check death
 			if (enemy.current_hp <= 0) {
 				enemy.is_dead = true;
-				//death message handled in draw
+				scrRetargetDeadEnemy(action.target);
 			}
 		break;
 			
@@ -530,6 +531,17 @@ function applyBattleAction(_user, _action, _target) {
 		
 			if (spell.effect_type == "damage" ) {
 				var dmg = scrCalcMagicDamage(_user.get_effective_stats().mAtk, _target.mDef, spell.mpower, spell.element, _target );
+				
+				if (_target.current_hp <= 0 && variable_struct_exists(_target, "is_dead")) {
+					_target.is_dead = true;
+					//find this enemy's index to retarget
+					for (var _ei = 0; ei < array_length(global.battle_enemies); _ei++) {
+						if (global.battle_enemies[_ei] == _target) {
+							scrRetargetDeadEnemy(_ei);
+							break;
+						}
+					}
+				}
 				_target.current_hp -= dmg;
 				if (_target.current_hp < 0) _target.current_hp = 0;
 				var _num_e = array_length(global.battle_enemies);
@@ -538,7 +550,8 @@ function applyBattleAction(_user, _action, _target) {
 					x: _start_x + _action.target * 64,  // 64 = enemy_spacing
 					y: 104,
 					value: dmg,
-					timer: 60
+					timer: 60,
+					enemy_idx: _action.target
 				});
 			} else if (spell.effect_type == "heal_hp") {
 				if (!_target.has_status("poison")) {
@@ -554,6 +567,17 @@ function applyBattleAction(_user, _action, _target) {
 			if (skill.uses_left <= 0) return;
 			skill.uses_left--;
 			
+			if (_target.current_hp <= 0 && variable_struct_exists(_target, "is_dead")) {
+					_target.is_dead = true;
+					//find this enemy's index to retarget
+					for (var _ei = 0; ei < array_length(global.battle_enemies); _ei++) {
+						if (global.battle_enemies[_ei] == _target) {
+							scrRetargetDeadEnemy(_ei);
+							break;
+						}
+					}
+				}
+			
 			if (skill.effect_type == "damage") {
 				var dmg = scrCalcPhysicalDamage(_user.get_effective_stats().atk, _target.def);
 				_target.current_hp -= dmg;
@@ -563,7 +587,8 @@ function applyBattleAction(_user, _action, _target) {
 				array_push(global.battle_damage_display, {
 					x: _start_x + _action.target * 64,
 					y: 104,
-					value: dmg, timer: 60
+					value: dmg, timer: 60,
+					enemy_idx: _action.target
 				});
 			} else if (skill.effect_type == "restore_mp") {
 				if (!_target.has_status("poison")) {
@@ -640,6 +665,11 @@ function scrResolveEnemyAction(_turn) {
 		dmg = scrCalcMagicDamage(enemy.mAtk, target.get_effective_stats().mDef, move.enPower, "none", target);
 	} else {
 		dmg = scrCalcPhysicalDamage(enemy.atk, global.party[target_idx].get_effective_stats().def);
+	}
+	
+	if (global.party[target_idx].current_hp <= 0) {
+		global.party[target_idx].is_dead = true;
+		scrRetargetDeadAlly(target_idx);
 	}
 	
 	if (target.battle_defending) dmg = floor(dmg * 0.5);
@@ -836,4 +866,44 @@ function scrBattleBuildItemList(_char_idx) {
 		array_push(result, { kind:"item", label:item.name, index:i, data:item });
 	}
 	return result;
+}
+//====================================RETARGETING====================================
+//called after an enemy dies - redirect any queued ally actions aimed at it
+function scrRetargetDeadEnemy(_dead_idx) {
+	//build a list of living enemies
+	var alive_enemies = [];
+	for (var i = 0; i < array_length(global.battle_enemies); i++) {
+		if (!global.battle_enemies[i].is_dead) array_push(alive_enemies, i);
+	}
+	if (array_length(alive_enemies) == 0) return;//nothing to retarget to
+	
+	for (var i = 0; i < array_length(global.battle_actions); i ++) {
+		var act = global.battle_actions[i];
+		if (act == undefined) continue;
+		//only redirect single target actions aimed at a dead enemy
+		if (act.all_targets) continue;
+		if (act.target_side == "enemy" && act.target == _dead_idx) {
+			act.target = alive_enemies[irandom(array_length(alive_enemies) - 1)];
+		}
+	}
+}
+
+//called after an ally falls, redirect any queued enemy actions
+function scrRetargetDeadAlly(_dead_idx) {
+	//built the list of living party members
+	var alive_party = [];
+	for (var i = 0; i < array_length(global.party); i++) {
+		if (global.party[i].current_hp > 0) array_push(alive_party, i);
+	}
+	if (array_length(alive_party) == 0) return;
+	
+	//enemy actions store target on the enemy struct
+	//retarget any enemy whose chosen target was a fallen ally
+	for (var i = 0; i < array_length(global.battle_enemies); i++) { 
+		var e = global.battle_enemies[i];
+		if (e.is_dead) continue;
+		if (variable_struct_exists(e, "action target") && e.action_target == _dead_idx) {
+			e.action_target = alive_party[irandom(array_length(alive_party) - 1)];
+		}
+	}
 }

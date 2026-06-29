@@ -11,8 +11,8 @@
   "name":"oFollowerParent",
   "overriddenProperties":[],
   "parent":{
-    "name":"Characters",
-    "path":"folders/Objects/Characters.yy",
+    "name":"Playable Characters",
+    "path":"folders/Objects/Playable Characters.yy",
   },
   "parentObjectId":null,
   "persistent":false,

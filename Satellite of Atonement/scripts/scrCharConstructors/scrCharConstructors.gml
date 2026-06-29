@@ -573,6 +573,48 @@ function award_xp(_xp_value) {
 	}
 }
 
+//===================================PARTY GUARD===================================
+function scrInitPartyFresh() {
+global.partyStatus = {
+		coat: false,
+		osei: false,
+		anna: false,
+		data: false,
+	}
+
+	//party order index
+	global.partyOrder = [oLeon, oCoat, oOsei, oAnna];
+
+	global.party = [];
+	
+	//Party constuctor syntax: cstrPartyMember(name, level, bio, age, species, can_use_magic)
+	array_push(global.party, cstrLeon());
+	array_push(global.party, cstrCoat());
+	array_push(global.party, cstrOsei());
+	array_push(global.party, cstrAnna())
+	
+
+//testing items spawnin
+global.party[0].add_item(global.it_potion);
+global.party[0].add_item(global.it_stimpak);
+global.party[0].add_item(global.it_antidote);
+
+global.party[1].add_item(global.it_antitox);
+
+global.party[2].add_items(global.it_cyanide, global.it_cyanide, global.it_cyanide, global.it_potion, global.it_potion, 
+	global.it_stimpak, global.it_cyanide, global.it_antitox, global.it_antitox, global.it_cyanide, global.it_cyanide, 
+	global.it_cyanide, global.it_cyanide, global.it_potion, global.it_potion, global.it_stimpak, global.it_cyanide, 
+	global.it_antitox, global.it_antitox, global.it_cyanide);
+	
+global.party[3].add_items(global.it_sword, global.it_dagger, global.it_staff, global.it_spear, global.it_shield, 
+	global.it_hat, global.it_helm, global.it_vest, global.it_plate, global.it_boots, global.it_greaves, global.it_mgcring, 
+	global.it_spdchrm);
+	
+	
+	//initialize party flag
+	global.party_initialized = true;
+}
+
 //========================PREMADE CHARACTER CONSTRUCTIONS========================
 function cstrLeon() {						//Initialize Leon creation
 	var c = new cstrPartyMember("Leon", "Spearman", 20, "Human", true, 1, 

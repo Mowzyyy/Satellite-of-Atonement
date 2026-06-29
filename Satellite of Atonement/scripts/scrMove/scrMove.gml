@@ -8,7 +8,7 @@ function scrMove(_dir){
 		var dest_y = y_pos + dy;
 
 		//check for barrier on destination tile
-		if (scrIsBarrierBlocked(dest_x, dest_y, _dir)) {
+		if (scrIsBarrierBlocked(dest_x, dest_y, _dir) || scrIsTileOccupied(dest_x, dest_y)) {
 			show_debug_message("BLOCKED at " + string(dest_x) + "," + string(dest_y) + " from dir " + string(_dir));
 			//try to slide
 			var slide_dir = scrGetSlideDir(dest_x, dest_y, x_pos, y_pos, _dir);

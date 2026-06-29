@@ -128,3 +128,11 @@ function scrGetSlideDir(_tx, _ty, _from_x, _from_y, _move_dir) {
 	if (array_length(candidates) == 0) return -1;
 	return candidates[0];
 }
+
+//bump into NPCs rather than passing through them
+function scrIsTileOccupied(_tx, _ty) {
+	var _px = _tx * TILE_WIDTH + TILE_WIDTH / 2;
+	var _py = _ty * TILE_HEIGHT + TILE_HEIGHT / 2;
+	if (instance_position(_px, _py, oNpcParent) != noone) return true;
+	return false;
+}

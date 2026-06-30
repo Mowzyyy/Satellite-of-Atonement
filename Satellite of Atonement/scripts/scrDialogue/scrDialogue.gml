@@ -17,10 +17,13 @@ function scrWrapDialogue(_text, _cols, _rows) {
 	var cur_lines = [];
 	var cur_line = "";
 	
+	var _safe_cols = _cols - 2;
+	
 	for (var i = 0; i < array_length(words); i++) {
 		var w = words[i];
 		var test = (cur_line == "") ? w : cur_line + " " + w;
-		if (string_length(test) <= _cols) {
+		
+		if (string_length(test) <= _safe_cols) {
 			cur_line = test;
 		} else {
 			array_push(cur_lines, cur_line);
@@ -76,4 +79,13 @@ function scrDialogueLogic() {
 		io_clear();
 		global.keyC = false;
 	}
+}
+
+function scrGetPortraitForObject(_obj) {
+	if (_obj == oLeon) return sChatPortLeon;
+	if (_obj == oCoat) return sChatPortCoat;
+	if (_obj == oOsei) return sChatPortOsei;
+	if (_obj == oAnna) return sChatPortAnna;
+	if (_obj == oData) return sChatPortData;
+	return sChatPortDefault;
 }

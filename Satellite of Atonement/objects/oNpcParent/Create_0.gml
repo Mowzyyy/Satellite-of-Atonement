@@ -42,8 +42,16 @@ walk_progress = 0;
 
 walk_timer = 0;
 
+//Dialogue
+has_dialogue = false;
+
+dialogue_text = "";
+dialogue_portrait = -1;
+
 interacting = false;
 interact_cooldown = 0;
 
+snap_back = false;//toggle: face original direction after talking
+original_dir = last_dir;//the facing which this npc starts with
 
 depth = -y;

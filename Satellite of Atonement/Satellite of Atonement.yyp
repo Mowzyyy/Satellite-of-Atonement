@@ -67,6 +67,7 @@
     {"id":{"name":"oCoat","path":"objects/oCoat/oCoat.yy",},},
     {"id":{"name":"oData","path":"objects/oData/oData.yy",},},
     {"id":{"name":"oDunesGuard1","path":"objects/oDunesGuard1/oDunesGuard1.yy",},},
+    {"id":{"name":"oDunesGuard2","path":"objects/oDunesGuard2/oDunesGuard2.yy",},},
     {"id":{"name":"oFollowerParent","path":"objects/oFollowerParent/oFollowerParent.yy",},},
     {"id":{"name":"oGameController","path":"objects/oGameController/oGameController.yy",},},
     {"id":{"name":"oLeon","path":"objects/oLeon/oLeon.yy",},},

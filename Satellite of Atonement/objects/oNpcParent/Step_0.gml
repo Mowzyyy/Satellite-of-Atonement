@@ -2,7 +2,15 @@ if (global.state != GAME_STATE.OVERWORLD) exit;
 
 if (interact_cooldown > 0) {
 	interact_cooldown--;
-	if (interact_cooldown == 0) interacting = false;
+	if (interact_cooldown == 0) {
+		interacting = false;
+		//restore original facing if enabled
+		if (snap_back) {
+			last_dir = original_dir;
+			sprite_index = sprite_standing;
+			image_index = last_dir;
+		}
+	}
 	if (interacting) exit;
 }
 
@@ -42,7 +50,7 @@ if (move_type == 1 && walk_timer <= 0) {
 		var dest_x = x_pos + dx;
 		var dest_y = y_pos + dy;
 		//check barriers, otehr Npcs, and party members
-		var blocked = scrIsBarrierBlocked(dest_x, dest_y, try_dir) || scrIsTileOccupied(dest_x, dest_y);
+		var blocked = scrIsBarrierBlocked(dest_x, dest_y, try_dir) || (scrGetBlockingNpc(dest_x, dest_y) != noone);
 		if (!blocked) {
 			for (var pin = 0; pin < array_length(global.partyOrder); pin++) {
 				var pinst = instance_find(global.partyOrder[pin], 0);
@@ -81,13 +89,22 @@ if (global.keyC) {
 			else if (leader.x_pos < x_pos) last_dir = directions.left;
 			else if (leader.y_pos < y_pos) last_dir = directions.up;
 			else if (leader.y_pos > y_pos) last_dir = directions.down;
+			
 			sprite_index = sprite_standing;
 			image_index = last_dir;
 			state = states.idle;
 			walk_progress = 0;
 			interacting = true;
-			scrStartDialogue("Welcome to the Dunes, traveler. The sands shift quickly here, so mind your step.", sDunesGuard1Portrait);
-			interact_cooldown = 30;
+			if (snap_back) {
+				interact_cooldown = 1;
+			} else {
+				interact_cooldown = 30;
+			}
+			
+			if (has_dialogue) {
+				scrStartDialogue(dialogue_text, dialogue_portrait);
+			}
+			
 			io_clear();
 			global.keyC = false;
 		}

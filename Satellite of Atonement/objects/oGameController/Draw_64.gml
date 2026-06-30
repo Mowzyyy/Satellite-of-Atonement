@@ -1183,8 +1183,8 @@ if (global.menu_page == MENU_PAGE.SKILLS) {
 if (global.dlg_active && global.dlg_page < array_length(global.dlg_pages)) {
 	draw_set_font(ftDefault);
 	
-	var box_w = 7 * 30 + 16;
-	var box_h = 9 * 2 + 14;
+	var box_w = 8 * 30 + 32;
+	var box_h = 9 * 2 + 28;
 	var box_x = floor((320 - box_w) / 2);
 	var box_y = 240 - box_h - 16;
 	
@@ -1198,9 +1198,9 @@ if (global.dlg_active && global.dlg_page < array_length(global.dlg_pages)) {
 	
 	var page_txt = global.dlg_pages[global.dlg_page];
 	var lines = string_split(page_txt, "\n");
-	var tx = box_x + 8;
-	var ty = box_y + 7;
-	var lh = 9;
+	var tx = box_x + 8;//shifts text horizontally
+	var ty = box_y + 11;//shifts text vertically
+	var lh = 12;
 	var words_drawn = 0;
 	
 	draw_set_halign(fa_left);
@@ -1228,7 +1228,7 @@ if (global.dlg_active && global.dlg_page < array_length(global.dlg_pages)) {
 	if (global.dlg_words_shown >= pg_total_words) {
 		var _blink_on = (blink_timer mod 40) < 20;
 		var cur_spr = _blink_on ? sTalk : sTalkBlink;
-		draw_sprite(cur_spr, 0, box_x + box_w - 8 - 4, box_y + box_h - 8 - 4);
+		draw_sprite(cur_spr, 0, box_x + box_w - 8 - 8, box_y + box_h - 8 - 4);
 	}
 	
 	draw_set_alpha(1);

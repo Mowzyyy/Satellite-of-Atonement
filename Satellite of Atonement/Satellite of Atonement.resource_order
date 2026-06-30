@@ -40,6 +40,7 @@
     {"name":"oCoat","order":1,"path":"objects/oCoat/oCoat.yy",},
     {"name":"oData","order":5,"path":"objects/oData/oData.yy",},
     {"name":"oDunesGuard1","order":1,"path":"objects/oDunesGuard1/oDunesGuard1.yy",},
+    {"name":"oDunesGuard2","order":3,"path":"objects/oDunesGuard2/oDunesGuard2.yy",},
     {"name":"oGameController","order":2,"path":"objects/oGameController/oGameController.yy",},
     {"name":"oLeon","order":3,"path":"objects/oLeon/oLeon.yy",},
     {"name":"oMainMenu","order":6,"path":"objects/oMainMenu/oMainMenu.yy",},

@@ -1,11 +1,11 @@
 {
   "$GMObject":"",
-  "%Name":"oDunesGuard1",
+  "%Name":"oDunesGuard2",
   "eventList":[
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"oDunesGuard1",
+  "name":"oDunesGuard2",
   "overriddenProperties":[],
   "parent":{
     "name":"Npcs",
@@ -33,8 +33,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"sDunesGuard1Down",
-    "path":"sprites/sDunesGuard1Down/sDunesGuard1Down.yy",
+    "name":"sDunesGuard2Down",
+    "path":"sprites/sDunesGuard2Down/sDunesGuard2Down.yy",
   },
   "spriteMaskId":null,
   "visible":true,

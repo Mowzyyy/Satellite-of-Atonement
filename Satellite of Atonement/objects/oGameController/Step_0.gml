@@ -64,6 +64,17 @@ switch (global.state) {
 			case GAME_STATE.BATTLE:
 				scrBattleLogic();
 				break;
+				
+			case GAME_STATE.DIALOGUE:
+				scrDialogueLogic();
+				//blink the talk cursor once the page is fully revealed
+				var _pg = global.dlg_pages[global.dlg_page];
+				var _pg_words = array_length(string_split(string_replace_all(_pg, "\n", " "), " "));
+				if (global.dlg_words_shown >= _pg_words) {
+					blink_timer++;
+				}
+				break;
+				
 }
 
 global.playtime += delta_time / 1000000;

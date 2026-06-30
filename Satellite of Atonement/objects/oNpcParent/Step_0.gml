@@ -86,6 +86,7 @@ if (global.keyC) {
 			state = states.idle;
 			walk_progress = 0;
 			interacting = true;
+			scrStartDialogue("Welcome to the Dunes, traveler. The sands shift quickly here, so mind your step.", sDunesGuard1Portrait);
 			interact_cooldown = 30;
 			io_clear();
 			global.keyC = false;

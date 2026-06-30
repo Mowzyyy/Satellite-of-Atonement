@@ -1179,3 +1179,59 @@ if (global.menu_page == MENU_PAGE.SKILLS) {
 		draw_sprite((_blink_on ? sCursor : sBlink), 0, bot_mid.x + 12, cursor_y);
 	}
 }
+//============================ DIALOGUE ============================
+if (global.dlg_active && global.dlg_page < array_length(global.dlg_pages)) {
+	draw_set_font(ftDefault);
+	
+	var box_w = 7 * 30 + 16;
+	var box_h = 9 * 2 + 14;
+	var box_x = floor((320 - box_w) / 2);
+	var box_y = 240 - box_h - 16;
+	
+	//portrait 4px above aligned to the left edge of box
+	if (global.dlg_portrait != -1 && sprite_exists(global.dlg_portrait)) {
+		var port_h = sprite_get_height(global.dlg_portrait);
+		draw_sprite(global.dlg_portrait, 0, box_x, box_y - 4 - port_h);
+	}
+	
+	draw_sprite_stretched(sBasicGUI, 0, box_x, box_y, box_w, box_h);
+	
+	var page_txt = global.dlg_pages[global.dlg_page];
+	var lines = string_split(page_txt, "\n");
+	var tx = box_x + 8;
+	var ty = box_y + 7;
+	var lh = 9;
+	var words_drawn = 0;
+	
+	draw_set_halign(fa_left);
+	draw_set_valign(fa_top);
+	
+	var _done = false;
+	for (var li = 0; li < array_length(lines); li++) {
+		var line_words = string_split(lines[li], " ");
+		var cx = tx;
+		for (var wi = 0; wi < array_length(line_words); wi++) {
+			if (words_drawn >= global.dlg_words_shown + 1) { _done = true; break; }
+			var word = line_words[wi];
+			var alpha = (words_drawn == global.dlg_words_shown) ? global.dlg_word_fade : 1;
+			draw_set_alpha(alpha);
+			draw_text(cx, ty + li * lh, word);
+			draw_set_alpha(1);
+			cx += string_width(word + " ");
+			words_drawn++;
+		}
+		if (_done) break;
+	}
+	
+	//blinking talk cursor, bottom-right, only when page fully revealed
+	var pg_total_words = array_length(string_split(string_replace_all(page_txt, "\n", " "), " "));
+	if (global.dlg_words_shown >= pg_total_words) {
+		var _blink_on = (blink_timer mod 40) < 20;
+		var cur_spr = _blink_on ? sTalk : sTalkBlink;
+		draw_sprite(cur_spr, 0, box_x + box_w - 8 - 4, box_y + box_h - 8 - 4);
+	}
+	
+	draw_set_alpha(1);
+	draw_set_halign(fa_left);
+	draw_set_valign(fa_top);
+}

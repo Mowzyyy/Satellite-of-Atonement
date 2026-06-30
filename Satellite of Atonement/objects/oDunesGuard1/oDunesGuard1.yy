@@ -32,7 +32,10 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":null,
+  "spriteId":{
+    "name":"sDunesGuard1Standing",
+    "path":"sprites/sDunesGuard1Standing/sDunesGuard1Standing.yy",
+  },
   "spriteMaskId":null,
   "visible":true,
 }

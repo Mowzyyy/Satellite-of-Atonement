@@ -265,7 +265,7 @@ function cstrPartyMember(_name,
 				if (!_target.is_dead) break;
 				_target.is_dead = false;
 				_target.current_hp = item.effect_amount > 0 ? item.effect_amount : _target.base_max_hp;
-				_target.cheack_death();
+				_target.check_death();
 				used = true;
 			break;
 			

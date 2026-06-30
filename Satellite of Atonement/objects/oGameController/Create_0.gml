@@ -106,6 +106,15 @@ global.stat_rollups = [];//active animations: { key, from, to, current, elapsed,
 global.item_use_wait = false;
 global.item_use_wait_timer = 0;
 global.item_use_wait_key = "";
+global.dlg_active = false;
+global.dlg_pages = [];//pre-wraps page strings joined with \n
+global.dlg_page =0;
+global.dlg_words_shown =0;//words fully revealed on the current page
+global.dlg_word_timer = 0;
+global.dlg_word_speed = 4;//frames between word reveals
+global.dlg_word_fade = 0;//0..1 fade of the newest word
+global.dlg_portrait = -1;//chat portrait sprite, -1 = none
+global.dlg_return_state = GAME_STATE.OVERWORLD;
 menu_cursor = 0;//Which menu option is highlighted
 blink_timer = 0;
 

@@ -5,11 +5,12 @@ if (instance_number(oGameController) > 1) {
 persistent = true;
 
 //==================================Party Data==================================
-//global xp init
+//Init Functions
 scrInitExpTables();
 scrInitItemGlobals();
 scrInitSpellGlobals();
 scrInitSkillGlobals();
+scrInitMacros();
 
 //initialize party
 if (!variable_global_exists("party_initialized")) {
@@ -86,37 +87,50 @@ if (!variable_global_exists("state_initialized")) {
 	global.state_initialized = true;
 }
 
-global.skill_death_msg_timer = 0;
+global.skill_death_msg_timer			= 0;
 
-global.menu_page = MENU_PAGE.MAIN;
-global.selected_char = 0;//0-3 for the 4 portraits
-global.stats_state = STATS_STATE.SELECT_WHO;
-global.selected_stat_char = 0;
-global.order_state = ORDER_STATE.SELECT;
-global.order_new = [];//builds the new order for partyOrder
-global.order_new_party = [];//builds the new order for party structs
-global.order_confirm_cursor = 0;
-global.skill_state = SKILL_STATE.SELECT_WHO;
-global.skill_char = 0;
-global.skill_cursor = 0;
-global.skill_selected = -1;
-global.skill_cannot_timer = 0;
-global.skill_target_cursor = 0;
-global.stat_rollups = [];//active animations: { key, from, to, current, elapsed, duration }
-global.item_use_wait = false;
-global.item_use_wait_timer = 0;
-global.item_use_wait_key = "";
-global.dlg_active = false;
-global.dlg_pages = [];//pre-wraps page strings joined with \n
-global.dlg_page =0;
-global.dlg_words_shown =0;//words fully revealed on the current page
-global.dlg_word_timer = 0;
-global.dlg_word_speed = 4;//frames between word reveals
-global.dlg_word_fade = 0;//0..1 fade of the newest word
-global.dlg_portrait = -1;//chat portrait sprite, -1 = none
-global.dlg_return_state = GAME_STATE.OVERWORLD;
-menu_cursor = 0;//Which menu option is highlighted
-blink_timer = 0;
+global.menu_page								= MENU_PAGE.MAIN;
+global.selected_char							= 0;															//0-3 for the 4 portraits
+global.stats_state									= STATS_STATE.SELECT_WHO;
+global.selected_stat_char					= 0;															//
+global.order_state								= ORDER_STATE.SELECT;
+global.order_new									= [];															//builds the new order for partyOrder
+global.order_new_party						= [];															//builds the new order for party structs
+global.order_confirm_cursor			= 0;
+
+global.macro_state								= MACRO_STATE.SELECT_SLOT;
+global.macro_slot									= -1;														//slot being edited
+global.macro_new								= [];															//entries being built
+global.macro_pending_member		= -1;														//party index currently being assigned
+global.macro_what_list						= [];															//spell/skill list for SELECT_WHAT
+global.macro_confirm_cursor			= 0;
+global.battle_macro_open				= false;													//battle macro list visible
+global.battle_macro_cursor				= 0;
+
+global.skill_state									= SKILL_STATE.SELECT_WHO;		//
+global.skill_char										= 0;
+global.skill_cursor									= 0;
+global.skill_selected								= -1;														//
+global.skill_cannot_timer					= 0;
+global.skill_target_cursor					= 0;
+global.stat_rollups								= [];															//active animations: { key, from, to, current, elapsed, duration }
+
+global.item_use_wait							= false;
+global.item_use_wait_timer				= 0;
+global.item_use_wait_key					= "";
+
+global.dlg_active									= false;
+global.dlg_pages									= [];															//pre-wraps page strings joined with \n
+global.dlg_page										=0;
+global.dlg_words_shown					=0;															//words fully revealed on the current page
+global.dlg_word_timer						= 0;
+global.dlg_word_speed						= 4;															//frames between word reveals
+global.dlg_word_fade							= 0;															//0..1 fade of the newest word
+global.dlg_portrait								= -1;														//chat portrait sprite, -1 = none
+global.dlg_return_state						= GAME_STATE.OVERWORLD;
+
+menu_cursor											= 0;															//Which menu option is highlighted
+blink_timer												= 0;
 
 //Restart game guard flag
 global.is_restarting = false;
@@ -154,6 +168,8 @@ global.battle_attacker						= -1;
 global.battle_attacker_side			= "";
 global.battle_intro_timer				= 0;
 global.battle_all_target_side			= "";
+global.battle_msgs							= [];																		//queue of message structs for battle info box
+global.battle_msg_index				= 0;																		//which message is currently displayed
 
 //============================Global Menu Drawing Settings============================
 //This makes every context menu in the game use the default font automatically

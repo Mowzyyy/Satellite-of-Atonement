@@ -52,6 +52,7 @@
     {"name":"rmTitle","order":2,"path":"rooms/rmTitle/rmTitle.yy",},
     {"name":"scrBarriers","order":13,"path":"scripts/scrBarriers/scrBarriers.yy",},
     {"name":"scrBattleLogic","order":17,"path":"scripts/scrBattleLogic/scrBattleLogic.yy",},
+    {"name":"scrBattleMacros","order":21,"path":"scripts/scrBattleMacros/scrBattleMacros.yy",},
     {"name":"scrCharConstructors","order":7,"path":"scripts/scrCharConstructors/scrCharConstructors.yy",},
     {"name":"scrDialogue","order":20,"path":"scripts/scrDialogue/scrDialogue.yy",},
     {"name":"scrEncounterZones","order":16,"path":"scripts/scrEncounterZones/scrEncounterZones.yy",},

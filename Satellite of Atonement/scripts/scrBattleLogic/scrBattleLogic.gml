@@ -18,6 +18,9 @@ function scrStartBattle(_enemy_list) {
 	global.battle_flee_result					= -1;// -1 = not tried, 0 = failed, 1 = success
 	global.battle_intro_timer				= 45;
 	
+	global.battle_macro_open			= false;
+	global.battle_macro_cursor			= 0;
+	
 	//initialize party actions array
 	global.battle_actions = [];
 	for (var i = 0; i < array_length(global.party); i++) {
@@ -144,6 +147,11 @@ function scrBattleCommandPhase() {
 		return;
 	}
 	
+	if (global.battle_macro_open) {
+		scrBattleMacroSelectPhase();
+		return;
+	}
+	
 	if (!global.battle_sub_open && global.battle_cmd_index == 0 && global.battle_phase == BATTLE_PHASE.SELECT_COMMAND) {
 		scrEnemyPickAllActions();
 		
@@ -162,24 +170,8 @@ function scrBattleCommandPhase() {
 					break;
 				
 				case 1://MACRO
-					var alive_enemies = [];
-					for (var mi = 0; mi < array_length(global.battle_enemies); mi++) {
-						if (!global.battle_enemies[mi].is_dead) array_push(alive_enemies, mi);
-					}
-					if (array_length(alive_enemies) > 0) {
-						for (var mi = 0; mi < array_length(global.battle_actions); mi++) {
-							if (global.party[mi].current_hp <= 0) {
-								global.battle_actions[mi] = { type: "dead", target: -1 };
-								continue;
-							}
-							var tgt = alive_enemies[irandom(array_length(alive_enemies) - 1)];
-							global.battle_actions[mi] = { type: "attack", target: tgt, target_side: "enemy", all_targets: false };
-						}
-					}
-					global.battle_sub_open = false;
-					global.battle_cmd_index = 0;
-					global.battle_turn_order = scrBuildTurnOrder();
-					global.battle_phase = BATTLE_PHASE.EXECUTE_TURN;
+					global.battle_macro_open = true;
+					global.battle_macro_cursor = 0;
 					io_clear();
 					global.keyC = false;
 					break;
@@ -449,6 +441,10 @@ function scrResolvePartyAction(_turn) {
 	
 	switch (action.type) {
 		case "attack":
+			if (variable_struct_exists(action, "macro_auto") && action.macro_auto) {
+				action.target = scrMacroPickEnemyTarget();
+			}
+			
 			if (action.target < 0 || action.target >= array_length(global.battle_enemies)) return;
 			var enemy = global.battle_enemies[action.target];
 			if (!enemy || enemy.is_dead) return;
@@ -466,7 +462,7 @@ function scrResolvePartyAction(_turn) {
 			var _start_x = 160 - (_num_e - 1) * 32;
 			array_push(global.battle_damage_display, {
 				x: _start_x + action.target * 64,//calculate from enemy position
-				y: 120 -16,
+				y: 36,
 				value: dmg,
 				timer: 90,
 				enemy_idx: action.target
@@ -491,6 +487,11 @@ function scrResolvePartyAction(_turn) {
 			
 			if (action.all_targets) {
 				global.battle_all_target_side = action.target_side;
+				
+				if (variable_struct_exists(action, "macro_auto") && action.macro_auto && !action.all_targets) {
+					action.target = _hits_enemy ? scrMacroPickEnemyTarget() : scrMacroPickAllyTarget();
+				}
+				
 				if (_hits_enemy) {
 					for (var ei = 0; ei < array_length(global.battle_enemies); ei++) {
 						if (!global.battle_enemies[ei].is_dead) {
@@ -553,9 +554,9 @@ function applyBattleAction(_user, _action, _target) {
 				var _start_x = 160 - (_num_e - 1) * 32;  // 32 = enemy_spacing/2
 				array_push(global.battle_damage_display, {
 					x: _start_x + _action.target * 64,  // 64 = enemy_spacing
-					y: 104,
+					y: 36,
 					value: dmg,
-					timer: 60,
+					timer: 90,
 					enemy_idx: _action.target
 				});
 			} else if (spell.effect_type == "heal_hp") {
@@ -591,8 +592,8 @@ function applyBattleAction(_user, _action, _target) {
 				var _start_x = 160 - (_num_e - 1) * 32;
 				array_push(global.battle_damage_display, {
 					x: _start_x + _action.target * 64,
-					y: 104,
-					value: dmg, timer: 60,
+					y: 36,
+					value: dmg, timer: 90,
 					enemy_idx: _action.target
 				});
 			} else if (skill.effect_type == "restore_mp") {
@@ -702,7 +703,7 @@ function scrResolveEnemyAction(_turn) {
 	
 	if (global.party[target_idx].current_hp <= 0) {
 		global.party[target_idx].is_dead = true;
-		scrRetargetDeadAlly(target_idx);
+		global.party[target_idx].status_effects = [];
 	}
 	
 	if (target.battle_defending) dmg = floor(dmg * 0.5);
@@ -766,14 +767,15 @@ function scrBattleWinLoss() {
 		total_money += global.battle_enemies[i].money;
 	}
 	global.money += total_money;
-	//distributes xp, placeholder full level up logic later
-	for (var i = 0; i < array_length(global.party); i++) {
-		if (global.party[i].current_hp > 0) {
-			global.party[i].experience += total_xp;
-		}
-	}
-	show_debug_message("Battle won! EXP: " + string(total_xp) + " Money: " + string(total_money));
-	scrEndBattle(true);
+	
+	global.battle_msgs = [];
+	global.battle_msg_index = 0;
+	array_push(global.battle_msgs, { kind: "text", text: "Victory!" });
+	array_push(global.battle_msgs, { kind: "text", text: "Gained " + string(total_xp) + " EXP and " + string(total_money) + " solars!" });
+	
+	award_xp(total_xp);
+	
+	global.battle_phase = BATTLE_PHASE.RESULTS;
 }
 
 function scrEndBattle(_victory) {
@@ -797,6 +799,17 @@ function scrEndBattle(_victory) {
 		show_debug_message("scrEndBattle WARNING: oBattleManager does not exist");
 	}
 	show_debug_message("Battle ended | victory: " + string(_victory));
+}
+
+function scrBattleResultsPhase() {
+	if (global.keyC) {
+		global.battle_msg_index++;
+		io_clear();
+		global.keyC = false;
+		if (global.battle_msg_index >= array_length(global.battle_msgs)) {
+			scrEndBattle(true);
+		}
+	}
 }
 //====================================TARGET SELECTION=====================================
 function scrBattleTargetSelectionPhase() {
@@ -917,26 +930,6 @@ function scrRetargetDeadEnemy(_dead_idx) {
 		if (act.all_targets) continue;
 		if (act.target_side == "enemy" && act.target == _dead_idx) {
 			act.target = alive_enemies[irandom(array_length(alive_enemies) - 1)];
-		}
-	}
-}
-
-//called after an ally falls, redirect any queued enemy actions
-function scrRetargetDeadAlly(_dead_idx) {
-	//built the list of living party members
-	var alive_party = [];
-	for (var i = 0; i < array_length(global.party); i++) {
-		if (global.party[i].current_hp > 0) array_push(alive_party, i);
-	}
-	if (array_length(alive_party) == 0) return;
-	
-	//enemy actions store target on the enemy struct
-	//retarget any enemy whose chosen target was a fallen ally
-	for (var i = 0; i < array_length(global.battle_enemies); i++) { 
-		var e = global.battle_enemies[i];
-		if (e.is_dead) continue;
-		if (variable_struct_exists(e, "action target") && e.action_target == _dead_idx) {
-			e.action_target = alive_party[irandom(array_length(alive_party) - 1)];
 		}
 	}
 }

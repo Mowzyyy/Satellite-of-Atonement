@@ -82,6 +82,7 @@
     {"id":{"name":"MACROS","path":"scripts/MACROS/MACROS.yy",},},
     {"id":{"name":"scrBarriers","path":"scripts/scrBarriers/scrBarriers.yy",},},
     {"id":{"name":"scrBattleLogic","path":"scripts/scrBattleLogic/scrBattleLogic.yy",},},
+    {"id":{"name":"scrBattleMacros","path":"scripts/scrBattleMacros/scrBattleMacros.yy",},},
     {"id":{"name":"scrCharConstructors","path":"scripts/scrCharConstructors/scrCharConstructors.yy",},},
     {"id":{"name":"scrDialogue","path":"scripts/scrDialogue/scrDialogue.yy",},},
     {"id":{"name":"scrEncounterZones","path":"scripts/scrEncounterZones/scrEncounterZones.yy",},},

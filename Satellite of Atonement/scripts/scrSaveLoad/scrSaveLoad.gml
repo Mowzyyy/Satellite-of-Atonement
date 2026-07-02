@@ -152,6 +152,18 @@ function serialize_flags() {
 	return out;
 }
 
+function serialize_macros() {
+	var out = [];
+	for (var i = 0; i < 8; i++) {
+		if (global.macros[i] == undefined) {
+			array_push(out, { name: "", entries: [] });
+		} else {
+			array_push(out, global.macros[i]);//already plain structs/strings
+		}
+	}
+	return out;
+}
+
 //========================================DESERIALIZERS========================================
 
 function deserialize_equipment(_data) {
@@ -343,7 +355,8 @@ function save_game(_slot) {
 		follower_data	: follower_data,
 		party					: party_data,
 		party_order	: party_order_names,
-		flags					: serialize_flags()
+		flags					: serialize_flags(),
+		macros				: serialize_macros()
 	};
 	
 	//serialize to JSON and write to buffer
@@ -403,6 +416,14 @@ function load_game(_slot) {
 	
 	//restore flags
 	deserialize_flags(data.flags);
+	
+	//restore macros
+	scrInitMacros();
+	if (variable_struct_exists(data, "macros")) {
+		for (var i = 0; i < min(8, array_length(data.macros)); i++) {
+			if (data.macros[i].name != "") global.macros[i] = data.macros[i];
+		}
+	}
 	
 	show_debug_message("Game loaded from slot " + string(_slot));
 	show_debug_message("Loaded party[0]: " + global.party[0].name + " Lv" + string(global.party[0].level) + " HP:" + string(global.party[0].current_hp));

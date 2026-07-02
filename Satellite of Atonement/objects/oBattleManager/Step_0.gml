@@ -31,4 +31,8 @@ switch (global.battle_phase) {
 	case BATTLE_PHASE.WIN_LOSS:
 		scrBattleWinLoss();
 		break;
+		
+	case BATTLE_PHASE.RESULTS:
+		scrBattleResultsPhase();
+		break;
 }

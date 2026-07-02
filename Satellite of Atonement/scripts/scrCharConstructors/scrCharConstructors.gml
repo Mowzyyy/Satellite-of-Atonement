@@ -196,6 +196,12 @@ function cstrPartyMember(_name,
 	
 	//Simple levelup - can expand with specific growth tables later
 	static level_up = function() {
+		var _before = {
+			level: level,
+			max_hp: base_max_hp, max_mp: base_max_mana,
+			atk: base_atk, def: base_def, spd: base_spd, mental: base_mental
+		};
+		
 		level++;
 		
 		//Phantasy Star-style growth
@@ -210,13 +216,21 @@ function cstrPartyMember(_name,
 		current_hp = base_max_hp;
 		current_mana = base_max_mana;
 		
-		exp_to_lvup = xp_threshold(name, level); //simple curve, tweak as needed
+		//display only: xp remaining until next level
+		exp_to_lvup = xp_threshold(name, level) - experience; 
 		
 		show_debug_message(name + " reached level " + string(level) + "!");
 		
 		//Check for spells and skills
 		learn_spells_at_level(name, level);
 		learn_skills_at_level(name, level);
+		
+		var _after = {
+			level: level,
+			max_hp: base_max_hp, max_mp: base_max_mana,
+			atk: base_atk, def: base_def, spd: base_spd, mental: base_mental
+		};
+		return { before: _before, after: _after };
 		
 	}
 	
@@ -275,7 +289,7 @@ function cstrPartyMember(_name,
 						_target.remove_status(item.effect_stat);
 						used = true;
 					}
-				} else if (array_length(_target.status_effects > 0)) {
+				} else if (array_length(_target.status_effects) > 0) {
 					_target.status_effects = [];
 					used = true;
 				}
@@ -557,23 +571,20 @@ function xp_threshold(_name, _level) {
 //Add to battle end/enemyt death handler
 //called once per enemy death - awards xp to all lviing party members
 function award_xp(_xp_value) {
-	var living = 0;
-	for (var i_exp = 0; i_exp < array_length(global.party); i_exp++) {
-		if (global.party[i_exp].current_hp > 0) living++;
-	}
-	if (living == 0) exit;
-	
-	//split xp as evenly as possible rounded up
-	var share = ceil(_xp_value / living);
-	
 	for (var i = 0; i < array_length(global.party); i++) {
 		var member = global.party[i];
-		if (member.current_hp > 0) {
-			member.experience += share;
-			while (member.experience >= member.exp_to_lvup) {
-				member.experience -= member.exp_to_lvup;
-				member.level_up();
-			}
+		if (member.current_hp <= 0) continue;
+		
+		member.experience += _xp_value;
+		
+		while (member.level < 99 && member.experience >= xp_threshold(member.name, member.level)) {
+			var res = member.level_up();
+			array_push(global.battle_msgs, {
+				kind: "levelup",
+				name: member.name,
+				before: res.before,
+				after: res.after
+			});
 		}
 	}
 }

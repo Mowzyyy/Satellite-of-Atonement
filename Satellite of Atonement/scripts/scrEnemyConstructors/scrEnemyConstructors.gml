@@ -56,7 +56,7 @@ function cstrEnemy(_name, _hp, _mp, _atk, _def, _spd, _mental, _exp, _money) con
 	}
 	
 	static set_flag = function(_key, _value) {
-		flag[$ _key] = _value;
+		flags[$ _key] = _value;
 		return self;
 	}
 	

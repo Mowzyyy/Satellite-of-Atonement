@@ -336,4 +336,79 @@ if (global.state == GAME_STATE.BATTLE) {
 		draw_set_halign(fa_left);
 		draw_set_valign(fa_top);
 	}
+	
+	//macro list - shown when MACRO is selected
+	if (global.battle_macro_open) {
+		var ml = scrBattleMacroList();
+		var ml_n = array_length(ml);
+		var ml_w = 88;
+		var ml_h =ceil((14 + ml_n * 10) / 8) * 8;
+		var ml_x = (320 / 4 - 72 - 4) + 72 + 4;//right edge of the cmd box + 4
+		var ml_y = 120 - ml_h - 4;
+		
+		draw_sprite_stretched(sBasicGUI, 0, ml_x, ml_y, ml_w, ml_h);
+		draw_set_halign(fa_left);
+		draw_set_valign(fa_top);
+		
+		for (var mi = 0; mi < ml_n; mi++) {
+			var mcol = (global.battle_macro_cursor == mi) ? c_yellow : c_white;
+			draw_text_color(ml_x + 16, ml_y + 8 + mi * 10, ml[mi].name, mcol, mcol, mcol, mcol, 1);
+		}
+		
+		var _mblink = (blink_timer mod 40) < 20;
+		draw_sprite((_mblink ? sCursor : sBlink), 0, ml_x + 5, ml_y + 8 + global.battle_macro_cursor * 10);
+	}
+}
+
+//============================ BATTLE MESSAGE BOX ============================
+if (global.battle_phase ==BATTLE_PHASE.RESULTS && global.battle_msg_index < array_length(global.battle_msgs)) {
+	var msg = global.battle_msgs[global.battle_msg_index];
+	var mbox_x, mbox_w;
+	var mbox_h = (msg.kind == "levelup") ? 56 : 24;
+	var mbox_bottom = 191;
+	var mbox_y = mbox_bottom - mbox_h;
+	
+	if (msg.kind == "levelup") {
+		mbox_w = 304;
+		mbox_x = 8;
+	} else {
+		var _t = variable_struct_exists(msg, "text") ? msg.text : "";
+		var _tw = string_width(_t);
+		mbox_w = max(48, ceil((_tw + 20) / 8) * 8);
+		mbox_x = floor((320 - mbox_w) / 2);
+	}
+	
+	draw_sprite_stretched(sBasicGUI, 0, mbox_x, mbox_y, mbox_w, mbox_h);
+	draw_set_halign(fa_left);
+	draw_set_valign(fa_top);
+	
+	if (msg.kind == "levelup") {
+		draw_text(mbox_x + 10, mbox_y + 6, msg.name + " reached level " + string(msg.after.level) + "!");
+
+		
+		//stat lines: before-> after, two columns of three
+		
+		var b = msg.before;
+		var a = msg.after;
+		var col1_x = mbox_x + 10;
+		var col2_x = mbox_x + 158;
+		var row_y = mbox_y + 18;
+		var row_h = 11;
+	
+		draw_text(col1_x, row_y + row_h * 0, "HP "	+ string(b.max_hp)	+ " > " + string(a.max_hp));
+		draw_text(col1_x, row_y + row_h * 1, "MP "	+ string(b.max_mp)	+ " > " + string(a.max_mp));
+		draw_text(col1_x, row_y + row_h * 2, "Atk "	+ string(b.atk)			+ " > " + string(a.atk));
+	    draw_text(col2_x, row_y + row_h * 0, "Def "	+ string(b.def)			+ " > " + string(a.def));
+	    draw_text(col2_x, row_y + row_h * 1, "Spd "	+ string(b.spd)			+ " > " + string(a.spd));
+	    draw_text(col2_x, row_y + row_h * 2, "Mntl "	+ string(b.mental)		+ " > " + string(a.mental));
+	} else{
+		var _t2 = variable_struct_exists(msg, "text") ? msg.text : "";
+		draw_set_halign(fa_center);
+		draw_text(mbox_x + mbox_w / 2, mbox_y + 8, _t2);
+		draw_set_halign(fa_left);
+	}
+	
+	//blinking talk cursor botright
+	var _blink_on = (blink_timer mod 40) < 20;
+	draw_sprite(_blink_on ? sTalk : sTalkBlink, 0, mbox_x + mbox_w - 12, mbox_y + mbox_h - 8);
 }

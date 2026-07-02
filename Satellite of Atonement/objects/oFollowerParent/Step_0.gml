@@ -16,6 +16,7 @@ for (var ide = 0; ide < array_length(global.party); ide++) {
 	if (_pm.current_hp <= 0 && !_pm.is_dead) {
 		_pm.current_hp = 0;
 		_pm.is_dead = true;
+		_pm.status_effects = [];
 		show_debug_message(_pm.name + " is in dying state");
 	} else if (_pm.current_hp > 0 && _pm.is_dead) {
 		_pm.is_dead = false;

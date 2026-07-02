@@ -479,6 +479,84 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 				draw_sprite(_cursor_spr, 0, cursor_x, cursor_y);
 	}
 	
+	//=========================== MACRO PAGE ===========================
+	if (global.menu_page == MENU_PAGE.MACRO) {
+		var top_mid = global.card_positions[1];
+		var bot_mid = global.card_positions[4];
+		var mlh = 10;
+		
+		//header panel
+		var prompt = "";
+		switch (global.macro_state) {
+			case MACRO_STATE.SELECT_SLOT:					prompt = "Which?";		break;
+			case MACRO_STATE.SELECT_MEMBER:			prompt = "Who?";		break;
+			case MACRO_STATE.SELECT_ACTION:				prompt = "Action?";		break;
+			case MACRO_STATE.SELECT_WHAT:					prompt = "What?";		break;
+			case MACRO_STATE.CONFIRM:							prompt = "Set?";			break;
+		}
+		draw_set_halign(fa_center);
+		draw_text(top_mid.x + global.card_w / 2, top_mid.y + 12, prompt);
+		draw_set_halign(fa_left);
+		
+		//list panel
+		var list_labels = [];
+		switch (global.macro_state) {
+			case MACRO_STATE.SELECT_SLOT:
+				for (var i = 0; i < 8; i++) {
+					list_labels[i] = (global.macros[i] != undefined) ? global.macros[i].name : "------";
+				}
+			break;
+			
+			case MACRO_STATE.SELECT_MEMBER:
+				for (var q = 0; q < array_length(global.party); q++) {
+					var placed = false;
+					for (var j = 0; j < array_length(global.macro_new); j++) {
+						if (global.macro_new[j].member_name == global.party[q].name) { placed = true; break; }
+					}
+					if (!placed) array_push(list_labels, global.party[q].name);
+				}
+			break;
+			
+			case MACRO_STATE.SELECT_ACTION:
+				list_labels = scrMacroActionOptions(global.party[global.macro_pending_member]);
+			break;
+			
+			case MACRO_STATE.SELECT_WHAT:
+				for (var i = 0; i < array_length(global.macro_what_list); i++) {
+					array_push(list_labels, global.macro_what_list[i].label);
+				}
+			break;
+			
+			case MACRO_STATE.CONFIRM:
+				list_labels = ["No", "Yes"];
+			break;
+		}
+		
+		var pl_n = array_length(list_labels);
+		var pl_h = ceil((16 + pl_n * mlh) / 8) * 8;
+
+		var cur = (global.macro_state == MACRO_STATE.CONFIRM) ? global.macro_confirm_cursor : menu_cursor;
+		for (var i = 0; i < pl_n; i++) {
+			var lcol = (cur == i) ? c_yellow : c_white;
+			draw_text_color(bot_mid.x + 18, bot_mid.y + 8 + i * mlh, list_labels[i], lcol, lcol, lcol, lcol, 1);
+		}
+		var _blink_on = (blink_timer mod 40) < 20;
+		draw_sprite((_blink_on ? sCursor : sBlink), 0, bot_mid.x + 6, bot_mid.y + 8 + cur * mlh);
+		draw_sprite((_blink_on ? sCursor : sBlink), 0, bot_mid.x + 6, bot_mid.y + 8 + cur * mlh);
+		
+		//live progress summary right card while assigning
+		if (global.macro_state != MACRO_STATE.SELECT_SLOT) {
+			var right = global.card_positions[2];
+			var sm_h = ceil((16 + max(1, array_length(global.macro_new)) * mlh) / 8) * 8;
+
+			for (var i = 0; i < array_length(global.macro_new); i++) {
+				var en = global.macro_new[i];
+				var lbl = en.member_name + ":" + (variable_struct_exists(en.action, "what") ? en.action.what : en.action.type);
+				draw_text(right.x + 6, right.y + 8 + i * mlh, string_copy(lbl, 1, 14));
+			}
+		}
+	}
+	
 	//reset draw settings
 	draw_set_halign(fa_left);
 	draw_set_valign(fa_center);
@@ -1200,7 +1278,7 @@ if (global.dlg_active && global.dlg_page < array_length(global.dlg_pages)) {
 	var lines = string_split(page_txt, "\n");
 	var tx = box_x + 8;//shifts text horizontally
 	var ty = box_y + 11;//shifts text vertically
-	var lh = 12;
+	var lh = 18;
 	var words_drawn = 0;
 	
 	draw_set_halign(fa_left);

@@ -129,8 +129,8 @@ function scrCalcMagicDamage(_mAtk, _mDef, _mpower, _element, _target) {
 	var base = floor(_mAtk * (_mpower / 100)) - _mDef;
 	base = max(1, base);
 	//apply weakness/resistance
-	if (_target.is_weak_to != undefined && _target.is_weak_to(_element)) base = floor(base * 1.5);
-	if (_target.is_resistant_to != undefined && _target.is_resistant_to(_element)) base = floor(base * 0.5);
+	if (variable_struct_exists(_target, "is_weak_to") && _target.is_weak_to(_element)) base = floor(base * 1.5);
+	if (variable_struct_exists(_target, "is_resistant_to") && _target.is_resistant_to(_element)) base = floor(base * 0.5);
 	return floor (base * (0.9 + random(0.2)));
 }
 
@@ -224,7 +224,7 @@ function scrBattleCommandPhase() {
 					if (array_length(cur_member.spells) == 0) break;
 					global.battle_sub_list = scrBattleBuildSpellList(global.battle_cmd_index);
 					if (array_length(global.battle_sub_list) > 0) {
-						global.battle_sub_mode = "spell";
+						global.battle_sub_mode = "magic";
 						global.battle_sub_cursor = 0;
 						global.battle_sub_page = 0;
 						io_clear();
@@ -848,7 +848,7 @@ function scrBattleTargetSelectionPhase() {
 			item_index: -1
 			};
 		
-		if (global.battle_sub_mode == "attack" && global.battle_pending_entry != undefined) {
+		if (global.battle_pending_entry != undefined) {
 			//plain attack
 			action.spell_index = global.battle_pending_entry.kind == "spell" ? global.battle_pending_entry.index : -1;
 			action.skill_index = global.battle_pending_entry.kind == "skill" ? global.battle_pending_entry.index : -1;
@@ -908,7 +908,7 @@ function scrBattleBuildItemList(_char_idx) {
 	var result = [];
 	for (var i = 0; i < array_length(member.inventory); i++) {
 		var item = member.inventory[i];
-		if (item.type != "consumable") continue;
+		if (!variable_struct_exists(item, "type") || item.type != "consumable") continue;
 		array_push(result, { kind:"item", label:item.name, index:i, data:item });
 	}
 	return result;

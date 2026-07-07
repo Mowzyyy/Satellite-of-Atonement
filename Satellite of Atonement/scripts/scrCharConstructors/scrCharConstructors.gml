@@ -1,52 +1,5 @@
 //Party Character Constructor
 	
-//====================================Equipment Constructor====================================
-function cstrEquipment(_name = "No Item", _slot_type = "none", _atk = 0, _def = 0, _spd = 0, _mental =  0, _mAtk = 0, _mDef = 0) constructor {
-		name = _name;
-		slot_type = _slot_type;//head, body, feet, r_hand, l_hand, accessory, weapon, misc, none
-		atk_bonus = _atk;
-		def_bonus = _def;
-		spd_bonus = _spd;
-		mental_bonus = _mental;
-		mAtk_bonus = _mAtk;
-		mDef_bonus = _mDef;
-		//accessory special effects - array of effect structs
-		//effects: { type: "flat_stat|multiplier|teach_skill|teach_spell|auto_effect|stats }
-		special_effects = [];
-		
-		//fluent setter for chaining special effects onto accessories
-		static add_effect = function(_effect) {
-			array_push(special_effects, _effect);
-			return self;
-		}
-		
-		//example : new cstrEquipment("Iron Sword", "right_hand", 15, 0, 2, 0, 0);
-}
-
-//=======================================Item Constructor=======================================
-//types - consumable, weapon, armor, key, misc
-//effect types - heal_hp, heal_mp, cure_status, damage, buff_stat
-function cstrItem(_name, _type, _description = "", _value = 0) constructor {
-	name					= _name;
-	type						= _type;//consumable, weapon, armor, key, misc
-	description			= _description;
-	value						= _value;//sell/buy price, 0 - unsellable
-	
-	//effect fields for consumables
-	effect_type			="none";		//heal_hp, heal_mp, cure_status, damage, buff_stat
-	effect_amount	= 0;					//amount healed, damaged, buffed
-	effect_stat			="";					//for buff_stat - atk, def, spd, mental etc
-	
-	
-	//fluent setter allows chaining configuration after construction
-	//eg var potion = new cstrIOtem("Potion", "consumable").set_effect("heal_hp", 50);
-	static set_effect = function(_type, _amount, _stat = "") {
-		effect_type			= _type;
-		effect_amount	= _amount;
-		effect_stat			=  _stat;
-		return self;
-	}
-}
 
 //====================================Main Party Constructor====================================
 

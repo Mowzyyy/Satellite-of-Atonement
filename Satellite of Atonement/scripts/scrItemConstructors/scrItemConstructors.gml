@@ -1,3 +1,52 @@
+//====================================Equipment Constructor====================================
+function cstrEquipment(_name = "No Item", _slot_type = "none", _atk = 0, _def = 0, _spd = 0, _mental =  0, _mAtk = 0, _mDef = 0) constructor {
+		name = _name;
+		slot_type = _slot_type;//head, body, feet, r_hand, l_hand, accessory, weapon, misc, none
+		atk_bonus = _atk;
+		def_bonus = _def;
+		spd_bonus = _spd;
+		mental_bonus = _mental;
+		mAtk_bonus = _mAtk;
+		mDef_bonus = _mDef;
+		//accessory special effects - array of effect structs
+		//effects: { type: "flat_stat|multiplier|teach_skill|teach_spell|auto_effect|stats }
+		special_effects = [];
+		
+		//fluent setter for chaining special effects onto accessories
+		static add_effect = function(_effect) {
+			array_push(special_effects, _effect);
+			return self;
+		}
+		
+		//example : new cstrEquipment("Iron Sword", "right_hand", 15, 0, 2, 0, 0);
+}
+
+//=======================================Item Constructor=======================================
+//types - consumable, weapon, armor, key, misc
+//effect types - heal_hp, heal_mp, cure_status, damage, buff_stat
+function cstrItem(_name, _type, _description = "", _value = 0) constructor {
+	name					= _name;
+	type						= _type;//consumable, weapon, armor, key, misc
+	description			= _description;
+	value						= _value;//sell/buy price, 0 - unsellable
+	
+	//effect fields for consumables
+	effect_type			="none";		//heal_hp, heal_mp, cure_status, damage, buff_stat
+	effect_amount	= 0;					//amount healed, damaged, buffed
+	effect_stat			="";					//for buff_stat - atk, def, spd, mental etc
+	target_type			= "single_ally";//for battle targeting
+	
+	
+	//fluent setter allows chaining configuration after construction
+	//eg var potion = new cstrIOtem("Potion", "consumable").set_effect("heal_hp", 50);
+	static set_effect = function(_type, _amount, _stat = "") {
+		effect_type			= _type;
+		effect_amount	= _amount;
+		effect_stat			=  _stat;
+		return self;
+	}
+}
+
 function scrInitItemGlobals(){
 	//consumables
 	global.it_potion					= new cstrItem("Potion",			"consumable", "Restores 20 HP", 10).set_effect("heal_hp",			20);
@@ -256,4 +305,44 @@ function scrEquipAutoSlot(_type) {
 		case "misc":				return "";//misc has no autoslot
 		default:						return "";
 	}
+}
+
+
+function scrProjectStatsOnEquip(_char_idx, _item) {
+	var member = global.party[_char_idx];
+	var before = member.get_effective_stats();
+	
+	//find which slot the item goes in
+	var slot = scrEquipAutoSlot(_item.slot_type);
+	if (slot == "") return before; // can't equip, return unchanged
+	
+	//2h - unequip both hands temporarily
+	var old_r = undefined, old_l = undefined;
+	if (_item.slot_type == "two_hand") {
+		old_r = member.r_Hand;
+		old_l = member.l_Hand;
+		member.r_Hand = new cstrEquipment();
+		member.l_Hand = new cstrEquipment();
+	} else if (slot == "r_Hand" && member.l_Hand.slot_type == "two_hand") {
+		old_r = member.r_Hand;
+		old_l = member.l_Hand;
+		member.r_Hand = new cstrEquipment();
+		member.l_Hand = new cstrEquipment();
+	} else {
+		//save old item in slot
+		old_r = member[$ slot];
+		member[$ slot] = _item;
+	}
+	
+	var after = member.get_effective_stats();
+	
+	//restore
+	if (_item.slot_type == "two_hand" || (slot == "r_Hand" && old_l != undefined)) {
+		member.r_Hand = old_r;
+		member.l_Hand = old_l;
+	} else {
+		member[$ slot] = old_r;
+	}
+	
+	return { before: before, after: after };
 }

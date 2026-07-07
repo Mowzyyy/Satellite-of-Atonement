@@ -113,7 +113,9 @@ if (state == states.walking){
 		//slide without animating
 		sprite_index = sprite_standing;
 		image_index = last_dir;
+		image_alpha = 0.4;
 	} else if (is_array(frames) && array_length(frames) > 0) {
+		image_alpha = 1;
 		image_index = frames[floor((array_length(frames) - 1) * _t)];
 	}
 }

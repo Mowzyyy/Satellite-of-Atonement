@@ -889,6 +889,13 @@ if (global.menu_page == MENU_PAGE.EQUIP) {
 				draw_text(bot_mid.x + lpad, bot_mid.y + lh * 7 - 4, "mDef");
 				draw_set_halign(fa_right);
 				draw_text(bot_mid.x + global.card_w - lpad, bot_mid.y + lh * 7 - 4, string(_item.mDef_bonus));
+				//projected stat deltas
+				var _proj = scrProjectStatsOnEquip(global.equip_char, _item);
+				if (_proj != undefined) {
+					draw_set_halign(fa_left);
+					draw_text(bot_mid.x + lpad, bot_mid.y + lh * 8 - 4, "Proj mAtk: " + string(_proj.after.mAtk - _proj.before.mAtk));
+					draw_text(bot_mid.x + lpad, bot_mid.y + lh * 9 - 4, "Proj mDef: " + string(_proj.after.mDef - _proj.before.mDef));
+				}
 			}
 		} else {
 			//portrait + HP/MP/Name/Level

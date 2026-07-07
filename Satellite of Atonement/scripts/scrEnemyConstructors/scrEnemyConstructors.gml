@@ -32,6 +32,7 @@ function cstrEnemy(_name, _hp, _mp, _atk, _def, _spd, _mental, _exp, _money) con
 	weaknesses	= [];//array of element strings ie "fire"
 	resistances		= [];//array of element strings
 	flags					= {};//boss flags ie { requires_item: "superwand", stage: 1 }
+	personality		= "aggressive";//personality targeting type
 	
 	//combat sprite - set per enemy instance
 	sprite_combat = 1;
@@ -40,6 +41,8 @@ function cstrEnemy(_name, _hp, _mp, _atk, _def, _spd, _mental, _exp, _money) con
 	//status
 	status_effects = [];
 	is_dead				= false;
+	is_dying			= false;
+	death_timer	= 0;
 	
 	static add_move = function(_move) {
 		array_push(moves, _move);
@@ -104,7 +107,7 @@ function scrBuildEnemy(_name) {
 }
 
 function cstrTestSlime() {
-	var e = new cstrEnemy("Slime", 30, 0, 8, 4, 6, 2, 10, 5);
+	var e = new cstrEnemy("Slime", 30, 0, 12, 6, 6, 2, 1, 5);
 	e.sprite_combat = sTestSlime;
 	e.add_move(new cstrEnemyMove("Tackle", "attack", 10, 0, "single_enemy", 4));
 	e.add_move(new cstrEnemyMove("Ooze", "status", 0, 0, "single_enemy", 1));
@@ -112,17 +115,19 @@ function cstrTestSlime() {
 }
 
 function cstrCuetzpal() {
-	var e = new cstrEnemy("Cuetzpal", 50, 4, 10, 6, 8, 4, 15, 8);
+	var e = new cstrEnemy("Cuetzpal", 40, 4, 16, 10, 8, 4, 2, 8);
 	e.sprite_combat = sCuetzpal;
 	e.add_move(new cstrEnemyMove("Spear Thrust", "attack", 18, 0, "single_enemy", 2));
 	e.add_move(new cstrEnemyMove("Bite","attack",12,0,"single_enemy",3));
+	e.personality = "cautious";
 	return e;
 }
 
 function cstrCapMage() {
-	var e = new cstrEnemy("CapMage", 40, 20, 6, 4, 3, 10, 20, 12);
+	var e = new cstrEnemy("CapMage", 45, 20, 12, 8, 3, 10, 5, 12);
 	e.sprite_combat = sCapMage;
 	e.add_move(new cstrEnemyMove("Flail", "attack", 8, 0, "single_enemy", 5));
-	e.add_move(new cstrEnemyMove("Kazam", "magic", 15, 6, "all_enemies", 3));
+	e.add_move(new cstrEnemyMove("Kazam", "magic", 18, 6, "all_enemies", 6));
+	e.personality = "herder";
 	return e;
 }

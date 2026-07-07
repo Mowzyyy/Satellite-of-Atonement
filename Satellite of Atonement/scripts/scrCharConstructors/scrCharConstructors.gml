@@ -169,7 +169,8 @@ function cstrPartyMember(_name,
 		current_hp = base_max_hp;
 		current_mana = base_max_mana;
 		
-		//display only: xp remaining until next level
+		//reset xp to 0 and display xp remaining until next level
+		experience = 0;
 		exp_to_lvup = xp_threshold(name, level) - experience; 
 		
 		show_debug_message(name + " reached level " + string(level) + "!");
@@ -524,11 +525,17 @@ function xp_threshold(_name, _level) {
 //Add to battle end/enemyt death handler
 //called once per enemy death - awards xp to all lviing party members
 function award_xp(_xp_value) {
+	var _alive = 0;
+	for (var i = 0; i < array_length(global.party); i++) {
+		if (global.party[i].current_hp > 0) _alive++;
+	}
+	if (_alive == 0) return;
+	var _share = floor(_xp_value / _alive);
 	for (var i = 0; i < array_length(global.party); i++) {
 		var member = global.party[i];
 		if (member.current_hp <= 0) continue;
 		
-		member.experience += _xp_value;
+		member.experience += _share;
 		
 		while (member.level < 99 && member.experience >= xp_threshold(member.name, member.level)) {
 			var res = member.level_up();

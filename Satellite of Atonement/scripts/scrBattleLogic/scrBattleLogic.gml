@@ -60,7 +60,7 @@ function scrBuildTurnOrder() {
 	
 	for (var i = 0; i < array_length(global.battle_enemies); i++) {
 		var e = global.battle_enemies[i];
-		if (e.is_dead) continue;
+		if (e.is_dead || e.is_dying) continue;
 		array_push(order, {
 			kind					: "enemy",
 			index					: i,
@@ -81,7 +81,7 @@ function scrBuildTurnOrder() {
 function scrEnemyPickAllActions() {
 	for (var i = 0; i < array_length(global.battle_enemies); i++) {
 		var e = global.battle_enemies[i];
-		if (e.is_dead) continue;
+		if (e.is_dead || e.is_dying) continue;
 		
 		//filter moves by MP availability
 		var valid_moves = [];
@@ -91,12 +91,59 @@ function scrEnemyPickAllActions() {
 			array_push(valid_moves, m);
 		}
 		
+		//persoanlity-based action selection
+		if (e.personality == "herder") {
+			var aoe = [];
+			for (var j = 0; j < array_length(valid_moves); j++) {
+				if (valid_moves[j].target == "all_enemies") array_push(aoe, valid_moves[j]);
+			}
+			if (array_length(aoe) > 0 && random(1) < 0.5) valid_moves = aoe;
+		}
+		
+		if (e.personality == "cautious" && e.current_hp < e.max_hp * 0.5 && random(1) < 0.3) {
+			e.action = undefined;
+			e.is_defending = true;
+			continue;
+		}
+		
 		if (array_length(valid_moves) > 0) {
 			e.action = e.choose_move(valid_moves);//uses filtered list
 		} else {
 			e.action = undefined;
 		}
 	}
+}
+
+function scrEnemyPickTarget(_enemy, _alive) {
+	var count = array_length(_alive);
+	if (count == 0) return -1;
+	switch (_enemy.personality) {
+		case "aggressive":
+			return _alive[irandom(count - 1)];
+		case "cautious":
+		case "speedy":
+			var wi = 0; var whp = 999999;
+			for (var i = 0; i < count; i++) {
+				var pai = _alive[i];
+				if (_enemy.personality == "speedy" && global.party[pai].battle_defending) continue;
+				if (global.party[pai].current_hp < whp) { whp = global.party[pai].current_hp; wi = i; }
+			}
+			if (_enemy.personality == "speedy" && whp == 999999) return _alive[irandom(count - 1)];
+			return _alive[wi];
+		case "haughty":
+			var si = 0; var shp = -1;
+			for (var i = 0; i < count; i++) {
+				var pai = _alive[i];
+				if (global.party[pai].current_hp > shp) { shp = global.party[pai].current_hp; si = i; }
+			}
+			return _alive[si];
+		case "herder":
+			var sorted = [];
+			for (var i = 0; i < count; i++) array_push(sorted, _alive[i]);
+			array_sort(sorted, function(a, b) { return global.party[a].current_hp - global.party[b].current_hp; });
+			return sorted[clamp(irandom(1) + 1, 0, count - 1)];
+	}
+	return _alive[irandom(count - 1)];
 }
 	
 //============================================FLEE============================================
@@ -119,14 +166,14 @@ function scrAttemptFlee() {
 }
 //=================================DAMAGE CALCULATION=================================
 function scrCalcPhysicalDamage(_atk, _def) {
-	var base = _atk - _def;
+	var base = _atk * _atk / (_atk + _def * 2);
 	base = max(1, base);//minimum 1 damage
 	//add slight random variance +/-10%
 	return floor(base * (0.9 + random(0.2)));
 }
 
 function scrCalcMagicDamage(_mAtk, _mDef, _mpower, _element, _target) {
-	var base = floor(_mAtk * (_mpower / 100)) - _mDef;
+	var base = floor(_mAtk * _mpower / 10) - _mDef;
 	base = max(1, base);
 	//apply weakness/resistance
 	if (variable_struct_exists(_target, "is_weak_to") && _target.is_weak_to(_element)) base = floor(base * 1.5);
@@ -323,7 +370,7 @@ function scrBattleCommandPhase() {
 							var _ct_order = [2, 1, 0, 3];
 							if (entry.data.target_type == "single_enemy") {
 								for (var ei = 0; ei < array_length(global.battle_enemies); ei++) {
-									if (!global.battle_enemies[ei].is_dead) array_push(global.battle_target_list, ei);
+									if (!global.battle_enemies[ei].is_dead && !global.battle_enemies[ei].is_dying) array_push(global.battle_target_list, ei);
 								}
 							} else if (entry.data.target_type == "single_ally") {
 								var is_revive = (entry.kind == "item" && entry.data.effect_type == "revive");
@@ -470,7 +517,8 @@ function scrResolvePartyAction(_turn) {
 			
 			//check death
 			if (enemy.current_hp <= 0) {
-				enemy.is_dead = true;
+				enemy.is_dying = true;
+				enemy.death_timer = 90;
 				scrRetargetDeadEnemy(action.target);
 			}
 		break;
@@ -494,7 +542,7 @@ function scrResolvePartyAction(_turn) {
 				
 				if (_hits_enemy) {
 					for (var ei = 0; ei < array_length(global.battle_enemies); ei++) {
-						if (!global.battle_enemies[ei].is_dead) {
+						if (!global.battle_enemies[ei].is_dead && !global.battle_enemies[ei].is_dying) {
 							applyBattleAction(member, action, global.battle_enemies[ei]);
 						}
 					}
@@ -538,18 +586,21 @@ function applyBattleAction(_user, _action, _target) {
 			if (spell.effect_type == "damage" ) {
 				var dmg = scrCalcMagicDamage(_user.get_effective_stats().mAtk, _target.mDef, spell.mpower, spell.element, _target );
 				
+				_target.current_hp -= dmg;
+				if (_target.current_hp < 0) _target.current_hp = 0;
+				
 				if (_target.current_hp <= 0 && variable_struct_exists(_target, "is_dead")) {
-					_target.is_dead = true;
+					_target.is_dying = true;
+					_target.death_timer = 90;
 					//find this enemy's index to retarget
-					for (var _ei = 0; ei < array_length(global.battle_enemies); _ei++) {
+					for (var _ei = 0; _ei < array_length(global.battle_enemies); _ei++) {
 						if (global.battle_enemies[_ei] == _target) {
 							scrRetargetDeadEnemy(_ei);
 							break;
 						}
 					}
 				}
-				_target.current_hp -= dmg;
-				if (_target.current_hp < 0) _target.current_hp = 0;
+
 				var _num_e = array_length(global.battle_enemies);
 				var _start_x = 160 - (_num_e - 1) * 32;  // 32 = enemy_spacing/2
 				array_push(global.battle_damage_display, {
@@ -573,21 +624,19 @@ function applyBattleAction(_user, _action, _target) {
 			if (skill.uses_left <= 0) return;
 			skill.uses_left--;
 			
-			if (_target.current_hp <= 0 && variable_struct_exists(_target, "is_dead")) {
-					_target.is_dead = true;
-					//find this enemy's index to retarget
-					for (var _ei = 0; ei < array_length(global.battle_enemies); _ei++) {
+			if (skill.effect_type == "damage") {
+				var dmg = scrCalcPhysicalDamage(_user.get_effective_stats().atk, _target.def);
+				_target.current_hp -= dmg;
+				if (_target.current_hp <= 0) {
+					_target.is_dying = true;
+					_target.death_timer = 90;
+					for (var _ei = 0; _ei < array_length(global.battle_enemies); _ei++) {
 						if (global.battle_enemies[_ei] == _target) {
 							scrRetargetDeadEnemy(_ei);
 							break;
 						}
 					}
 				}
-			
-			if (skill.effect_type == "damage") {
-				var dmg = scrCalcPhysicalDamage(_user.get_effective_stats().atk, _target.def);
-				_target.current_hp -= dmg;
-				if (_target.current_hp < 0) _target.current_hp = 0;
 				var _num_e = array_length(global.battle_enemies);
 				var _start_x = 160 - (_num_e - 1) * 32;
 				array_push(global.battle_damage_display, {
@@ -630,7 +679,14 @@ function scrResolveEnemyAction(_turn) {
 	
 	//enemy.action was set at turn start by scrEnemyPickAllActions()
 	var move = enemy.action;
-	if (!move) return;
+	if (!move) {
+		if (enemy.is_defending) {
+			enemy.is_defending = false;
+			show_debug_message(enemy.name + " defends!");
+			return;
+		}
+		return;
+	}
 	
 	//pick random alive party member
 	var alive = [];
@@ -638,7 +694,7 @@ function scrResolveEnemyAction(_turn) {
 		if (global.party[i].current_hp > 0) array_push(alive, i);
 	}
 	if (array_length(alive) == 0) return;
-	var target_idx = alive[irandom(array_length(alive) - 1)];
+	var target_idx = scrEnemyPickTarget(enemy, alive);
 	var target = global.party[target_idx];
 	
 	//mark who is being attacked so only they stay visible
@@ -728,7 +784,7 @@ function scrResolveEnemyAction(_turn) {
 function scrCheckBattleEnd() {
 	var enemies_dead = true;
 	for (var i = 0; i < array_length(global.battle_enemies); i++) {
-		if (!global.battle_enemies[i].is_dead) { enemies_dead = false; break; }
+		if (!global.battle_enemies[i].is_dead && !global.battle_enemies[i].is_dying) { enemies_dead = false; break; }
 	}
 	if (enemies_dead) {
 		global.battle_phase = BATTLE_PHASE.WIN_LOSS;
@@ -919,7 +975,7 @@ function scrRetargetDeadEnemy(_dead_idx) {
 	//build a list of living enemies
 	var alive_enemies = [];
 	for (var i = 0; i < array_length(global.battle_enemies); i++) {
-		if (!global.battle_enemies[i].is_dead) array_push(alive_enemies, i);
+		if (!global.battle_enemies[i].is_dead && !global.battle_enemies[i].is_dying) array_push(alive_enemies, i);
 	}
 	if (array_length(alive_enemies) == 0) return;//nothing to retarget to
 	

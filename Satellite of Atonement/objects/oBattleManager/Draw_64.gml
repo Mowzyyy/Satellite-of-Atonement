@@ -37,17 +37,8 @@ if (global.state == GAME_STATE.BATTLE) {
 	for (var ei = 0; ei < num_enemies; ei++) {
 		var e = global.battle_enemies[ei];
 		//keep dead enemy visible while its damage popup is still showing
-		if (e.is_dead) {
-			var _popup_active = false;
-			for (var _dp = 0; _dp < array_length(global.battle_damage_display); _dp++) {
-				var _d = global.battle_damage_display[_dp];
-				if (variable_struct_exists(_d, "enemy_idx") && _d.enemy_idx == ei) {
-					_popup_active = true;
-					break;
-				}
-			}
-			if (!_popup_active) continue;
-		}
+		if (e.is_dead) continue;
+
 		
 		//during an attack only show the targeted enemy
 		if (global.battle_attack_target != -1 || global.battle_attacker != -1 || global.battle_all_target_side != "") {
@@ -58,9 +49,28 @@ if (global.state == GAME_STATE.BATTLE) {
 		}
 		
 		//target select flash
-		if (_tgt_enemy && global.battle_target_list[global.battle_target_cursor] == ei && (blink_timer mod 50) >= 25) continue;
 		if (e.sprite_combat != -1 && sprite_exists(e.sprite_combat)) {
-			draw_sprite(e.sprite_combat, 0, enemy_start_x + ei * enemy_spacing, enemy_y);
+			if (e.is_dying) {
+				var _sw = sprite_get_width(e.sprite_combat);
+				var _sh = sprite_get_height(e.sprite_combat);
+				var _ox = _sw / 2;
+				var _frame = 90 - e.death_timer;
+				var _creep = floor((_sh * (_frame + 1)) / 90);
+				var _offset = 8;
+				for (var _col = 0; _col < _sw; _col++) {
+					var _col_creep = _creep + ((_col + _frame) mod 2) * _offset;
+					var _vis_h = _sh - _col_creep;
+					if (_vis_h > 0) {
+					draw_sprite_part(e.sprite_combat, 0,
+									_col, 0,
+									1, _vis_h,
+									enemy_start_x + ei * enemy_spacing + _col - _ox,
+									enemy_y - _sh);
+					}
+				}
+			} else {
+				draw_sprite(e.sprite_combat, 0, enemy_start_x + ei * enemy_spacing, enemy_y);
+			}
 		}
 	}
 	
@@ -268,7 +278,7 @@ if (global.state == GAME_STATE.BATTLE) {
 	var enemy_types = [];
 	for (var ei = 0; ei < array_length(global.battle_enemies); ei++) {
 		var e = global.battle_enemies[ei];
-		if (e.is_dead) continue;
+		if (e.is_dead || e.is_dying) continue;
 		//check if this name is already in the list
 		var found = false;
 		for (var eti = 0; eti < array_length(enemy_types); eti++) {

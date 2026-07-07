@@ -18,6 +18,17 @@ for (var di = array_length(global.battle_damage_display) - 1; di >= 0; di--) {
 	}
 }
 
+for (var _ei = array_length(global.battle_enemies) - 1; _ei >= 0; _ei--) {
+	var _e = global.battle_enemies[_ei];
+	if (_e.is_dying) {
+		_e.death_timer--;
+		if (_e.death_timer <= 0) {
+			_e.is_dying = false;
+			_e.is_dead = true;
+		}
+	}
+}
+
 switch (global.battle_phase) {
 	
 	case BATTLE_PHASE.SELECT_COMMAND:

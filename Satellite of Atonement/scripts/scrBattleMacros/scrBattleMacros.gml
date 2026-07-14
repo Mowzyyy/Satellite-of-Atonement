@@ -244,6 +244,13 @@ function scrMacroMenuLogic() {
 	}
 }
 
+function scrMacroActionOptions(_member) {
+	var opts = ["ATTACK", "DEFEND"];
+	if (array_length(_member.spells) > 0) array_push(opts, "MAGIC");
+	if (array_length(_member.skills) > 0) array_push(opts, "SKILL");
+	return opts;
+}
+
 //builds the runtime list: AutoAtk preset + all defined slots
 function scrBattleMacroList() {
 	var list = [ scrMacroAutoAttack() ];
@@ -378,11 +385,4 @@ function scrBuildTurnOrderForMacro(_ordered_indices) {
 		return random(2) > 1 ? 1 : -1;
 	});
 	return order;
-}
-
-function scrMacroActionOptions(_member) {
-	var opts = ["ATTACK", "DEFEND"];
-	if (array_length(_member.spells) > 0) array_push(opts, "MAGIC");
-	if (array_length(_member.skills) > 0) array_push(opts, "SKILL");
-	return opts;
 }

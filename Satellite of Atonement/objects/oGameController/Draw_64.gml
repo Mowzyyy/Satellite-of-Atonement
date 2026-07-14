@@ -481,30 +481,50 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 	
 	//=========================== MACRO PAGE ===========================
 	if (global.menu_page == MENU_PAGE.MACRO) {
+		var top_left = global.card_positions[0];
 		var top_mid = global.card_positions[1];
+		var top_right = global.card_positions[2];
+		var bot_left = global.card_positions[3];
 		var bot_mid = global.card_positions[4];
-		var mlh = 10;
+		var bot_right = global.card_positions[5];
 		
-		//header panel
+		var lh = 14;
+		var lpad = 6;
+		
+		//top mid - header and state prompt
+		draw_set_halign(fa_center);
+		var mid_cx = top_mid.x + global.card_w / 2;
+		draw_text(mid_cx, top_mid.y + lh * 1, "MACRO");
 		var prompt = "";
 		switch (global.macro_state) {
-			case MACRO_STATE.SELECT_SLOT:					prompt = "Which?";		break;
-			case MACRO_STATE.SELECT_MEMBER:			prompt = "Who?";		break;
-			case MACRO_STATE.SELECT_ACTION:				prompt = "Action?";		break;
-			case MACRO_STATE.SELECT_WHAT:					prompt = "What?";		break;
-			case MACRO_STATE.CONFIRM:							prompt = "Set?";			break;
+			case MACRO_STATE.SELECT_SLOT:					prompt = "WHICH?";			break;
+			case MACRO_STATE.SELECT_MEMBER:			prompt = "WHO?";				break;
+			case MACRO_STATE.SELECT_ACTION:				prompt = "ACTION?";			break;
+			case MACRO_STATE.SELECT_WHAT:					prompt = "WHAT?";				break;
+			case	MACRO_STATE.CONFIRM:							prompt = "OKAY?";				break;
 		}
-		draw_set_halign(fa_center);
-		draw_text(top_mid.x + global.card_w / 2, top_mid.y + 12, prompt);
+		draw_text(mid_cx, top_mid.y + lh * 2, prompt);
 		draw_set_halign(fa_left);
 		
-		//list panel
+		//top-left - the macro being buiilts( member : action, in order)
+		draw_set_halign(fa_center);
+		draw_text(top_left.x + global.card_w / 2, top_left.y + lh * 1, "SEQUENCE");
+		draw_set_halign(fa_left);
+		for (var i_seq = 0; i_seq < array_length(global.macro_new); i_seq++) {
+			var en = global.macro_new[i_seq];
+			var act_lbl = variable_struct_exists(en.action, "what") ? en.action.what : en.action.type;
+			draw_text(top_left.x + lpad, top_left.y + lh * (2 + i_seq), string(i_seq + 1));
+			draw_set_halign(fa_right);
+			draw_text(top_left.x + global.card_w - lpad, top_left.y + lh * (2 + i_seq), string_copy(en.member_name, 1, 4) + ":" + string_copy(act_lbl, 1, 5));
+			draw_set_halign(fa_left);
+		}
+		
+		//bot mid - active selection list
 		var list_labels = [];
 		switch (global.macro_state) {
+			
 			case MACRO_STATE.SELECT_SLOT:
-				for (var i = 0; i < 8; i++) {
-					list_labels[i] = (global.macros[i] != undefined) ? global.macros[i].name : "------";
-				}
+				for (var i = 0; i < 8; i++) list_labels[i] = (global.macros[i] != undefined) ? global.macros[i].name : "-EMPTY-";
 			break;
 			
 			case MACRO_STATE.SELECT_MEMBER:
@@ -521,40 +541,20 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 				list_labels = scrMacroActionOptions(global.party[global.macro_pending_member]);
 			break;
 			
-			case MACRO_STATE.SELECT_WHAT:
-				for (var i = 0; i < array_length(global.macro_what_list); i++) {
-					array_push(list_labels, global.macro_what_list[i].label);
-				}
-			break;
-			
 			case MACRO_STATE.CONFIRM:
-				list_labels = ["No", "Yes"];
+				list_lables = ["No", "Yes"];
 			break;
 		}
 		
-		var pl_n = array_length(list_labels);
-		var pl_h = ceil((16 + pl_n * mlh) / 8) * 8;
-
 		var cur = (global.macro_state == MACRO_STATE.CONFIRM) ? global.macro_confirm_cursor : menu_cursor;
-		for (var i = 0; i < pl_n; i++) {
-			var lcol = (cur == i) ? c_yellow : c_white;
-			draw_text_color(bot_mid.x + 18, bot_mid.y + 8 + i * mlh, list_labels[i], lcol, lcol, lcol, lcol, 1);
+		for (var i = 0; i < array_length(list_labels); i++) {
+			var col = (cur == i) ? c_yellow : c_white;
+			draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i * 20), list_labels[i], col, col, col, col, 1);
 		}
+		var cursor_y = bot_mid.y + 20 + (cur * 20);
+		var cursor_x = bot_mid.x + 12;
 		var _blink_on = (blink_timer mod 40) < 20;
-		draw_sprite((_blink_on ? sCursor : sBlink), 0, bot_mid.x + 6, bot_mid.y + 8 + cur * mlh);
-		draw_sprite((_blink_on ? sCursor : sBlink), 0, bot_mid.x + 6, bot_mid.y + 8 + cur * mlh);
-		
-		//live progress summary right card while assigning
-		if (global.macro_state != MACRO_STATE.SELECT_SLOT) {
-			var right = global.card_positions[2];
-			var sm_h = ceil((16 + max(1, array_length(global.macro_new)) * mlh) / 8) * 8;
-
-			for (var i = 0; i < array_length(global.macro_new); i++) {
-				var en = global.macro_new[i];
-				var lbl = en.member_name + ":" + (variable_struct_exists(en.action, "what") ? en.action.what : en.action.type);
-				draw_text(right.x + 6, right.y + 8 + i * mlh, string_copy(lbl, 1, 14));
-			}
-		}
+		draw_sprite((_blink_on ? sCursor : sBlink), 0, cursor_x, cursor_y);
 	}
 	
 	//reset draw settings
@@ -562,7 +562,7 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 	draw_set_valign(fa_center);
 	draw_set_color(c_white);
 }
-
+//===================================GAME OVER===================================
 if (global.state == GAME_STATE.GAME_OVER) {
 	draw_set_alpha(0.8);
 	draw_set_color(c_black);

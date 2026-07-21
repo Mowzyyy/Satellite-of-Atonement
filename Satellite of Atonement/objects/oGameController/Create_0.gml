@@ -106,6 +106,7 @@ global.macro_what_list						= [];															//spell/skill list for SELECT_WH
 global.macro_confirm_cursor			= 0;
 global.battle_macro_open				= false;													//battle macro list visible
 global.battle_macro_cursor				= 0;
+global.macro_what_page					= 0;
 
 global.skill_state									= SKILL_STATE.SELECT_WHO;		//
 global.skill_char										= 0;

@@ -157,6 +157,13 @@ function scrMacroMenuLogic() {
 		
 			if (global.keyC) {
 				var choice = opts[menu_cursor];
+				
+				if (!scrMacroOptionEnabled(member, choice)) {
+					io_clear();
+					global.keyC = false;
+					break;//do nothing, stay on the list if choice grayed out
+				}
+				
 				if (choice == "ATTACK" || choice == "DEFEND") {
 					array_push(global.macro_new, {
 						member_name: member.name,
@@ -179,6 +186,7 @@ function scrMacroMenuLogic() {
 						}
 					}
 					global.macro_state = MACRO_STATE.SELECT_WHAT;
+					global.macro_what_page = 0;
 					ds_stack_push(global.submenu_history, SUBMENU_HISTORY.MACRO_SELECT_WHAT);
 					menu_cursor = 0;
 				}
@@ -191,21 +199,45 @@ function scrMacroMenuLogic() {
 			var wl_size = array_length(global.macro_what_list);
 			if (wl_size == 0) { global.macro_state = MACRO_STATE.SELECT_ACTION; break; }
 			
-			if (global.keyUpPressed)   { menu_cursor = (menu_cursor - 1 + wl_size) mod wl_size; io_clear(); }
-			if (global.keyDownPressed) { menu_cursor = (menu_cursor + 1) mod wl_size; io_clear(); }
+			var wl_page = global.macro_what_page;
+			var wl_has_next = (wl_page * 5 + 5) < wl_size;
+			var wl_show_next = wl_has_next || (wl_page > 0);
+			var wl_max_cursor = wl_show_next ? 5 : min(4, wl_size - wl_page * 5 - 1);
+			
+			if (global.keyUpPressed)   {
+				menu_cursor--;
+				if (menu_cursor < 0) menu_cursor = wl_max_cursor;
+				io_clear();
+			}
+			
+			if (global.keyDownPressed) {
+				menu_cursor++;
+				if (menu_cursor > wl_max_cursor) menu_cursor = 0;
+				io_clear();
+			}
 			
 			if (global.keyC) {
-				var w = global.macro_what_list[menu_cursor];
-				var member2 = global.party[global.macro_pending_member];
-				array_push(global.macro_new, {
-					member_name: member2.name,
-					action: { type: w.kind, what: w.label }
-				});
-				//pop SELECT_WHAT and SELECT_ACTION, back to member selection
-				ds_stack_pop(global.submenu_history);
-				ds_stack_pop(global.submenu_history);
-				global.macro_state = MACRO_STATE.SELECT_MEMBER;
-				menu_cursor = 0;
+				if (wl_show_next && menu_cursor == 0) {
+					//NEXT/FIRST paging
+					if (wl_has_next) global.macro_what_page++;
+					else global.macro_what_page = 0;
+					menu_cursor = 0;
+				} else {
+					var actual = wl_page * 5 + menu_cursor - (wl_show_next ? 1 : 0);
+					if (actual >= 0 && actual < wl_size) {
+						var w = global.macro_what_list[actual];
+						var member2 = global.party[global.macro_pending_member];
+						array_push(global.macro_new, {
+							member_name: member2.name,
+							action: { type: w.kind, what: w.label }
+						});
+						ds_stack_pop(global.submenu_history);
+						ds_stack_pop(global.submenu_history);
+						global.macro_state = MACRO_STATE.SELECT_MEMBER;
+						global.macro_what_page = 0;
+						menu_cursor = 0;
+					}
+				}
 				io_clear();
 				global.keyC = false;
 			}
@@ -245,10 +277,13 @@ function scrMacroMenuLogic() {
 }
 
 function scrMacroActionOptions(_member) {
-	var opts = ["ATTACK", "DEFEND"];
-	if (array_length(_member.spells) > 0) array_push(opts, "MAGIC");
-	if (array_length(_member.skills) > 0) array_push(opts, "SKILL");
-	return opts;
+	return ["ATTACK", "DEFEND", "MAGIC", "SKILL"];
+}
+
+function scrMacroOptionEnabled(_member, _opt) {
+	if (_opt == "MAGIC") return array_length(_member.spells) > 0;
+	if (_opt == "SKILL") return array_length(_member.skills) > 0;
+	return true;
 }
 
 //builds the runtime list: AutoAtk preset + all defined slots

@@ -549,13 +549,78 @@ if (global.state == GAME_STATE.IN_GAME_MENU) {
 		var cur = (global.macro_state == MACRO_STATE.CONFIRM) ? global.macro_confirm_cursor : menu_cursor;
 		for (var i = 0; i < array_length(list_labels); i++) {
 			var col = (cur == i) ? c_yellow : c_white;
+			if (global.macro_state == MACRO_STATE.SELECT_ACTION) {
+				if (!scrMacroOptionEnabled(global.party[global.macro_pending_member], list_labels[i])) {
+					col = (cur == i) ? c_olive : c_gray;
+				}
+			} 
 			draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + (i * 20), list_labels[i], col, col, col, col, 1);
 		}
-		var cursor_y = bot_mid.y + 20 + (cur * 20);
-		var cursor_x = bot_mid.x + 12;
-		var _blink_on = (blink_timer mod 40) < 20;
-		draw_sprite((_blink_on ? sCursor : sBlink), 0, cursor_x, cursor_y);
+		if (global.macro_state != MACRO_STATE.SELECT_WHAT) {
+			var cursor_y = bot_mid.y + 20 + (cur * 20);
+			var cursor_x = bot_mid.x + 12;
+			var _blink_on = (blink_timer mod 40) < 20;
+			draw_sprite((_blink_on ? sCursor : sBlink), 0, cursor_x, cursor_y);
+		}
+		
+		//bot mid - paginated spell/skill list for SELECT_WHAT
+		if (global.macro_state == MACRO_STATE.SELECT_WHAT) {
+			var wl_size2 = array_length(global.macro_what_list);
+			var wl_page2 = global.macro_what_page;
+			var wl_start = wl_page2 * 5;
+			var wl_has_next2 = (wl_start + 5) < wl_size2;
+			var wl_show_next2 = wl_has_next2 || (wl_page2 > 0);
+			
+			if (wl_show_next2) {
+				var nlbl = (wl_page2 > 0 && !wl_has_next2) ? "*FIRST*" : "*NEXT*";
+				var ncol = (menu_cursor == 0) ? c_yellow : c_white;
+				draw_text_color(bot_mid.x + 24, bot_mid.y + 20, nlbl, ncol, ncol, ncol, ncol, 1);
+			}
+			for (var wi = 0; wi < 5; wi++) {
+				var slot = wl_start + wi;
+				if (slot >= wl_size2) break;
+				var ci = wi + (wl_show_next2 ? 1 : 0);
+				var wcol = (menu_cursor == ci) ? c_yellow : c_white;
+				draw_text_color(bot_mid.x + 24, bot_mid.y + 20 + ci * 20, global.macro_what_list[slot].label, wcol, wcol, wcol, wcol, 1);
+			}
+			var _wblink = (blink_timer mod 40) < 20;
+			draw_sprite((_wblink ? sCursor : sBlink), 0, bot_mid.x + 12, bot_mid.y + 20 + menu_cursor * 20);
+		}
+		
+		//bot right - selected member preview facing sprite + action icon
+		if (global.macro_state == MACRO_STATE.SELECT_ACTION || global.macro_state == MACRO_STATE.SELECT_WHAT) {
+		var pm_obj = global.partyOrder[global.macro_pending_member];
+		var pm_inst = instance_find(pm_obj, 0);
+		
+		//facing right overworld sprite on left half
+		if (pm_inst != noone && instance_exists(pm_inst)) {
+			var face_spr = pm_inst.sprite[directions.right];
+			if (face_spr != -1 && sprite_exists(face_spr)) {
+				draw_sprite(face_spr, 0, bot_right.x + 16, bot_right.y + lh * 3)
+			}
+		}
+		
+		//action icon on right half reflects the current highlight
+		var icon_spr = -1;
+		if (global.macro_state == MACRO_STATE.SELECT_ACTION) {
+			var opts = scrMacroActionOptions(global.party[global.macro_pending_member]);
+			var sel = opts[menu_cursor];
+			if (sel == "ATTACK") icon_spr = sAttackIcon;
+			else if (sel == "DEFEND") icon_spr = sDefendIcon;
+			else if (sel == "MAGIC") icon_spr = sMagicIcon;
+			else if (sel == "SKILL") icon_spr = sSkillIcon;
+		} else {
+			//SELECT_WHAT - show magic or skill icon based on the list kind
+			if (array_length(global.macro_what_list) > 0) {
+				icon_spr = (global.macro_what_list[0].kind == "magic") ? sMagicIcon : sSkillIcon;
+			}
+		}
+		if (icon_spr != -1 && sprite_exists(icon_spr)) {
+			draw_sprite(icon_spr, 0, bot_right.x + global.card_w - 32, bot_right.y + lh * 3);
+			}
+		}
 	}
+	
 	
 	//reset draw settings
 	draw_set_halign(fa_left);

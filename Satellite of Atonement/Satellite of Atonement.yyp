@@ -85,6 +85,7 @@
     {"id":{"name":"scrBattleMacros","path":"scripts/scrBattleMacros/scrBattleMacros.yy",},},
     {"id":{"name":"scrCharConstructors","path":"scripts/scrCharConstructors/scrCharConstructors.yy",},},
     {"id":{"name":"scrDialogue","path":"scripts/scrDialogue/scrDialogue.yy",},},
+    {"id":{"name":"scrDrawCommon","path":"scripts/scrDrawCommon/scrDrawCommon.yy",},},
     {"id":{"name":"scrEncounterZones","path":"scripts/scrEncounterZones/scrEncounterZones.yy",},},
     {"id":{"name":"scrEnemyConstructors","path":"scripts/scrEnemyConstructors/scrEnemyConstructors.yy",},},
     {"id":{"name":"scrGameOver","path":"scripts/scrGameOver/scrGameOver.yy",},},

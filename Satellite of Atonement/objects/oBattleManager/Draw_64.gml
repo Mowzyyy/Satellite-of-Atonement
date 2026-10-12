@@ -1,18 +1,6 @@
 //============================BATTLE GUI============================
 if (global.state == GAME_STATE.BATTLE) {
-	var lh = 9;//line height for battle cards
-	var lpad = 6;
-	
-	//card dimenisons
-	var card_w = 80;
-	var card_h = 48;
-	var card_gap = 0;
-	var total_card_w = (4 * card_w) + (3 * card_gap);
-	var card_start_x = floor((320 - total_card_w) / 2);
-	var card_y = 240 - card_h;
-	
-	//draw order - midleft, midright, farleft, farright
-	var card_order = [2, 1, 0, 3];
+	scrDrawBattleLayout();
 	
 	//draw the battle background behind everything
 	if (global.battle_background !=-1 && sprite_exists(global.battle_background)) {

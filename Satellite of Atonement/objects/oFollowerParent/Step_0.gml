@@ -30,7 +30,10 @@ if (myRank == 0) {
 	
 	//A switch to define which direction the character is going to move before they move on screen, making it a switch means it checks in order and breaks
 	//Inspired directly by how Phantasy Star IV movement
-	if (state == states.idle) {
+	if (state == states.idle
+		&& !global.move_latch_active
+		&& global.state != GAME_STATE.DIALOGUE
+		&&	global.state != GAME_STATE.CUTSCENE) {
 		
 		//queued slide takes place before reading new input
 	if (global.slide_followup) {

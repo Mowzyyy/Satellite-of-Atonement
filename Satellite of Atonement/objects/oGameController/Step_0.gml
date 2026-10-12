@@ -13,6 +13,12 @@ global.keyC = keyboard_check_pressed (ord("E")) || keyboard_check_pressed(ord("C
 global.keyB = keyboard_check_pressed(ord("Q")) || keyboard_check_pressed(ord("X"));
 global.keyA = keyboard_check_pressed(vk_tab) || keyboard_check_pressed(ord("Z"));
 
+//require-release latch: clear once all held direction keys are released
+if (global.move_latch_active
+	&& !(global.keyLeft || global.keyRight || global.keyUp || global.keyDown)) {
+		global.move_latch_active = false;
+	}
+
 //=================================Transition=================================
 //handle transition fade
 if (global.transition_phase == 0 && global.transition_active) {

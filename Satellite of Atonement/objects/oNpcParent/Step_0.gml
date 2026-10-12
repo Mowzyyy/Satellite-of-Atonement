@@ -1,4 +1,7 @@
-if (global.state != GAME_STATE.OVERWORLD) exit;
+if (global.state != GAME_STATE.OVERWORLD
+	&& global.state != GAME_STATE.DIALOGUE) exit;
+	
+	if (global.dlg_active && global.dlg_speaker == id) exit;
 
 if (interact_cooldown > 0) {
 	interact_cooldown--;
@@ -78,7 +81,7 @@ if (move_type == 1 && walk_timer <= 0) {
 }
 
 //interaction
-if (global.keyC) {
+if (global.keyC && global.state == GAME_STATE.OVERWORLD) {
 	var leader = instance_find(global.partyOrder[0], 0);
 	if (leader != noone && instance_exists(leader)) {
 		var dx = abs(x_pos - leader.x_pos);
@@ -102,7 +105,7 @@ if (global.keyC) {
 			}
 			
 			if (has_dialogue) {
-				scrStartDialogue(dialogue_text, dialogue_portrait);
+				scrStartDialogue(dialogue_text, dialogue_portrait, id);
 			}
 			
 			io_clear();

@@ -1,5 +1,5 @@
 //being a dialogue. _text is the full string; _portrait is a sprite index or -1/undefined
-function scrStartDialogue(_text, _portrait) {
+function scrStartDialogue(_text, _portrait, _speaker = noone) {
 	draw_set_font(ftDefault);
 	global.dlg_portrait				=	(_portrait == undefined) ? -1 : _portrait;
 	global.dlg_pages					=	scrWrapDialogue(_text, 30, 2);
@@ -7,6 +7,8 @@ function scrStartDialogue(_text, _portrait) {
 	global.dlg_words_shown	=	0;
 	global.dlg_word_timer		=	0;
 	global.dlg_active					=	true;
+	global.dlg_speaker				= _speaker;
+	global.move_latch_active	= (global.keyLeft || global.keyRight || global.keyUp || global.keyDown);
 	global.dlg_return_state		=	global.state;
 	global.state								=	GAME_STATE.DIALOGUE;
 }
